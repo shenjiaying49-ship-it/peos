@@ -1,0 +1,3287 @@
+[
+ {
+  "id": "sport_climb-1",
+  "cat": "💪 身体",
+  "name": "岩壁新手",
+  "desc": "完成 攀岩 训练 1 次",
+  "points": 10,
+  "tier": "普通",
+  "stat": "sport_climb",
+  "val": 1
+ },
+ {
+  "id": "sport_climb-5",
+  "cat": "💪 身体",
+  "name": "岩壁常客",
+  "desc": "完成 攀岩 训练 5 次",
+  "points": 25,
+  "tier": "稀有",
+  "stat": "sport_climb",
+  "val": 5
+ },
+ {
+  "id": "sport_climb-15",
+  "cat": "💪 身体",
+  "name": "壁虎",
+  "desc": "完成 攀岩 训练 15 次",
+  "points": 60,
+  "tier": "史诗",
+  "stat": "sport_climb",
+  "val": 15
+ },
+ {
+  "id": "sport_climb-30",
+  "cat": "💪 身体",
+  "name": "岩壁诗人",
+  "desc": "完成 攀岩 训练 30 次",
+  "points": 150,
+  "tier": "传说",
+  "stat": "sport_climb",
+  "val": 30
+ },
+ {
+  "id": "sport_climb-60",
+  "cat": "💪 身体",
+  "name": "地质学家",
+  "desc": "完成 攀岩 训练 60 次",
+  "points": 150,
+  "tier": "传说",
+  "stat": "sport_climb",
+  "val": 60
+ },
+ {
+  "id": "sport_swim-1",
+  "cat": "💪 身体",
+  "name": "戏水者",
+  "desc": "完成 游泳 训练 1 次",
+  "points": 10,
+  "tier": "普通",
+  "stat": "sport_swim",
+  "val": 1
+ },
+ {
+  "id": "sport_swim-5",
+  "cat": "💪 身体",
+  "name": "浪里白条",
+  "desc": "完成 游泳 训练 5 次",
+  "points": 25,
+  "tier": "稀有",
+  "stat": "sport_swim",
+  "val": 5
+ },
+ {
+  "id": "sport_swim-15",
+  "cat": "💪 身体",
+  "name": "人鱼",
+  "desc": "完成 游泳 训练 15 次",
+  "points": 60,
+  "tier": "史诗",
+  "stat": "sport_swim",
+  "val": 15
+ },
+ {
+  "id": "sport_swim-30",
+  "cat": "💪 身体",
+  "name": "深蓝住民",
+  "desc": "完成 游泳 训练 30 次",
+  "points": 150,
+  "tier": "传说",
+  "stat": "sport_swim",
+  "val": 30
+ },
+ {
+  "id": "sport_swim-60",
+  "cat": "💪 身体",
+  "name": "海洋之子",
+  "desc": "完成 游泳 训练 60 次",
+  "points": 150,
+  "tier": "传说",
+  "stat": "sport_swim",
+  "val": 60
+ },
+ {
+  "id": "sport_badminton-1",
+  "cat": "💪 身体",
+  "name": "挥拍者",
+  "desc": "完成 羽毛球 训练 1 次",
+  "points": 10,
+  "tier": "普通",
+  "stat": "sport_badminton",
+  "val": 1
+ },
+ {
+  "id": "sport_badminton-5",
+  "cat": "💪 身体",
+  "name": "球场常客",
+  "desc": "完成 羽毛球 训练 5 次",
+  "points": 25,
+  "tier": "稀有",
+  "stat": "sport_badminton",
+  "val": 5
+ },
+ {
+  "id": "sport_badminton-15",
+  "cat": "💪 身体",
+  "name": "杀球手",
+  "desc": "完成 羽毛球 训练 15 次",
+  "points": 60,
+  "tier": "史诗",
+  "stat": "sport_badminton",
+  "val": 15
+ },
+ {
+  "id": "sport_badminton-30",
+  "cat": "💪 身体",
+  "name": "羽坛老狐狸",
+  "desc": "完成 羽毛球 训练 30 次",
+  "points": 150,
+  "tier": "传说",
+  "stat": "sport_badminton",
+  "val": 30
+ },
+ {
+  "id": "sport_badminton-60",
+  "cat": "💪 身体",
+  "name": "球场魔术师",
+  "desc": "完成 羽毛球 训练 60 次",
+  "points": 150,
+  "tier": "传说",
+  "stat": "sport_badminton",
+  "val": 60
+ },
+ {
+  "id": "sport_slope-1",
+  "cat": "💪 身体",
+  "name": "爬坡者",
+  "desc": "完成 爬坡 训练 1 次",
+  "points": 10,
+  "tier": "普通",
+  "stat": "sport_slope",
+  "val": 1
+ },
+ {
+  "id": "sport_slope-5",
+  "cat": "💪 身体",
+  "name": "登坡常客",
+  "desc": "完成 爬坡 训练 5 次",
+  "points": 25,
+  "tier": "稀有",
+  "stat": "sport_slope",
+  "val": 5
+ },
+ {
+  "id": "sport_slope-15",
+  "cat": "💪 身体",
+  "name": "坡道杀手",
+  "desc": "完成 爬坡 训练 15 次",
+  "points": 60,
+  "tier": "史诗",
+  "stat": "sport_slope",
+  "val": 15
+ },
+ {
+  "id": "sport_slope-30",
+  "cat": "💪 身体",
+  "name": "山地山羊",
+  "desc": "完成 爬坡 训练 30 次",
+  "points": 150,
+  "tier": "传说",
+  "stat": "sport_slope",
+  "val": 30
+ },
+ {
+  "id": "sport_slope-60",
+  "cat": "💪 身体",
+  "name": "等高线征服者",
+  "desc": "完成 爬坡 训练 60 次",
+  "points": 150,
+  "tier": "传说",
+  "stat": "sport_slope",
+  "val": 60
+ },
+ {
+  "id": "publish-1",
+  "cat": "🚀 事业",
+  "name": "第一声啼鸣",
+  "desc": "累计发布内容 1 篇",
+  "points": 10,
+  "tier": "普通",
+  "stat": "publish",
+  "val": 1
+ },
+ {
+  "id": "publish-3",
+  "cat": "🚀 事业",
+  "name": "内容工匠",
+  "desc": "累计发布内容 3 篇",
+  "points": 25,
+  "tier": "稀有",
+  "stat": "publish",
+  "val": 3
+ },
+ {
+  "id": "publish-8",
+  "cat": "🚀 事业",
+  "name": "稳定输出者",
+  "desc": "累计发布内容 8 篇",
+  "points": 60,
+  "tier": "史诗",
+  "stat": "publish",
+  "val": 8
+ },
+ {
+  "id": "publish-15",
+  "cat": "🚀 事业",
+  "name": "创作机器",
+  "desc": "累计发布内容 15 篇",
+  "points": 150,
+  "tier": "传说",
+  "stat": "publish",
+  "val": 15
+ },
+ {
+  "id": "publish-30",
+  "cat": "🚀 事业",
+  "name": "叙事者",
+  "desc": "累计发布内容 30 篇",
+  "points": 150,
+  "tier": "传说",
+  "stat": "publish",
+  "val": 30
+ },
+ {
+  "id": "publish-50",
+  "cat": "🚀 事业",
+  "name": "传说作者",
+  "desc": "累计发布内容 50 篇",
+  "points": 150,
+  "tier": "传说",
+  "stat": "publish",
+  "val": 50
+ },
+ {
+  "id": "topics_added-1",
+  "cat": "🚀 事业",
+  "name": "选题捕手",
+  "desc": "手动添加待写选题 1 条",
+  "points": 10,
+  "tier": "普通",
+  "stat": "topics_added",
+  "val": 1
+ },
+ {
+  "id": "topics_added-10",
+  "cat": "🚀 事业",
+  "name": "选题收藏家",
+  "desc": "手动添加待写选题 10 条",
+  "points": 25,
+  "tier": "稀有",
+  "stat": "topics_added",
+  "val": 10
+ },
+ {
+  "id": "topics_added-50",
+  "cat": "🚀 事业",
+  "name": "灵感猎人",
+  "desc": "手动添加待写选题 50 条",
+  "points": 60,
+  "tier": "史诗",
+  "stat": "topics_added",
+  "val": 50
+ },
+ {
+  "id": "tasks_done-1",
+  "cat": "🐸 闭环",
+  "name": "第一次闭环",
+  "desc": "累计完成任务 1 项",
+  "points": 10,
+  "tier": "普通",
+  "stat": "tasks_done",
+  "val": 1
+ },
+ {
+  "id": "tasks_done-10",
+  "cat": "🐸 闭环",
+  "name": "节奏建立者",
+  "desc": "累计完成任务 10 项",
+  "points": 25,
+  "tier": "稀有",
+  "stat": "tasks_done",
+  "val": 10
+ },
+ {
+  "id": "tasks_done-50",
+  "cat": "🐸 闭环",
+  "name": "闭环惯犯",
+  "desc": "累计完成任务 50 项",
+  "points": 60,
+  "tier": "史诗",
+  "stat": "tasks_done",
+  "val": 50
+ },
+ {
+  "id": "tasks_done-150",
+  "cat": "🐸 闭环",
+  "name": "系统本身",
+  "desc": "累计完成任务 150 项",
+  "points": 150,
+  "tier": "传说",
+  "stat": "tasks_done",
+  "val": 150
+ },
+ {
+  "id": "tasks_done-400",
+  "cat": "🐸 闭环",
+  "name": "永动机",
+  "desc": "累计完成任务 400 项",
+  "points": 150,
+  "tier": "传说",
+  "stat": "tasks_done",
+  "val": 400
+ },
+ {
+  "id": "streak-3",
+  "cat": "🐸 闭环",
+  "name": "三日之约",
+  "desc": "连续 3 天有任务完成或日记",
+  "points": 10,
+  "tier": "普通",
+  "stat": "streak",
+  "val": 3
+ },
+ {
+  "id": "streak-7",
+  "cat": "🐸 闭环",
+  "name": "一周不断",
+  "desc": "连续 7 天有任务完成或日记",
+  "points": 25,
+  "tier": "稀有",
+  "stat": "streak",
+  "val": 7
+ },
+ {
+  "id": "streak-21",
+  "cat": "🐸 闭环",
+  "name": "二十一天铸骨",
+  "desc": "连续 21 天有任务完成或日记",
+  "points": 60,
+  "tier": "史诗",
+  "stat": "streak",
+  "val": 21
+ },
+ {
+  "id": "streak-60",
+  "cat": "🐸 闭环",
+  "name": "两月成钢",
+  "desc": "连续 60 天有任务完成或日记",
+  "points": 150,
+  "tier": "传说",
+  "stat": "streak",
+  "val": 60
+ },
+ {
+  "id": "streak-100",
+  "cat": "🐸 闭环",
+  "name": "百日成瘾",
+  "desc": "连续 100 天有任务完成或日记",
+  "points": 150,
+  "tier": "传说",
+  "stat": "streak",
+  "val": 100
+ },
+ {
+  "id": "quad_mind-5",
+  "cat": "🐸 闭环",
+  "name": "心智·启程",
+  "desc": "完成 心智象限任务 5 项",
+  "points": 10,
+  "tier": "普通",
+  "stat": "quad_mind",
+  "val": 5
+ },
+ {
+  "id": "quad_mind-25",
+  "cat": "🐸 闭环",
+  "name": "心智·常客",
+  "desc": "完成 心智象限任务 25 项",
+  "points": 25,
+  "tier": "稀有",
+  "stat": "quad_mind",
+  "val": 25
+ },
+ {
+  "id": "quad_mind-75",
+  "cat": "🐸 闭环",
+  "name": "心智·专家",
+  "desc": "完成 心智象限任务 75 项",
+  "points": 60,
+  "tier": "史诗",
+  "stat": "quad_mind",
+  "val": 75
+ },
+ {
+  "id": "quad_mind-200",
+  "cat": "🐸 闭环",
+  "name": "心智·大师",
+  "desc": "完成 心智象限任务 200 项",
+  "points": 150,
+  "tier": "传说",
+  "stat": "quad_mind",
+  "val": 200
+ },
+ {
+  "id": "quad_mind-500",
+  "cat": "🐸 闭环",
+  "name": "心智·宗师",
+  "desc": "完成 心智象限任务 500 项",
+  "points": 150,
+  "tier": "传说",
+  "stat": "quad_mind",
+  "val": 500
+ },
+ {
+  "id": "quad_body-5",
+  "cat": "🐸 闭环",
+  "name": "身体·启程",
+  "desc": "完成 身体象限任务 5 项",
+  "points": 10,
+  "tier": "普通",
+  "stat": "quad_body",
+  "val": 5
+ },
+ {
+  "id": "quad_body-25",
+  "cat": "🐸 闭环",
+  "name": "身体·常客",
+  "desc": "完成 身体象限任务 25 项",
+  "points": 25,
+  "tier": "稀有",
+  "stat": "quad_body",
+  "val": 25
+ },
+ {
+  "id": "quad_body-75",
+  "cat": "🐸 闭环",
+  "name": "身体·专家",
+  "desc": "完成 身体象限任务 75 项",
+  "points": 60,
+  "tier": "史诗",
+  "stat": "quad_body",
+  "val": 75
+ },
+ {
+  "id": "quad_body-200",
+  "cat": "🐸 闭环",
+  "name": "身体·大师",
+  "desc": "完成 身体象限任务 200 项",
+  "points": 150,
+  "tier": "传说",
+  "stat": "quad_body",
+  "val": 200
+ },
+ {
+  "id": "quad_body-500",
+  "cat": "🐸 闭环",
+  "name": "身体·宗师",
+  "desc": "完成 身体象限任务 500 项",
+  "points": 150,
+  "tier": "传说",
+  "stat": "quad_body",
+  "val": 500
+ },
+ {
+  "id": "quad_spirit-5",
+  "cat": "🐸 闭环",
+  "name": "精神·启程",
+  "desc": "完成 精神象限任务 5 项",
+  "points": 10,
+  "tier": "普通",
+  "stat": "quad_spirit",
+  "val": 5
+ },
+ {
+  "id": "quad_spirit-25",
+  "cat": "🐸 闭环",
+  "name": "精神·常客",
+  "desc": "完成 精神象限任务 25 项",
+  "points": 25,
+  "tier": "稀有",
+  "stat": "quad_spirit",
+  "val": 25
+ },
+ {
+  "id": "quad_spirit-75",
+  "cat": "🐸 闭环",
+  "name": "精神·专家",
+  "desc": "完成 精神象限任务 75 项",
+  "points": 60,
+  "tier": "史诗",
+  "stat": "quad_spirit",
+  "val": 75
+ },
+ {
+  "id": "quad_spirit-200",
+  "cat": "🐸 闭环",
+  "name": "精神·大师",
+  "desc": "完成 精神象限任务 200 项",
+  "points": 150,
+  "tier": "传说",
+  "stat": "quad_spirit",
+  "val": 200
+ },
+ {
+  "id": "quad_spirit-500",
+  "cat": "🐸 闭环",
+  "name": "精神·宗师",
+  "desc": "完成 精神象限任务 500 项",
+  "points": 150,
+  "tier": "传说",
+  "stat": "quad_spirit",
+  "val": 500
+ },
+ {
+  "id": "quad_vocation-5",
+  "cat": "🐸 闭环",
+  "name": "事业·启程",
+  "desc": "完成 事业象限任务 5 项",
+  "points": 10,
+  "tier": "普通",
+  "stat": "quad_vocation",
+  "val": 5
+ },
+ {
+  "id": "quad_vocation-25",
+  "cat": "🐸 闭环",
+  "name": "事业·常客",
+  "desc": "完成 事业象限任务 25 项",
+  "points": 25,
+  "tier": "稀有",
+  "stat": "quad_vocation",
+  "val": 25
+ },
+ {
+  "id": "quad_vocation-75",
+  "cat": "🐸 闭环",
+  "name": "事业·专家",
+  "desc": "完成 事业象限任务 75 项",
+  "points": 60,
+  "tier": "史诗",
+  "stat": "quad_vocation",
+  "val": 75
+ },
+ {
+  "id": "quad_vocation-200",
+  "cat": "🐸 闭环",
+  "name": "事业·大师",
+  "desc": "完成 事业象限任务 200 项",
+  "points": 150,
+  "tier": "传说",
+  "stat": "quad_vocation",
+  "val": 200
+ },
+ {
+  "id": "quad_vocation-500",
+  "cat": "🐸 闭环",
+  "name": "事业·宗师",
+  "desc": "完成 事业象限任务 500 项",
+  "points": 150,
+  "tier": "传说",
+  "stat": "quad_vocation",
+  "val": 500
+ },
+ {
+  "id": "diary_days-1",
+  "cat": "📖 记录",
+  "name": "第一页日记",
+  "desc": "写日记 1 天",
+  "points": 10,
+  "tier": "普通",
+  "stat": "diary_days",
+  "val": 1
+ },
+ {
+  "id": "diary_days-7",
+  "cat": "📖 记录",
+  "name": "一周记录者",
+  "desc": "写日记 7 天",
+  "points": 25,
+  "tier": "稀有",
+  "stat": "diary_days",
+  "val": 7
+ },
+ {
+  "id": "diary_days-30",
+  "cat": "📖 记录",
+  "name": "月度档案员",
+  "desc": "写日记 30 天",
+  "points": 60,
+  "tier": "史诗",
+  "stat": "diary_days",
+  "val": 30
+ },
+ {
+  "id": "diary_days-100",
+  "cat": "📖 记录",
+  "name": "百日史官",
+  "desc": "写日记 100 天",
+  "points": 150,
+  "tier": "传说",
+  "stat": "diary_days",
+  "val": 100
+ },
+ {
+  "id": "diary_days-365",
+  "cat": "📖 记录",
+  "name": "年度编年史家",
+  "desc": "写日记 365 天",
+  "points": 150,
+  "tier": "传说",
+  "stat": "diary_days",
+  "val": 365
+ },
+ {
+  "id": "data_days-1",
+  "cat": "📖 记录",
+  "name": "称重第一课",
+  "desc": "回填身体数据 1 天",
+  "points": 10,
+  "tier": "普通",
+  "stat": "data_days",
+  "val": 1
+ },
+ {
+  "id": "data_days-7",
+  "cat": "📖 记录",
+  "name": "数据信徒",
+  "desc": "回填身体数据 7 天",
+  "points": 25,
+  "tier": "稀有",
+  "stat": "data_days",
+  "val": 7
+ },
+ {
+  "id": "data_days-30",
+  "cat": "📖 记录",
+  "name": "量化人生",
+  "desc": "回填身体数据 30 天",
+  "points": 60,
+  "tier": "史诗",
+  "stat": "data_days",
+  "val": 30
+ },
+ {
+  "id": "earth_one-0",
+  "cat": "🌍 地球Online",
+  "name": "地球任务·抬头看云 3 分钟，给其",
+  "desc": "首次完成：抬头看云 3 分钟，给其中一朵起个名字",
+  "points": 15,
+  "tier": "稀有",
+  "stat": "earth_one",
+  "val": 0
+ },
+ {
+  "id": "earth_one-1",
+  "cat": "🌍 地球Online",
+  "name": "地球任务·赤脚在草地或地板上站 1",
+  "desc": "首次完成：赤脚在草地或地板上站 1 分钟",
+  "points": 15,
+  "tier": "稀有",
+  "stat": "earth_one",
+  "val": 1
+ },
+ {
+  "id": "earth_one-2",
+  "cat": "🌍 地球Online",
+  "name": "地球任务·给一位朋友发一句歌词，不",
+  "desc": "首次完成：给一位朋友发一句歌词，不解释",
+  "points": 15,
+  "tier": "稀有",
+  "stat": "earth_one",
+  "val": 2
+ },
+ {
+  "id": "earth_one-3",
+  "cat": "🌍 地球Online",
+  "name": "地球任务·和食堂阿姨 / 便利店店",
+  "desc": "首次完成：和食堂阿姨 / 便利店店员说谢谢并问今天过得如何",
+  "points": 15,
+  "tier": "稀有",
+  "stat": "earth_one",
+  "val": 3
+ },
+ {
+  "id": "earth_one-4",
+  "cat": "🌍 地球Online",
+  "name": "地球任务·走一条没走过的路回宿舍",
+  "desc": "首次完成：走一条没走过的路回宿舍",
+  "points": 15,
+  "tier": "稀有",
+  "stat": "earth_one",
+  "val": 4
+ },
+ {
+  "id": "earth_one-5",
+  "cat": "🌍 地球Online",
+  "name": "地球任务·用非惯用手刷一次牙",
+  "desc": "首次完成：用非惯用手刷一次牙",
+  "points": 15,
+  "tier": "稀有",
+  "stat": "earth_one",
+  "val": 5
+ },
+ {
+  "id": "earth_one-6",
+  "cat": "🌍 地球Online",
+  "name": "地球任务·拍下今天天空最好看的一刻",
+  "desc": "首次完成：拍下今天天空最好看的一刻",
+  "points": 15,
+  "tier": "稀有",
+  "stat": "earth_one",
+  "val": 6
+ },
+ {
+  "id": "earth_one-7",
+  "cat": "🌍 地球Online",
+  "name": "地球任务·给三年后的自己写一句话（",
+  "desc": "首次完成：给三年后的自己写一句话（存进日记）",
+  "points": 15,
+  "tier": "稀有",
+  "stat": "earth_one",
+  "val": 7
+ },
+ {
+  "id": "earth_one-8",
+  "cat": "🌍 地球Online",
+  "name": "地球任务·尝试一种没喝过的饮品",
+  "desc": "首次完成：尝试一种没喝过的饮品",
+  "points": 15,
+  "tier": "稀有",
+  "stat": "earth_one",
+  "val": 8
+ },
+ {
+  "id": "earth_one-9",
+  "cat": "🌍 地球Online",
+  "name": "地球任务·在纸上画今天遇到的一个人",
+  "desc": "首次完成：在纸上画今天遇到的一个人（画得烂也算）",
+  "points": 15,
+  "tier": "稀有",
+  "stat": "earth_one",
+  "val": 9
+ },
+ {
+  "id": "earth_one-10",
+  "cat": "🌍 地球Online",
+  "name": "地球任务·盯着窗外发呆 5 分钟，",
+  "desc": "首次完成：盯着窗外发呆 5 分钟，不掏手机",
+  "points": 15,
+  "tier": "稀有",
+  "stat": "earth_one",
+  "val": 10
+ },
+ {
+  "id": "earth_one-11",
+  "cat": "🌍 地球Online",
+  "name": "地球任务·把手机调成灰度模式 1 ",
+  "desc": "首次完成：把手机调成灰度模式 1 小时",
+  "points": 15,
+  "tier": "稀有",
+  "stat": "earth_one",
+  "val": 11
+ },
+ {
+  "id": "earth_one-12",
+  "cat": "🌍 地球Online",
+  "name": "地球任务·学一句粤语/客家话并当场",
+  "desc": "首次完成：学一句粤语/客家话并当场用掉",
+  "points": 15,
+  "tier": "稀有",
+  "stat": "earth_one",
+  "val": 12
+ },
+ {
+  "id": "earth_one-13",
+  "cat": "🌍 地球Online",
+  "name": "地球任务·在校园里找一个安静的角落",
+  "desc": "首次完成：在校园里找一个安静的角落坐 10 分钟",
+  "points": 15,
+  "tier": "稀有",
+  "stat": "earth_one",
+  "val": 13
+ },
+ {
+  "id": "earth_one-14",
+  "cat": "🌍 地球Online",
+  "name": "地球任务·认真听一首歌的完整张专辑",
+  "desc": "首次完成：认真听一首歌的完整张专辑顺序（不切歌）",
+  "points": 15,
+  "tier": "稀有",
+  "stat": "earth_one",
+  "val": 14
+ },
+ {
+  "id": "earth_one-15",
+  "cat": "🌍 地球Online",
+  "name": "地球任务·帮一个陌生人做一件 30",
+  "desc": "首次完成：帮一个陌生人做一件 30 秒内的小事",
+  "points": 15,
+  "tier": "稀有",
+  "stat": "earth_one",
+  "val": 15
+ },
+ {
+  "id": "earth_one-16",
+  "cat": "🌍 地球Online",
+  "name": "地球任务·把桌面收拾到只剩 3 样",
+  "desc": "首次完成：把桌面收拾到只剩 3 样东西",
+  "points": 15,
+  "tier": "稀有",
+  "stat": "earth_one",
+  "val": 16
+ },
+ {
+  "id": "earth_one-17",
+  "cat": "🌍 地球Online",
+  "name": "地球任务·写下 3 样今天值得感谢",
+  "desc": "首次完成：写下 3 样今天值得感谢的具体小事",
+  "points": 15,
+  "tier": "稀有",
+  "stat": "earth_one",
+  "val": 17
+ },
+ {
+  "id": "earth_one-18",
+  "cat": "🌍 地球Online",
+  "name": "地球任务·中午吃饭时不看任何屏幕",
+  "desc": "首次完成：中午吃饭时不看任何屏幕",
+  "points": 15,
+  "tier": "稀有",
+  "stat": "earth_one",
+  "val": 18
+ },
+ {
+  "id": "earth_one-19",
+  "cat": "🌍 地球Online",
+  "name": "地球任务·给爸妈发一张今天拍的照片",
+  "desc": "首次完成：给爸妈发一张今天拍的照片，配一句话",
+  "points": 15,
+  "tier": "稀有",
+  "stat": "earth_one",
+  "val": 19
+ },
+ {
+  "id": "earth_one-20",
+  "cat": "🌍 地球Online",
+  "name": "地球任务·尝试闭眼单腿站立 30 ",
+  "desc": "首次完成：尝试闭眼单腿站立 30 秒",
+  "points": 15,
+  "tier": "稀有",
+  "stat": "earth_one",
+  "val": 20
+ },
+ {
+  "id": "earth_one-21",
+  "cat": "🌍 地球Online",
+  "name": "地球任务·把今天最烦的事写成一句诗",
+  "desc": "首次完成：把今天最烦的事写成一句诗（烂诗也行）",
+  "points": 15,
+  "tier": "稀有",
+  "stat": "earth_one",
+  "val": 21
+ },
+ {
+  "id": "earth_one-22",
+  "cat": "🌍 地球Online",
+  "name": "地球任务·在图书馆随手翻开一本书，",
+  "desc": "首次完成：在图书馆随手翻开一本书，抄下第一段打动你的话",
+  "points": 15,
+  "tier": "稀有",
+  "stat": "earth_one",
+  "val": 22
+ },
+ {
+  "id": "earth_one-23",
+  "cat": "🌍 地球Online",
+  "name": "地球任务·日落时分停下手头所有事看",
+  "desc": "首次完成：日落时分停下手头所有事看太阳下山",
+  "points": 15,
+  "tier": "稀有",
+  "stat": "earth_one",
+  "val": 23
+ },
+ {
+  "id": "earth_one-24",
+  "cat": "🌍 地球Online",
+  "name": "地球任务·给自己买一个小小的、无用",
+  "desc": "首次完成：给自己买一个小小的、无用的、喜欢的东西（≤10 元）",
+  "points": 15,
+  "tier": "稀有",
+  "stat": "earth_one",
+  "val": 24
+ },
+ {
+  "id": "earth_one-25",
+  "cat": "🌍 地球Online",
+  "name": "地球任务·在电梯/楼道里对陌生人微",
+  "desc": "首次完成：在电梯/楼道里对陌生人微笑点头",
+  "points": 15,
+  "tier": "稀有",
+  "stat": "earth_one",
+  "val": 25
+ },
+ {
+  "id": "earth_one-26",
+  "cat": "🌍 地球Online",
+  "name": "地球任务·今天走路时刻意放慢 20",
+  "desc": "首次完成：今天走路时刻意放慢 20% 速度",
+  "points": 15,
+  "tier": "稀有",
+  "stat": "earth_one",
+  "val": 26
+ },
+ {
+  "id": "earth_one-27",
+  "cat": "🌍 地球Online",
+  "name": "地球任务·给一部看过的剧/书打一个",
+  "desc": "首次完成：给一部看过的剧/书打一个真实的分",
+  "points": 15,
+  "tier": "稀有",
+  "stat": "earth_one",
+  "val": 27
+ },
+ {
+  "id": "earth_one-28",
+  "cat": "🌍 地球Online",
+  "name": "地球任务·伸一个大大的懒腰并哼出声",
+  "desc": "首次完成：伸一个大大的懒腰并哼出声",
+  "points": 15,
+  "tier": "稀有",
+  "stat": "earth_one",
+  "val": 28
+ },
+ {
+  "id": "earth_one-29",
+  "cat": "🌍 地球Online",
+  "name": "地球任务·用语音备忘录录 30 秒",
+  "desc": "首次完成：用语音备忘录录 30 秒今天的环境音",
+  "points": 15,
+  "tier": "稀有",
+  "stat": "earth_one",
+  "val": 29
+ },
+ {
+  "id": "earth_one-30",
+  "cat": "🌍 地球Online",
+  "name": "地球任务·找一个陌生人问路（哪怕你",
+  "desc": "首次完成：找一个陌生人问路（哪怕你知道路）",
+  "points": 15,
+  "tier": "稀有",
+  "stat": "earth_one",
+  "val": 30
+ },
+ {
+  "id": "earth_one-31",
+  "cat": "🌍 地球Online",
+  "name": "地球任务·把手机壁纸换成今天拍的照",
+  "desc": "首次完成：把手机壁纸换成今天拍的照片",
+  "points": 15,
+  "tier": "稀有",
+  "stat": "earth_one",
+  "val": 31
+ },
+ {
+  "id": "earth_one-32",
+  "cat": "🌍 地球Online",
+  "name": "地球任务·吃一样你小时候爱吃但现在",
+  "desc": "首次完成：吃一样你小时候爱吃但现在很少吃的东西",
+  "points": 15,
+  "tier": "稀有",
+  "stat": "earth_one",
+  "val": 32
+ },
+ {
+  "id": "earth_one-33",
+  "cat": "🌍 地球Online",
+  "name": "地球任务·写下你最想拥有的一项超能",
+  "desc": "首次完成：写下你最想拥有的一项超能力，和它的代价",
+  "points": 15,
+  "tier": "稀有",
+  "stat": "earth_one",
+  "val": 33
+ },
+ {
+  "id": "earth_one-34",
+  "cat": "🌍 地球Online",
+  "name": "地球任务·在雨里走 3 分钟（没雨",
+  "desc": "首次完成：在雨里走 3 分钟（没雨就作罢，看云 3 分钟）",
+  "points": 15,
+  "tier": "稀有",
+  "stat": "earth_one",
+  "val": 34
+ },
+ {
+  "id": "earth_one-35",
+  "cat": "🌍 地球Online",
+  "name": "地球任务·给一位很久没联系的人发一",
+  "desc": "首次完成：给一位很久没联系的人发一句「突然想起你」",
+  "points": 15,
+  "tier": "稀有",
+  "stat": "earth_one",
+  "val": 35
+ },
+ {
+  "id": "earth_one-36",
+  "cat": "🌍 地球Online",
+  "name": "地球任务·今天上楼梯时每次跨两级（",
+  "desc": "首次完成：今天上楼梯时每次跨两级（注意安全）",
+  "points": 15,
+  "tier": "稀有",
+  "stat": "earth_one",
+  "val": 36
+ },
+ {
+  "id": "earth_one-37",
+  "cat": "🌍 地球Online",
+  "name": "地球任务·认真读一款食品的配料表，",
+  "desc": "首次完成：认真读一款食品的配料表，找出你不认识的成分",
+  "points": 15,
+  "tier": "稀有",
+  "stat": "earth_one",
+  "val": 37
+ },
+ {
+  "id": "earth_one-38",
+  "cat": "🌍 地球Online",
+  "name": "地球任务·把一件今天纠结的小事在 ",
+  "desc": "首次完成：把一件今天纠结的小事在 10 秒内决定掉",
+  "points": 15,
+  "tier": "稀有",
+  "stat": "earth_one",
+  "val": 38
+ },
+ {
+  "id": "earth_one-39",
+  "cat": "🌍 地球Online",
+  "name": "地球任务·躺草地/长椅上听 2 首",
+  "desc": "首次完成：躺草地/长椅上听 2 首歌的时间",
+  "points": 15,
+  "tier": "稀有",
+  "stat": "earth_one",
+  "val": 39
+ },
+ {
+  "id": "earth_one-40",
+  "cat": "🌍 地球Online",
+  "name": "地球任务·给今天的自己打分并用一个",
+  "desc": "首次完成：给今天的自己打分并用一个词形容今天",
+  "points": 15,
+  "tier": "稀有",
+  "stat": "earth_one",
+  "val": 40
+ },
+ {
+  "id": "earth_one-41",
+  "cat": "🌍 地球Online",
+  "name": "地球任务·尝试用左手写字写下今天的",
+  "desc": "首次完成：尝试用左手写字写下今天的日期",
+  "points": 15,
+  "tier": "稀有",
+  "stat": "earth_one",
+  "val": 41
+ },
+ {
+  "id": "earth_one-42",
+  "cat": "🌍 地球Online",
+  "name": "地球任务·在人群中观察一个人的走路",
+  "desc": "首次完成：在人群中观察一个人的走路姿态并脑补他的故事",
+  "points": 15,
+  "tier": "稀有",
+  "stat": "earth_one",
+  "val": 42
+ },
+ {
+  "id": "earth_one-43",
+  "cat": "🌍 地球Online",
+  "name": "地球任务·喝一杯纯净水，慢慢喝完，",
+  "desc": "首次完成：喝一杯纯净水，慢慢喝完，什么都不干",
+  "points": 15,
+  "tier": "稀有",
+  "stat": "earth_one",
+  "val": 43
+ },
+ {
+  "id": "earth_one-44",
+  "cat": "🌍 地球Online",
+  "name": "地球任务·今天比昨天早睡 15 分",
+  "desc": "首次完成：今天比昨天早睡 15 分钟",
+  "points": 15,
+  "tier": "稀有",
+  "stat": "earth_one",
+  "val": 44
+ },
+ {
+  "id": "earth_one-45",
+  "cat": "🌍 地球Online",
+  "name": "地球任务·洗澡时唱一首歌（跑调加成",
+  "desc": "首次完成：洗澡时唱一首歌（跑调加成）",
+  "points": 15,
+  "tier": "稀有",
+  "stat": "earth_one",
+  "val": 45
+ },
+ {
+  "id": "earth_one-46",
+  "cat": "🌍 地球Online",
+  "name": "地球任务·把最近一张拍糊的照片设为",
+  "desc": "首次完成：把最近一张拍糊的照片设为联系人头像（自用彩蛋）",
+  "points": 15,
+  "tier": "稀有",
+  "stat": "earth_one",
+  "val": 46
+ },
+ {
+  "id": "earth_one-47",
+  "cat": "🌍 地球Online",
+  "name": "地球任务·向一个 AI 提一个你从",
+  "desc": "首次完成：向一个 AI 提一个你从没问过人类的怪问题",
+  "points": 15,
+  "tier": "稀有",
+  "stat": "earth_one",
+  "val": 47
+ },
+ {
+  "id": "earth_one-48",
+  "cat": "🌍 地球Online",
+  "name": "地球任务·数一数今天说了几次「谢谢",
+  "desc": "首次完成：数一数今天说了几次「谢谢」",
+  "points": 15,
+  "tier": "稀有",
+  "stat": "earth_one",
+  "val": 48
+ },
+ {
+  "id": "earth_one-49",
+  "cat": "🌍 地球Online",
+  "name": "地球任务·吃水果时认真感受它的味道",
+  "desc": "首次完成：吃水果时认真感受它的味道，不刷手机",
+  "points": 15,
+  "tier": "稀有",
+  "stat": "earth_one",
+  "val": 49
+ },
+ {
+  "id": "earth_one-50",
+  "cat": "🌍 地球Online",
+  "name": "地球任务·把手机通知关掉一整个晚上",
+  "desc": "首次完成：把手机通知关掉一整个晚上",
+  "points": 15,
+  "tier": "稀有",
+  "stat": "earth_one",
+  "val": 50
+ },
+ {
+  "id": "earth_one-51",
+  "cat": "🌍 地球Online",
+  "name": "地球任务·写下你最讨厌的营销套路（",
+  "desc": "首次完成：写下你最讨厌的营销套路（职业病彩蛋）",
+  "points": 15,
+  "tier": "稀有",
+  "stat": "earth_one",
+  "val": 51
+ },
+ {
+  "id": "earth_one-52",
+  "cat": "🌍 地球Online",
+  "name": "地球任务·对着镜子夸自己一句具体的",
+  "desc": "首次完成：对着镜子夸自己一句具体的优点",
+  "points": 15,
+  "tier": "稀有",
+  "stat": "earth_one",
+  "val": 52
+ },
+ {
+  "id": "earth_one-53",
+  "cat": "🌍 地球Online",
+  "name": "地球任务·今天的每一段对话里多问一",
+  "desc": "首次完成：今天的每一段对话里多问一个「为什么」",
+  "points": 15,
+  "tier": "稀有",
+  "stat": "earth_one",
+  "val": 53
+ },
+ {
+  "id": "earth_one-54",
+  "cat": "🌍 地球Online",
+  "name": "地球任务·用 10 个词总结这个星",
+  "desc": "首次完成：用 10 个词总结这个星期",
+  "points": 15,
+  "tier": "稀有",
+  "stat": "earth_one",
+  "val": 54
+ },
+ {
+  "id": "earth_one-55",
+  "cat": "🌍 地球Online",
+  "name": "地球任务·学一个新单词并找机会用掉",
+  "desc": "首次完成：学一个新单词并找机会用掉它",
+  "points": 15,
+  "tier": "稀有",
+  "stat": "earth_one",
+  "val": 55
+ },
+ {
+  "id": "earth_one-56",
+  "cat": "🌍 地球Online",
+  "name": "地球任务·整理相册：删掉 20 张",
+  "desc": "首次完成：整理相册：删掉 20 张废片",
+  "points": 15,
+  "tier": "稀有",
+  "stat": "earth_one",
+  "val": 56
+ },
+ {
+  "id": "earth_one-57",
+  "cat": "🌍 地球Online",
+  "name": "地球任务·今天不抱怨挑战（忍不住就",
+  "desc": "首次完成：今天不抱怨挑战（忍不住就重置计数）",
+  "points": 15,
+  "tier": "稀有",
+  "stat": "earth_one",
+  "val": 57
+ },
+ {
+  "id": "earth_one-58",
+  "cat": "🌍 地球Online",
+  "name": "地球任务·给自己 5 分钟规划一个",
+  "desc": "首次完成：给自己 5 分钟规划一个不可能的计划",
+  "points": 15,
+  "tier": "稀有",
+  "stat": "earth_one",
+  "val": 58
+ },
+ {
+  "id": "earth_one-59",
+  "cat": "🌍 地球Online",
+  "name": "地球任务·在日记里写下一句你今天听",
+  "desc": "首次完成：在日记里写下一句你今天听到的好句子",
+  "points": 15,
+  "tier": "稀有",
+  "stat": "earth_one",
+  "val": 59
+ },
+ {
+  "id": "books_done-1",
+  "cat": "📚 书影",
+  "name": "开卷",
+  "desc": "读完并记录 1 本书",
+  "points": 10,
+  "tier": "普通",
+  "stat": "books_done",
+  "val": 1
+ },
+ {
+  "id": "books_done-3",
+  "cat": "📚 书影",
+  "name": "读者",
+  "desc": "读完并记录 3 本书",
+  "points": 25,
+  "tier": "稀有",
+  "stat": "books_done",
+  "val": 3
+ },
+ {
+  "id": "books_done-10",
+  "cat": "📚 书影",
+  "name": "书虫",
+  "desc": "读完并记录 10 本书",
+  "points": 60,
+  "tier": "史诗",
+  "stat": "books_done",
+  "val": 10
+ },
+ {
+  "id": "books_done-30",
+  "cat": "📚 书影",
+  "name": "藏书家",
+  "desc": "读完并记录 30 本书",
+  "points": 150,
+  "tier": "传说",
+  "stat": "books_done",
+  "val": 30
+ },
+ {
+  "id": "books_done-80",
+  "cat": "📚 书影",
+  "name": "行走的图书馆",
+  "desc": "读完并记录 80 本书",
+  "points": 150,
+  "tier": "传说",
+  "stat": "books_done",
+  "val": 80
+ },
+ {
+  "id": "shows_done-1",
+  "cat": "📚 书影",
+  "name": "入坑",
+  "desc": "看完并记录 1 部剧",
+  "points": 10,
+  "tier": "普通",
+  "stat": "shows_done",
+  "val": 1
+ },
+ {
+  "id": "shows_done-5",
+  "cat": "📚 书影",
+  "name": "追剧人",
+  "desc": "看完并记录 5 部剧",
+  "points": 25,
+  "tier": "稀有",
+  "stat": "shows_done",
+  "val": 5
+ },
+ {
+  "id": "shows_done-20",
+  "cat": "📚 书影",
+  "name": "剧评家",
+  "desc": "看完并记录 20 部剧",
+  "points": 60,
+  "tier": "史诗",
+  "stat": "shows_done",
+  "val": 20
+ },
+ {
+  "id": "shows_done-60",
+  "cat": "📚 书影",
+  "name": "阅片无数",
+  "desc": "看完并记录 60 部剧",
+  "points": 150,
+  "tier": "传说",
+  "stat": "shows_done",
+  "val": 60
+ },
+ {
+  "id": "reviews-1",
+  "cat": "📚 书影",
+  "name": "留痕者",
+  "desc": "写下 1 条书评/剧评",
+  "points": 10,
+  "tier": "普通",
+  "stat": "reviews",
+  "val": 1
+ },
+ {
+  "id": "reviews-5",
+  "cat": "📚 书影",
+  "name": "短评写手",
+  "desc": "写下 5 条书评/剧评",
+  "points": 25,
+  "tier": "稀有",
+  "stat": "reviews",
+  "val": 5
+ },
+ {
+  "id": "reviews-20",
+  "cat": "📚 书影",
+  "name": "长评作者",
+  "desc": "写下 20 条书评/剧评",
+  "points": 60,
+  "tier": "史诗",
+  "stat": "reviews",
+  "val": 20
+ },
+ {
+  "id": "progress_done-1",
+  "cat": "📚 书影",
+  "name": "进度条启动",
+  "desc": "读完一本在追的书（进度 100%）",
+  "points": 10,
+  "tier": "普通",
+  "stat": "progress_done",
+  "val": 1
+ },
+ {
+  "id": "progress_done-5",
+  "cat": "📚 书影",
+  "name": "追更者",
+  "desc": "读完一本在追的书（进度 100%）",
+  "points": 25,
+  "tier": "稀有",
+  "stat": "progress_done",
+  "val": 5
+ },
+ {
+  "id": "progress_done-20",
+  "cat": "📚 书影",
+  "name": "完结收割机",
+  "desc": "读完一本在追的书（进度 100%）",
+  "points": 60,
+  "tier": "史诗",
+  "stat": "progress_done",
+  "val": 20
+ },
+ {
+  "id": "fin_records-1",
+  "cat": "💰 财务",
+  "name": "第一笔记账",
+  "desc": "记录收支 1 笔",
+  "points": 10,
+  "tier": "普通",
+  "stat": "fin_records",
+  "val": 1
+ },
+ {
+  "id": "fin_records-30",
+  "cat": "💰 财务",
+  "name": "账本主人",
+  "desc": "记录收支 30 笔",
+  "points": 25,
+  "tier": "稀有",
+  "stat": "fin_records",
+  "val": 30
+ },
+ {
+  "id": "fin_records-150",
+  "cat": "💰 财务",
+  "name": "复式生活家",
+  "desc": "记录收支 150 笔",
+  "points": 60,
+  "tier": "史诗",
+  "stat": "fin_records",
+  "val": 150
+ },
+ {
+  "id": "budget_ok_days-7",
+  "cat": "💰 财务",
+  "name": "守门员",
+  "desc": "单日支出 ≤¥100 达 7 天",
+  "points": 10,
+  "tier": "普通",
+  "stat": "budget_ok_days",
+  "val": 7
+ },
+ {
+  "id": "budget_ok_days-30",
+  "cat": "💰 财务",
+  "name": "预算铁壁",
+  "desc": "单日支出 ≤¥100 达 30 天",
+  "points": 25,
+  "tier": "稀有",
+  "stat": "budget_ok_days",
+  "val": 30
+ },
+ {
+  "id": "budget_ok_days-100",
+  "cat": "💰 财务",
+  "name": "财务自由预备役",
+  "desc": "单日支出 ≤¥100 达 100 天",
+  "points": 60,
+  "tier": "史诗",
+  "stat": "budget_ok_days",
+  "val": 100
+ },
+ {
+  "id": "months_positive-1",
+  "cat": "💰 财务",
+  "name": "初次结余",
+  "desc": "月度结余为正 1 个月",
+  "points": 10,
+  "tier": "普通",
+  "stat": "months_positive",
+  "val": 1
+ },
+ {
+  "id": "months_positive-3",
+  "cat": "💰 财务",
+  "name": "结余常客",
+  "desc": "月度结余为正 3 个月",
+  "points": 25,
+  "tier": "稀有",
+  "stat": "months_positive",
+  "val": 3
+ },
+ {
+  "id": "months_positive-6",
+  "cat": "💰 财务",
+  "name": "攒钱机器",
+  "desc": "月度结余为正 6 个月",
+  "points": 60,
+  "tier": "史诗",
+  "stat": "months_positive",
+  "val": 6
+ },
+ {
+  "id": "months_positive-12",
+  "cat": "💰 财务",
+  "name": "小金库主人",
+  "desc": "月度结余为正 12 个月",
+  "points": 150,
+  "tier": "传说",
+  "stat": "months_positive",
+  "val": 12
+ },
+ {
+  "id": "calib_mind-3",
+  "cat": "🧭 状态",
+  "name": "心智 3.0",
+  "desc": "月度校准把 心智 打到 3 分",
+  "points": 10,
+  "tier": "普通",
+  "stat": "calib_mind",
+  "val": 3
+ },
+ {
+  "id": "calib_mind-4",
+  "cat": "🧭 状态",
+  "name": "心智 4.0",
+  "desc": "月度校准把 心智 打到 4 分",
+  "points": 25,
+  "tier": "稀有",
+  "stat": "calib_mind",
+  "val": 4
+ },
+ {
+  "id": "calib_mind-5",
+  "cat": "🧭 状态",
+  "name": "心智 满分",
+  "desc": "月度校准把 心智 打到 5 分",
+  "points": 60,
+  "tier": "史诗",
+  "stat": "calib_mind",
+  "val": 5
+ },
+ {
+  "id": "calib_body-3",
+  "cat": "🧭 状态",
+  "name": "身体 3.0",
+  "desc": "月度校准把 身体 打到 3 分",
+  "points": 10,
+  "tier": "普通",
+  "stat": "calib_body",
+  "val": 3
+ },
+ {
+  "id": "calib_body-4",
+  "cat": "🧭 状态",
+  "name": "身体 4.0",
+  "desc": "月度校准把 身体 打到 4 分",
+  "points": 25,
+  "tier": "稀有",
+  "stat": "calib_body",
+  "val": 4
+ },
+ {
+  "id": "calib_body-5",
+  "cat": "🧭 状态",
+  "name": "身体 满分",
+  "desc": "月度校准把 身体 打到 5 分",
+  "points": 60,
+  "tier": "史诗",
+  "stat": "calib_body",
+  "val": 5
+ },
+ {
+  "id": "calib_spirit-3",
+  "cat": "🧭 状态",
+  "name": "精神 3.0",
+  "desc": "月度校准把 精神 打到 3 分",
+  "points": 10,
+  "tier": "普通",
+  "stat": "calib_spirit",
+  "val": 3
+ },
+ {
+  "id": "calib_spirit-4",
+  "cat": "🧭 状态",
+  "name": "精神 4.0",
+  "desc": "月度校准把 精神 打到 4 分",
+  "points": 25,
+  "tier": "稀有",
+  "stat": "calib_spirit",
+  "val": 4
+ },
+ {
+  "id": "calib_spirit-5",
+  "cat": "🧭 状态",
+  "name": "精神 满分",
+  "desc": "月度校准把 精神 打到 5 分",
+  "points": 60,
+  "tier": "史诗",
+  "stat": "calib_spirit",
+  "val": 5
+ },
+ {
+  "id": "calib_vocation-3",
+  "cat": "🧭 状态",
+  "name": "事业 3.0",
+  "desc": "月度校准把 事业 打到 3 分",
+  "points": 10,
+  "tier": "普通",
+  "stat": "calib_vocation",
+  "val": 3
+ },
+ {
+  "id": "calib_vocation-4",
+  "cat": "🧭 状态",
+  "name": "事业 4.0",
+  "desc": "月度校准把 事业 打到 4 分",
+  "points": 25,
+  "tier": "稀有",
+  "stat": "calib_vocation",
+  "val": 4
+ },
+ {
+  "id": "calib_vocation-5",
+  "cat": "🧭 状态",
+  "name": "事业 满分",
+  "desc": "月度校准把 事业 打到 5 分",
+  "points": 60,
+  "tier": "史诗",
+  "stat": "calib_vocation",
+  "val": 5
+ },
+ {
+  "id": "calibrations-1",
+  "cat": "🧭 状态",
+  "name": "重新认识自己",
+  "desc": "完成月度校准 1 次",
+  "points": 10,
+  "tier": "普通",
+  "stat": "calibrations",
+  "val": 1
+ },
+ {
+  "id": "calibrations-3",
+  "cat": "🧭 状态",
+  "name": "诚实面对者",
+  "desc": "完成月度校准 3 次",
+  "points": 25,
+  "tier": "稀有",
+  "stat": "calibrations",
+  "val": 3
+ },
+ {
+  "id": "calibrations-6",
+  "cat": "🧭 状态",
+  "name": "校准狂人",
+  "desc": "完成月度校准 6 次",
+  "points": 60,
+  "tier": "史诗",
+  "stat": "calibrations",
+  "val": 6
+ },
+ {
+  "id": "calibrations-12",
+  "cat": "🧭 状态",
+  "name": "年度复盘家",
+  "desc": "完成月度校准 12 次",
+  "points": 150,
+  "tier": "传说",
+  "stat": "calibrations",
+  "val": 12
+ },
+ {
+  "id": "total_score-2",
+  "cat": "🧭 状态",
+  "name": "总分 2.0",
+  "desc": "四象限总分达到 2",
+  "points": 10,
+  "tier": "普通",
+  "stat": "total_score",
+  "val": 2
+ },
+ {
+  "id": "total_score-2.5",
+  "cat": "🧭 状态",
+  "name": "总分 2.5",
+  "desc": "四象限总分达到 2.5",
+  "points": 25,
+  "tier": "稀有",
+  "stat": "total_score",
+  "val": 2.5
+ },
+ {
+  "id": "total_score-3",
+  "cat": "🧭 状态",
+  "name": "总分 3.0",
+  "desc": "四象限总分达到 3",
+  "points": 60,
+  "tier": "史诗",
+  "stat": "total_score",
+  "val": 3
+ },
+ {
+  "id": "total_score-4",
+  "cat": "🧭 状态",
+  "name": "总分 4.0",
+  "desc": "四象限总分达到 4",
+  "points": 150,
+  "tier": "传说",
+  "stat": "total_score",
+  "val": 4
+ },
+ {
+  "id": "total_score-5",
+  "cat": "🧭 状态",
+  "name": "总分 5.0·传说",
+  "desc": "四象限总分达到 5",
+  "points": 150,
+  "tier": "传说",
+  "stat": "total_score",
+  "val": 5
+ },
+ {
+  "id": "ach_count-10",
+  "cat": "🏆 收集",
+  "name": "收集入门",
+  "desc": "解锁 10 个成就",
+  "points": 10,
+  "tier": "普通",
+  "stat": "ach_count",
+  "val": 10
+ },
+ {
+  "id": "ach_count-50",
+  "cat": "🏆 收集",
+  "name": "成就猎人",
+  "desc": "解锁 50 个成就",
+  "points": 25,
+  "tier": "稀有",
+  "stat": "ach_count",
+  "val": 50
+ },
+ {
+  "id": "ach_count-100",
+  "cat": "🏆 收集",
+  "name": "奖杯陈列室",
+  "desc": "解锁 100 个成就",
+  "points": 60,
+  "tier": "史诗",
+  "stat": "ach_count",
+  "val": 100
+ },
+ {
+  "id": "ach_count-200",
+  "cat": "🏆 收集",
+  "name": "全成就强迫症",
+  "desc": "解锁 200 个成就",
+  "points": 150,
+  "tier": "传说",
+  "stat": "ach_count",
+  "val": 200
+ },
+ {
+  "id": "ach_count-300",
+  "cat": "🏆 收集",
+  "name": "地球 Online 主宰",
+  "desc": "解锁 300 个成就",
+  "points": 150,
+  "tier": "传说",
+  "stat": "ach_count",
+  "val": 300
+ },
+ {
+  "id": "lang_jp-5",
+  "cat": "🧠 心智",
+  "name": "假名相识",
+  "desc": "完成日语任务 5 次",
+  "points": 10,
+  "tier": "普通",
+  "stat": "lang_jp",
+  "val": 5
+ },
+ {
+  "id": "lang_jp-20",
+  "cat": "🧠 心智",
+  "name": "假名熟悉",
+  "desc": "完成日语任务 20 次",
+  "points": 25,
+  "tier": "稀有",
+  "stat": "lang_jp",
+  "val": 20
+ },
+ {
+  "id": "lang_jp-60",
+  "cat": "🧠 心智",
+  "name": "日语常客",
+  "desc": "完成日语任务 60 次",
+  "points": 60,
+  "tier": "史诗",
+  "stat": "lang_jp",
+  "val": 60
+ },
+ {
+  "id": "lang_jp-150",
+  "cat": "🧠 心智",
+  "name": "晨读日语魂",
+  "desc": "完成日语任务 150 次",
+  "points": 150,
+  "tier": "传说",
+  "stat": "lang_jp",
+  "val": 150
+ },
+ {
+  "id": "lang_en-5",
+  "cat": "🧠 心智",
+  "name": "开口第一句",
+  "desc": "完成英语口述任务 5 次",
+  "points": 10,
+  "tier": "普通",
+  "stat": "lang_en",
+  "val": 5
+ },
+ {
+  "id": "lang_en-20",
+  "cat": "🧠 心智",
+  "name": "口语练习生",
+  "desc": "完成英语口述任务 20 次",
+  "points": 25,
+  "tier": "稀有",
+  "stat": "lang_en",
+  "val": 20
+ },
+ {
+  "id": "lang_en-60",
+  "cat": "🧠 心智",
+  "name": "双语切换者",
+  "desc": "完成英语口述任务 60 次",
+  "points": 60,
+  "tier": "史诗",
+  "stat": "lang_en",
+  "val": 60
+ },
+ {
+  "id": "spirit_msg-3",
+  "cat": "🤝 精神",
+  "name": "破冰者",
+  "desc": "发出非事务性消息 3 次",
+  "points": 10,
+  "tier": "普通",
+  "stat": "spirit_msg",
+  "val": 3
+ },
+ {
+  "id": "spirit_msg-15",
+  "cat": "🤝 精神",
+  "name": "消息艺术家",
+  "desc": "发出非事务性消息 15 次",
+  "points": 25,
+  "tier": "稀有",
+  "stat": "spirit_msg",
+  "val": 15
+ },
+ {
+  "id": "spirit_msg-50",
+  "cat": "🤝 精神",
+  "name": "连接者",
+  "desc": "发出非事务性消息 50 次",
+  "points": 60,
+  "tier": "史诗",
+  "stat": "spirit_msg",
+  "val": 50
+ },
+ {
+  "id": "deep_talks-1",
+  "cat": "🤝 精神",
+  "name": "第一次深谈",
+  "desc": "完成深度对话实验 1 次",
+  "points": 10,
+  "tier": "普通",
+  "stat": "deep_talks",
+  "val": 1
+ },
+ {
+  "id": "deep_talks-4",
+  "cat": "🤝 精神",
+  "name": "对话实验者",
+  "desc": "完成深度对话实验 4 次",
+  "points": 25,
+  "tier": "稀有",
+  "stat": "deep_talks",
+  "val": 4
+ },
+ {
+  "id": "deep_talks-12",
+  "cat": "🤝 精神",
+  "name": "深夜谈话主持人",
+  "desc": "完成深度对话实验 12 次",
+  "points": 60,
+  "tier": "史诗",
+  "stat": "deep_talks",
+  "val": 12
+ },
+ {
+  "id": "sport_any-5",
+  "cat": "💪 身体",
+  "name": "有氧启动",
+  "desc": "完成有氧训练（任意）5 次",
+  "points": 10,
+  "tier": "普通",
+  "stat": "sport_any",
+  "val": 5
+ },
+ {
+  "id": "sport_any-20",
+  "cat": "💪 身体",
+  "name": "心肺建设者",
+  "desc": "完成有氧训练（任意）20 次",
+  "points": 25,
+  "tier": "稀有",
+  "stat": "sport_any",
+  "val": 20
+ },
+ {
+  "id": "sport_any-50",
+  "cat": "💪 身体",
+  "name": "耐力主义者",
+  "desc": "完成有氧训练（任意）50 次",
+  "points": 60,
+  "tier": "史诗",
+  "stat": "sport_any",
+  "val": 50
+ },
+ {
+  "id": "sport_any-120",
+  "cat": "💪 身体",
+  "name": "铁心肺",
+  "desc": "完成有氧训练（任意）120 次",
+  "points": 150,
+  "tier": "传说",
+  "stat": "sport_any",
+  "val": 120
+ },
+ {
+  "id": "stretch_done-10",
+  "cat": "💪 身体",
+  "name": "拉伸小白",
+  "desc": "完成收尾拉伸任务 10 次",
+  "points": 10,
+  "tier": "普通",
+  "stat": "stretch_done",
+  "val": 10
+ },
+ {
+  "id": "stretch_done-50",
+  "cat": "💪 身体",
+  "name": "柔韧者",
+  "desc": "完成收尾拉伸任务 50 次",
+  "points": 25,
+  "tier": "稀有",
+  "stat": "stretch_done",
+  "val": 50
+ },
+ {
+  "id": "stretch_done-150",
+  "cat": "💪 身体",
+  "name": "筋长一寸",
+  "desc": "完成收尾拉伸任务 150 次",
+  "points": 60,
+  "tier": "史诗",
+  "stat": "stretch_done",
+  "val": 150
+ },
+ {
+  "id": "points_total-100",
+  "cat": "🎮 积分",
+  "name": "第一桶金",
+  "desc": "累计获得 100 积分",
+  "points": 10,
+  "tier": "普通",
+  "stat": "points_total",
+  "val": 100
+ },
+ {
+  "id": "points_total-500",
+  "cat": "🎮 积分",
+  "name": "百分俱乐部",
+  "desc": "累计获得 500 积分",
+  "points": 25,
+  "tier": "稀有",
+  "stat": "points_total",
+  "val": 500
+ },
+ {
+  "id": "points_total-1000",
+  "cat": "🎮 积分",
+  "name": "千分大佬",
+  "desc": "累计获得 1000 积分",
+  "points": 60,
+  "tier": "史诗",
+  "stat": "points_total",
+  "val": 1000
+ },
+ {
+  "id": "points_total-5000",
+  "cat": "🎮 积分",
+  "name": "万分传说",
+  "desc": "累计获得 5000 积分",
+  "points": 150,
+  "tier": "传说",
+  "stat": "points_total",
+  "val": 5000
+ },
+ {
+  "id": "redeemed-1",
+  "cat": "🎮 积分",
+  "name": "初次犒赏",
+  "desc": "兑换奖励 1 次",
+  "points": 10,
+  "tier": "普通",
+  "stat": "redeemed",
+  "val": 1
+ },
+ {
+  "id": "redeemed-5",
+  "cat": "🎮 积分",
+  "name": "兑换行家",
+  "desc": "兑换奖励 5 次",
+  "points": 25,
+  "tier": "稀有",
+  "stat": "redeemed",
+  "val": 5
+ },
+ {
+  "id": "redeemed-20",
+  "cat": "🎮 积分",
+  "name": "快乐采购员",
+  "desc": "兑换奖励 20 次",
+  "points": 60,
+  "tier": "史诗",
+  "stat": "redeemed",
+  "val": 20
+ },
+ {
+  "id": "earth_roam-1",
+  "cat": "🌍 地球Online",
+  "name": "漫游·早起看一次日出 ×1",
+  "desc": "早起看一次日出（第 1 轮）",
+  "points": 15,
+  "tier": [
+   "稀有",
+   25
+  ],
+  "stat": "earth_roam",
+  "val": 1
+ },
+ {
+  "id": "earth_roam-2",
+  "cat": "🌍 地球Online",
+  "name": "漫游·连续 3 天 23: ×1",
+  "desc": "连续 3 天 23:00 前入睡（第 1 轮）",
+  "points": 15,
+  "tier": [
+   "稀有",
+   25
+  ],
+  "stat": "earth_roam",
+  "val": 2
+ },
+ {
+  "id": "earth_roam-3",
+  "cat": "🌍 地球Online",
+  "name": "漫游·一天走满 8000  ×1",
+  "desc": "一天走满 8000 步（第 1 轮）",
+  "points": 15,
+  "tier": [
+   "稀有",
+   25
+  ],
+  "stat": "earth_roam",
+  "val": 3
+ },
+ {
+  "id": "earth_roam-4",
+  "cat": "🌍 地球Online",
+  "name": "漫游·喝满 2L 水 ×1",
+  "desc": "喝满 2L 水（第 1 轮）",
+  "points": 15,
+  "tier": [
+   "稀有",
+   25
+  ],
+  "stat": "earth_roam",
+  "val": 4
+ },
+ {
+  "id": "earth_roam-5",
+  "cat": "🌍 地球Online",
+  "name": "漫游·午休 20 分钟 ×1",
+  "desc": "午休 20 分钟（第 1 轮）",
+  "points": 15,
+  "tier": [
+   "稀有",
+   25
+  ],
+  "stat": "earth_roam",
+  "val": 5
+ },
+ {
+  "id": "earth_roam-6",
+  "cat": "🌍 地球Online",
+  "name": "漫游·一整天不说「随便」 ×1",
+  "desc": "一整天不说「随便」（第 1 轮）",
+  "points": 15,
+  "tier": [
+   "稀有",
+   25
+  ],
+  "stat": "earth_roam",
+  "val": 6
+ },
+ {
+  "id": "earth_roam-7",
+  "cat": "🌍 地球Online",
+  "name": "漫游·看一部纪录片 ×1",
+  "desc": "看一部纪录片（第 1 轮）",
+  "points": 15,
+  "tier": [
+   "稀有",
+   25
+  ],
+  "stat": "earth_roam",
+  "val": 7
+ },
+ {
+  "id": "earth_roam-8",
+  "cat": "🌍 地球Online",
+  "name": "漫游·给植物浇水/养一盆植 ×2",
+  "desc": "给植物浇水/养一盆植物（第 2 轮）",
+  "points": 20,
+  "tier": [
+   "史诗",
+   60
+  ],
+  "stat": "earth_roam",
+  "val": 8
+ },
+ {
+  "id": "earth_roam-9",
+  "cat": "🌍 地球Online",
+  "name": "漫游·早起看一次日出 ×2",
+  "desc": "早起看一次日出（第 2 轮）",
+  "points": 20,
+  "tier": [
+   "史诗",
+   60
+  ],
+  "stat": "earth_roam",
+  "val": 9
+ },
+ {
+  "id": "earth_roam-10",
+  "cat": "🌍 地球Online",
+  "name": "漫游·连续 3 天 23: ×2",
+  "desc": "连续 3 天 23:00 前入睡（第 2 轮）",
+  "points": 20,
+  "tier": [
+   "史诗",
+   60
+  ],
+  "stat": "earth_roam",
+  "val": 10
+ },
+ {
+  "id": "earth_roam-11",
+  "cat": "🌍 地球Online",
+  "name": "漫游·一天走满 8000  ×2",
+  "desc": "一天走满 8000 步（第 2 轮）",
+  "points": 20,
+  "tier": [
+   "史诗",
+   60
+  ],
+  "stat": "earth_roam",
+  "val": 11
+ },
+ {
+  "id": "earth_roam-12",
+  "cat": "🌍 地球Online",
+  "name": "漫游·喝满 2L 水 ×2",
+  "desc": "喝满 2L 水（第 2 轮）",
+  "points": 20,
+  "tier": [
+   "史诗",
+   60
+  ],
+  "stat": "earth_roam",
+  "val": 12
+ },
+ {
+  "id": "earth_roam-13",
+  "cat": "🌍 地球Online",
+  "name": "漫游·午休 20 分钟 ×2",
+  "desc": "午休 20 分钟（第 2 轮）",
+  "points": 20,
+  "tier": [
+   "史诗",
+   60
+  ],
+  "stat": "earth_roam",
+  "val": 13
+ },
+ {
+  "id": "earth_roam-14",
+  "cat": "🌍 地球Online",
+  "name": "漫游·一整天不说「随便」 ×2",
+  "desc": "一整天不说「随便」（第 2 轮）",
+  "points": 20,
+  "tier": [
+   "史诗",
+   60
+  ],
+  "stat": "earth_roam",
+  "val": 14
+ },
+ {
+  "id": "earth_roam-15",
+  "cat": "🌍 地球Online",
+  "name": "漫游·看一部纪录片 ×2",
+  "desc": "看一部纪录片（第 2 轮）",
+  "points": 20,
+  "tier": [
+   "史诗",
+   60
+  ],
+  "stat": "earth_roam",
+  "val": 15
+ },
+ {
+  "id": "earth_roam-16",
+  "cat": "🌍 地球Online",
+  "name": "漫游·给植物浇水/养一盆植 ×3",
+  "desc": "给植物浇水/养一盆植物（第 3 轮）",
+  "points": 25,
+  "tier": [
+   "传说",
+   150
+  ],
+  "stat": "earth_roam",
+  "val": 16
+ },
+ {
+  "id": "earth_roam-17",
+  "cat": "🌍 地球Online",
+  "name": "漫游·早起看一次日出 ×3",
+  "desc": "早起看一次日出（第 3 轮）",
+  "points": 25,
+  "tier": [
+   "传说",
+   150
+  ],
+  "stat": "earth_roam",
+  "val": 17
+ },
+ {
+  "id": "earth_roam-18",
+  "cat": "🌍 地球Online",
+  "name": "漫游·连续 3 天 23: ×3",
+  "desc": "连续 3 天 23:00 前入睡（第 3 轮）",
+  "points": 25,
+  "tier": [
+   "传说",
+   150
+  ],
+  "stat": "earth_roam",
+  "val": 18
+ },
+ {
+  "id": "earth_roam-19",
+  "cat": "🌍 地球Online",
+  "name": "漫游·一天走满 8000  ×3",
+  "desc": "一天走满 8000 步（第 3 轮）",
+  "points": 25,
+  "tier": [
+   "传说",
+   150
+  ],
+  "stat": "earth_roam",
+  "val": 19
+ },
+ {
+  "id": "earth_roam-20",
+  "cat": "🌍 地球Online",
+  "name": "漫游·喝满 2L 水 ×3",
+  "desc": "喝满 2L 水（第 3 轮）",
+  "points": 25,
+  "tier": [
+   "传说",
+   150
+  ],
+  "stat": "earth_roam",
+  "val": 20
+ },
+ {
+  "id": "earth_roam-21",
+  "cat": "🌍 地球Online",
+  "name": "漫游·午休 20 分钟 ×3",
+  "desc": "午休 20 分钟（第 3 轮）",
+  "points": 25,
+  "tier": [
+   "传说",
+   150
+  ],
+  "stat": "earth_roam",
+  "val": 21
+ },
+ {
+  "id": "earth_roam-22",
+  "cat": "🌍 地球Online",
+  "name": "漫游·一整天不说「随便」 ×3",
+  "desc": "一整天不说「随便」（第 3 轮）",
+  "points": 25,
+  "tier": [
+   "传说",
+   150
+  ],
+  "stat": "earth_roam",
+  "val": 22
+ },
+ {
+  "id": "earth_roam-23",
+  "cat": "🌍 地球Online",
+  "name": "漫游·看一部纪录片 ×3",
+  "desc": "看一部纪录片（第 3 轮）",
+  "points": 25,
+  "tier": [
+   "传说",
+   150
+  ],
+  "stat": "earth_roam",
+  "val": 23
+ },
+ {
+  "id": "earth_roam-24",
+  "cat": "🌍 地球Online",
+  "name": "漫游·给植物浇水/养一盆植 ×4",
+  "desc": "给植物浇水/养一盆植物（第 4 轮）",
+  "points": 30,
+  "tier": [
+   "传说",
+   150
+  ],
+  "stat": "earth_roam",
+  "val": 24
+ },
+ {
+  "id": "earth_roam-25",
+  "cat": "🌍 地球Online",
+  "name": "漫游·早起看一次日出 ×4",
+  "desc": "早起看一次日出（第 4 轮）",
+  "points": 30,
+  "tier": [
+   "传说",
+   150
+  ],
+  "stat": "earth_roam",
+  "val": 25
+ },
+ {
+  "id": "earth_roam-26",
+  "cat": "🌍 地球Online",
+  "name": "漫游·连续 3 天 23: ×4",
+  "desc": "连续 3 天 23:00 前入睡（第 4 轮）",
+  "points": 30,
+  "tier": [
+   "传说",
+   150
+  ],
+  "stat": "earth_roam",
+  "val": 26
+ },
+ {
+  "id": "earth_roam-27",
+  "cat": "🌍 地球Online",
+  "name": "漫游·一天走满 8000  ×4",
+  "desc": "一天走满 8000 步（第 4 轮）",
+  "points": 30,
+  "tier": [
+   "传说",
+   150
+  ],
+  "stat": "earth_roam",
+  "val": 27
+ },
+ {
+  "id": "earth_roam-28",
+  "cat": "🌍 地球Online",
+  "name": "漫游·喝满 2L 水 ×4",
+  "desc": "喝满 2L 水（第 4 轮）",
+  "points": 30,
+  "tier": [
+   "传说",
+   150
+  ],
+  "stat": "earth_roam",
+  "val": 28
+ },
+ {
+  "id": "earth_roam-29",
+  "cat": "🌍 地球Online",
+  "name": "漫游·午休 20 分钟 ×4",
+  "desc": "午休 20 分钟（第 4 轮）",
+  "points": 30,
+  "tier": [
+   "传说",
+   150
+  ],
+  "stat": "earth_roam",
+  "val": 29
+ },
+ {
+  "id": "earth_roam-30",
+  "cat": "🌍 地球Online",
+  "name": "漫游·一整天不说「随便」 ×4",
+  "desc": "一整天不说「随便」（第 4 轮）",
+  "points": 30,
+  "tier": [
+   "传说",
+   150
+  ],
+  "stat": "earth_roam",
+  "val": 30
+ },
+ {
+  "id": "earth_roam-31",
+  "cat": "🌍 地球Online",
+  "name": "漫游·看一部纪录片 ×4",
+  "desc": "看一部纪录片（第 4 轮）",
+  "points": 30,
+  "tier": [
+   "传说",
+   150
+  ],
+  "stat": "earth_roam",
+  "val": 31
+ },
+ {
+  "id": "earth_roam-32",
+  "cat": "🌍 地球Online",
+  "name": "漫游·给植物浇水/养一盆植 ×5",
+  "desc": "给植物浇水/养一盆植物（第 5 轮）",
+  "points": 35,
+  "tier": [
+   "传说",
+   150
+  ],
+  "stat": "earth_roam",
+  "val": 32
+ },
+ {
+  "id": "earth_roam-33",
+  "cat": "🌍 地球Online",
+  "name": "漫游·早起看一次日出 ×5",
+  "desc": "早起看一次日出（第 5 轮）",
+  "points": 35,
+  "tier": [
+   "传说",
+   150
+  ],
+  "stat": "earth_roam",
+  "val": 33
+ },
+ {
+  "id": "earth_roam-34",
+  "cat": "🌍 地球Online",
+  "name": "漫游·连续 3 天 23: ×5",
+  "desc": "连续 3 天 23:00 前入睡（第 5 轮）",
+  "points": 35,
+  "tier": [
+   "传说",
+   150
+  ],
+  "stat": "earth_roam",
+  "val": 34
+ },
+ {
+  "id": "earth_roam-35",
+  "cat": "🌍 地球Online",
+  "name": "漫游·一天走满 8000  ×5",
+  "desc": "一天走满 8000 步（第 5 轮）",
+  "points": 35,
+  "tier": [
+   "传说",
+   150
+  ],
+  "stat": "earth_roam",
+  "val": 35
+ },
+ {
+  "id": "earth_roam-36",
+  "cat": "🌍 地球Online",
+  "name": "漫游·喝满 2L 水 ×5",
+  "desc": "喝满 2L 水（第 5 轮）",
+  "points": 35,
+  "tier": [
+   "传说",
+   150
+  ],
+  "stat": "earth_roam",
+  "val": 36
+ },
+ {
+  "id": "earth_roam-37",
+  "cat": "🌍 地球Online",
+  "name": "漫游·午休 20 分钟 ×5",
+  "desc": "午休 20 分钟（第 5 轮）",
+  "points": 35,
+  "tier": [
+   "传说",
+   150
+  ],
+  "stat": "earth_roam",
+  "val": 37
+ },
+ {
+  "id": "earth_roam-38",
+  "cat": "🌍 地球Online",
+  "name": "漫游·一整天不说「随便」 ×5",
+  "desc": "一整天不说「随便」（第 5 轮）",
+  "points": 35,
+  "tier": [
+   "传说",
+   150
+  ],
+  "stat": "earth_roam",
+  "val": 38
+ },
+ {
+  "id": "earth_roam-39",
+  "cat": "🌍 地球Online",
+  "name": "漫游·看一部纪录片 ×5",
+  "desc": "看一部纪录片（第 5 轮）",
+  "points": 35,
+  "tier": [
+   "传说",
+   150
+  ],
+  "stat": "earth_roam",
+  "val": 39
+ },
+ {
+  "id": "earth_roam-40",
+  "cat": "🌍 地球Online",
+  "name": "漫游·给植物浇水/养一盆植 ×6",
+  "desc": "给植物浇水/养一盆植物（第 6 轮）",
+  "points": 40,
+  "tier": [
+   "传说",
+   150
+  ],
+  "stat": "earth_roam",
+  "val": 40
+ },
+ {
+  "id": "earth_roam-41",
+  "cat": "🌍 地球Online",
+  "name": "漫游·早起看一次日出 ×6",
+  "desc": "早起看一次日出（第 6 轮）",
+  "points": 40,
+  "tier": [
+   "传说",
+   150
+  ],
+  "stat": "earth_roam",
+  "val": 41
+ },
+ {
+  "id": "earth_roam-42",
+  "cat": "🌍 地球Online",
+  "name": "漫游·连续 3 天 23: ×6",
+  "desc": "连续 3 天 23:00 前入睡（第 6 轮）",
+  "points": 40,
+  "tier": [
+   "传说",
+   150
+  ],
+  "stat": "earth_roam",
+  "val": 42
+ },
+ {
+  "id": "earth_roam-43",
+  "cat": "🌍 地球Online",
+  "name": "漫游·一天走满 8000  ×6",
+  "desc": "一天走满 8000 步（第 6 轮）",
+  "points": 40,
+  "tier": [
+   "传说",
+   150
+  ],
+  "stat": "earth_roam",
+  "val": 43
+ },
+ {
+  "id": "earth_roam-44",
+  "cat": "🌍 地球Online",
+  "name": "漫游·喝满 2L 水 ×6",
+  "desc": "喝满 2L 水（第 6 轮）",
+  "points": 40,
+  "tier": [
+   "传说",
+   150
+  ],
+  "stat": "earth_roam",
+  "val": 44
+ },
+ {
+  "id": "earth_roam-45",
+  "cat": "🌍 地球Online",
+  "name": "漫游·午休 20 分钟 ×6",
+  "desc": "午休 20 分钟（第 6 轮）",
+  "points": 40,
+  "tier": [
+   "传说",
+   150
+  ],
+  "stat": "earth_roam",
+  "val": 45
+ },
+ {
+  "id": "earth_roam-46",
+  "cat": "🌍 地球Online",
+  "name": "漫游·一整天不说「随便」 ×6",
+  "desc": "一整天不说「随便」（第 6 轮）",
+  "points": 40,
+  "tier": [
+   "传说",
+   150
+  ],
+  "stat": "earth_roam",
+  "val": 46
+ },
+ {
+  "id": "earth_roam-47",
+  "cat": "🌍 地球Online",
+  "name": "漫游·看一部纪录片 ×6",
+  "desc": "看一部纪录片（第 6 轮）",
+  "points": 40,
+  "tier": [
+   "传说",
+   150
+  ],
+  "stat": "earth_roam",
+  "val": 47
+ },
+ {
+  "id": "earth_roam-48",
+  "cat": "🌍 地球Online",
+  "name": "漫游·给植物浇水/养一盆植 ×7",
+  "desc": "给植物浇水/养一盆植物（第 7 轮）",
+  "points": 45,
+  "tier": [
+   "传说",
+   150
+  ],
+  "stat": "earth_roam",
+  "val": 48
+ },
+ {
+  "id": "earth_roam-49",
+  "cat": "🌍 地球Online",
+  "name": "漫游·早起看一次日出 ×7",
+  "desc": "早起看一次日出（第 7 轮）",
+  "points": 45,
+  "tier": [
+   "传说",
+   150
+  ],
+  "stat": "earth_roam",
+  "val": 49
+ },
+ {
+  "id": "earth_roam-50",
+  "cat": "🌍 地球Online",
+  "name": "漫游·连续 3 天 23: ×7",
+  "desc": "连续 3 天 23:00 前入睡（第 7 轮）",
+  "points": 45,
+  "tier": [
+   "传说",
+   150
+  ],
+  "stat": "earth_roam",
+  "val": 50
+ },
+ {
+  "id": "earth_roam-51",
+  "cat": "🌍 地球Online",
+  "name": "漫游·一天走满 8000  ×7",
+  "desc": "一天走满 8000 步（第 7 轮）",
+  "points": 45,
+  "tier": [
+   "传说",
+   150
+  ],
+  "stat": "earth_roam",
+  "val": 51
+ },
+ {
+  "id": "earth_roam-52",
+  "cat": "🌍 地球Online",
+  "name": "漫游·喝满 2L 水 ×7",
+  "desc": "喝满 2L 水（第 7 轮）",
+  "points": 45,
+  "tier": [
+   "传说",
+   150
+  ],
+  "stat": "earth_roam",
+  "val": 52
+ },
+ {
+  "id": "earth_roam-53",
+  "cat": "🌍 地球Online",
+  "name": "漫游·午休 20 分钟 ×7",
+  "desc": "午休 20 分钟（第 7 轮）",
+  "points": 45,
+  "tier": [
+   "传说",
+   150
+  ],
+  "stat": "earth_roam",
+  "val": 53
+ },
+ {
+  "id": "earth_roam-54",
+  "cat": "🌍 地球Online",
+  "name": "漫游·一整天不说「随便」 ×7",
+  "desc": "一整天不说「随便」（第 7 轮）",
+  "points": 45,
+  "tier": [
+   "传说",
+   150
+  ],
+  "stat": "earth_roam",
+  "val": 54
+ },
+ {
+  "id": "earth_roam-55",
+  "cat": "🌍 地球Online",
+  "name": "漫游·看一部纪录片 ×7",
+  "desc": "看一部纪录片（第 7 轮）",
+  "points": 45,
+  "tier": [
+   "传说",
+   150
+  ],
+  "stat": "earth_roam",
+  "val": 55
+ },
+ {
+  "id": "earth_roam-56",
+  "cat": "🌍 地球Online",
+  "name": "漫游·给植物浇水/养一盆植 ×8",
+  "desc": "给植物浇水/养一盆植物（第 8 轮）",
+  "points": 50,
+  "tier": [
+   "传说",
+   150
+  ],
+  "stat": "earth_roam",
+  "val": 56
+ },
+ {
+  "id": "earth_roam-57",
+  "cat": "🌍 地球Online",
+  "name": "漫游·早起看一次日出 ×8",
+  "desc": "早起看一次日出（第 8 轮）",
+  "points": 50,
+  "tier": [
+   "传说",
+   150
+  ],
+  "stat": "earth_roam",
+  "val": 57
+ },
+ {
+  "id": "earth_roam-58",
+  "cat": "🌍 地球Online",
+  "name": "漫游·连续 3 天 23: ×8",
+  "desc": "连续 3 天 23:00 前入睡（第 8 轮）",
+  "points": 50,
+  "tier": [
+   "传说",
+   150
+  ],
+  "stat": "earth_roam",
+  "val": 58
+ },
+ {
+  "id": "earth_roam-59",
+  "cat": "🌍 地球Online",
+  "name": "漫游·一天走满 8000  ×8",
+  "desc": "一天走满 8000 步（第 8 轮）",
+  "points": 50,
+  "tier": [
+   "传说",
+   150
+  ],
+  "stat": "earth_roam",
+  "val": 59
+ },
+ {
+  "id": "earth_roam-60",
+  "cat": "🌍 地球Online",
+  "name": "漫游·喝满 2L 水 ×8",
+  "desc": "喝满 2L 水（第 8 轮）",
+  "points": 50,
+  "tier": [
+   "传说",
+   150
+  ],
+  "stat": "earth_roam",
+  "val": 60
+ },
+ {
+  "id": "earth_roam-61",
+  "cat": "🌍 地球Online",
+  "name": "漫游·午休 20 分钟 ×8",
+  "desc": "午休 20 分钟（第 8 轮）",
+  "points": 50,
+  "tier": [
+   "传说",
+   150
+  ],
+  "stat": "earth_roam",
+  "val": 61
+ },
+ {
+  "id": "earth_roam-62",
+  "cat": "🌍 地球Online",
+  "name": "漫游·一整天不说「随便」 ×8",
+  "desc": "一整天不说「随便」（第 8 轮）",
+  "points": 50,
+  "tier": [
+   "传说",
+   150
+  ],
+  "stat": "earth_roam",
+  "val": 62
+ },
+ {
+  "id": "earth_roam-63",
+  "cat": "🌍 地球Online",
+  "name": "漫游·看一部纪录片 ×8",
+  "desc": "看一部纪录片（第 8 轮）",
+  "points": 50,
+  "tier": [
+   "传说",
+   150
+  ],
+  "stat": "earth_roam",
+  "val": 63
+ },
+ {
+  "id": "earth_roam-64",
+  "cat": "🌍 地球Online",
+  "name": "漫游·给植物浇水/养一盆植 ×9",
+  "desc": "给植物浇水/养一盆植物（第 9 轮）",
+  "points": 55,
+  "tier": [
+   "传说",
+   150
+  ],
+  "stat": "earth_roam",
+  "val": 64
+ },
+ {
+  "id": "earth_roam-65",
+  "cat": "🌍 地球Online",
+  "name": "漫游·早起看一次日出 ×9",
+  "desc": "早起看一次日出（第 9 轮）",
+  "points": 55,
+  "tier": [
+   "传说",
+   150
+  ],
+  "stat": "earth_roam",
+  "val": 65
+ },
+ {
+  "id": "earth_roam-66",
+  "cat": "🌍 地球Online",
+  "name": "漫游·连续 3 天 23: ×9",
+  "desc": "连续 3 天 23:00 前入睡（第 9 轮）",
+  "points": 55,
+  "tier": [
+   "传说",
+   150
+  ],
+  "stat": "earth_roam",
+  "val": 66
+ },
+ {
+  "id": "earth_roam-67",
+  "cat": "🌍 地球Online",
+  "name": "漫游·一天走满 8000  ×9",
+  "desc": "一天走满 8000 步（第 9 轮）",
+  "points": 55,
+  "tier": [
+   "传说",
+   150
+  ],
+  "stat": "earth_roam",
+  "val": 67
+ },
+ {
+  "id": "earth_roam-68",
+  "cat": "🌍 地球Online",
+  "name": "漫游·喝满 2L 水 ×9",
+  "desc": "喝满 2L 水（第 9 轮）",
+  "points": 55,
+  "tier": [
+   "传说",
+   150
+  ],
+  "stat": "earth_roam",
+  "val": 68
+ },
+ {
+  "id": "earth_roam-69",
+  "cat": "🌍 地球Online",
+  "name": "漫游·午休 20 分钟 ×9",
+  "desc": "午休 20 分钟（第 9 轮）",
+  "points": 55,
+  "tier": [
+   "传说",
+   150
+  ],
+  "stat": "earth_roam",
+  "val": 69
+ },
+ {
+  "id": "earth_roam-70",
+  "cat": "🌍 地球Online",
+  "name": "漫游·一整天不说「随便」 ×9",
+  "desc": "一整天不说「随便」（第 9 轮）",
+  "points": 55,
+  "tier": [
+   "传说",
+   150
+  ],
+  "stat": "earth_roam",
+  "val": 70
+ },
+ {
+  "id": "earth_roam-71",
+  "cat": "🌍 地球Online",
+  "name": "漫游·看一部纪录片 ×9",
+  "desc": "看一部纪录片（第 9 轮）",
+  "points": 55,
+  "tier": [
+   "传说",
+   150
+  ],
+  "stat": "earth_roam",
+  "val": 71
+ },
+ {
+  "id": "earth_roam-72",
+  "cat": "🌍 地球Online",
+  "name": "漫游·给植物浇水/养一盆植 ×10",
+  "desc": "给植物浇水/养一盆植物（第 10 轮）",
+  "points": 60,
+  "tier": [
+   "传说",
+   150
+  ],
+  "stat": "earth_roam",
+  "val": 72
+ },
+ {
+  "id": "earth_roam-73",
+  "cat": "🌍 地球Online",
+  "name": "漫游·早起看一次日出 ×10",
+  "desc": "早起看一次日出（第 10 轮）",
+  "points": 60,
+  "tier": [
+   "传说",
+   150
+  ],
+  "stat": "earth_roam",
+  "val": 73
+ },
+ {
+  "id": "earth_roam-74",
+  "cat": "🌍 地球Online",
+  "name": "漫游·连续 3 天 23: ×10",
+  "desc": "连续 3 天 23:00 前入睡（第 10 轮）",
+  "points": 60,
+  "tier": [
+   "传说",
+   150
+  ],
+  "stat": "earth_roam",
+  "val": 74
+ },
+ {
+  "id": "earth_roam-75",
+  "cat": "🌍 地球Online",
+  "name": "漫游·一天走满 8000  ×10",
+  "desc": "一天走满 8000 步（第 10 轮）",
+  "points": 60,
+  "tier": [
+   "传说",
+   150
+  ],
+  "stat": "earth_roam",
+  "val": 75
+ },
+ {
+  "id": "earth_roam-76",
+  "cat": "🌍 地球Online",
+  "name": "漫游·喝满 2L 水 ×10",
+  "desc": "喝满 2L 水（第 10 轮）",
+  "points": 60,
+  "tier": [
+   "传说",
+   150
+  ],
+  "stat": "earth_roam",
+  "val": 76
+ },
+ {
+  "id": "earth_roam-77",
+  "cat": "🌍 地球Online",
+  "name": "漫游·午休 20 分钟 ×10",
+  "desc": "午休 20 分钟（第 10 轮）",
+  "points": 60,
+  "tier": [
+   "传说",
+   150
+  ],
+  "stat": "earth_roam",
+  "val": 77
+ },
+ {
+  "id": "earth_roam-78",
+  "cat": "🌍 地球Online",
+  "name": "漫游·一整天不说「随便」 ×10",
+  "desc": "一整天不说「随便」（第 10 轮）",
+  "points": 60,
+  "tier": [
+   "传说",
+   150
+  ],
+  "stat": "earth_roam",
+  "val": 78
+ },
+ {
+  "id": "earth_roam-79",
+  "cat": "🌍 地球Online",
+  "name": "漫游·看一部纪录片 ×10",
+  "desc": "看一部纪录片（第 10 轮）",
+  "points": 60,
+  "tier": [
+   "传说",
+   150
+  ],
+  "stat": "earth_roam",
+  "val": 79
+ },
+ {
+  "id": "earth_roam-80",
+  "cat": "🌍 地球Online",
+  "name": "漫游·给植物浇水/养一盆植 ×11",
+  "desc": "给植物浇水/养一盆植物（第 11 轮）",
+  "points": 65,
+  "tier": [
+   "传说",
+   150
+  ],
+  "stat": "earth_roam",
+  "val": 80
+ },
+ {
+  "id": "earth_roam-81",
+  "cat": "🌍 地球Online",
+  "name": "漫游·早起看一次日出 ×11",
+  "desc": "早起看一次日出（第 11 轮）",
+  "points": 65,
+  "tier": [
+   "传说",
+   150
+  ],
+  "stat": "earth_roam",
+  "val": 81
+ },
+ {
+  "id": "earth_roam-82",
+  "cat": "🌍 地球Online",
+  "name": "漫游·连续 3 天 23: ×11",
+  "desc": "连续 3 天 23:00 前入睡（第 11 轮）",
+  "points": 65,
+  "tier": [
+   "传说",
+   150
+  ],
+  "stat": "earth_roam",
+  "val": 82
+ },
+ {
+  "id": "earth_roam-83",
+  "cat": "🌍 地球Online",
+  "name": "漫游·一天走满 8000  ×11",
+  "desc": "一天走满 8000 步（第 11 轮）",
+  "points": 65,
+  "tier": [
+   "传说",
+   150
+  ],
+  "stat": "earth_roam",
+  "val": 83
+ },
+ {
+  "id": "earth_roam-84",
+  "cat": "🌍 地球Online",
+  "name": "漫游·喝满 2L 水 ×11",
+  "desc": "喝满 2L 水（第 11 轮）",
+  "points": 65,
+  "tier": [
+   "传说",
+   150
+  ],
+  "stat": "earth_roam",
+  "val": 84
+ },
+ {
+  "id": "earth_roam-85",
+  "cat": "🌍 地球Online",
+  "name": "漫游·午休 20 分钟 ×11",
+  "desc": "午休 20 分钟（第 11 轮）",
+  "points": 65,
+  "tier": [
+   "传说",
+   150
+  ],
+  "stat": "earth_roam",
+  "val": 85
+ },
+ {
+  "id": "earth_roam-86",
+  "cat": "🌍 地球Online",
+  "name": "漫游·一整天不说「随便」 ×11",
+  "desc": "一整天不说「随便」（第 11 轮）",
+  "points": 65,
+  "tier": [
+   "传说",
+   150
+  ],
+  "stat": "earth_roam",
+  "val": 86
+ },
+ {
+  "id": "earth_roam-87",
+  "cat": "🌍 地球Online",
+  "name": "漫游·看一部纪录片 ×11",
+  "desc": "看一部纪录片（第 11 轮）",
+  "points": 65,
+  "tier": [
+   "传说",
+   150
+  ],
+  "stat": "earth_roam",
+  "val": 87
+ },
+ {
+  "id": "earth_roam-88",
+  "cat": "🌍 地球Online",
+  "name": "漫游·给植物浇水/养一盆植 ×12",
+  "desc": "给植物浇水/养一盆植物（第 12 轮）",
+  "points": 70,
+  "tier": [
+   "传说",
+   150
+  ],
+  "stat": "earth_roam",
+  "val": 88
+ },
+ {
+  "id": "earth_roam-89",
+  "cat": "🌍 地球Online",
+  "name": "漫游·早起看一次日出 ×12",
+  "desc": "早起看一次日出（第 12 轮）",
+  "points": 70,
+  "tier": [
+   "传说",
+   150
+  ],
+  "stat": "earth_roam",
+  "val": 89
+ },
+ {
+  "id": "earth_roam-90",
+  "cat": "🌍 地球Online",
+  "name": "漫游·连续 3 天 23: ×12",
+  "desc": "连续 3 天 23:00 前入睡（第 12 轮）",
+  "points": 70,
+  "tier": [
+   "传说",
+   150
+  ],
+  "stat": "earth_roam",
+  "val": 90
+ },
+ {
+  "id": "earth_roam-91",
+  "cat": "🌍 地球Online",
+  "name": "漫游·一天走满 8000  ×12",
+  "desc": "一天走满 8000 步（第 12 轮）",
+  "points": 70,
+  "tier": [
+   "传说",
+   150
+  ],
+  "stat": "earth_roam",
+  "val": 91
+ },
+ {
+  "id": "earth_roam-92",
+  "cat": "🌍 地球Online",
+  "name": "漫游·喝满 2L 水 ×12",
+  "desc": "喝满 2L 水（第 12 轮）",
+  "points": 70,
+  "tier": [
+   "传说",
+   150
+  ],
+  "stat": "earth_roam",
+  "val": 92
+ },
+ {
+  "id": "earth_roam-93",
+  "cat": "🌍 地球Online",
+  "name": "漫游·午休 20 分钟 ×12",
+  "desc": "午休 20 分钟（第 12 轮）",
+  "points": 70,
+  "tier": [
+   "传说",
+   150
+  ],
+  "stat": "earth_roam",
+  "val": 93
+ },
+ {
+  "id": "earth_roam-94",
+  "cat": "🌍 地球Online",
+  "name": "漫游·一整天不说「随便」 ×12",
+  "desc": "一整天不说「随便」（第 12 轮）",
+  "points": 70,
+  "tier": [
+   "传说",
+   150
+  ],
+  "stat": "earth_roam",
+  "val": 94
+ },
+ {
+  "id": "earth_roam-95",
+  "cat": "🌍 地球Online",
+  "name": "漫游·看一部纪录片 ×12",
+  "desc": "看一部纪录片（第 12 轮）",
+  "points": 70,
+  "tier": [
+   "传说",
+   150
+  ],
+  "stat": "earth_roam",
+  "val": 95
+ }
+]

@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SJY · PEOS 个人操作系统</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<canvas id="particles"></canvas>
+<header class="topbar">
+  <div class="brand">
+    <span class="logo">SJY<span class="logo-dot">·</span>PEOS<span class="cursor">▌</span></span>
+    <span class="brand-sub">Personal Executive OS · 本地只读驾驶舱</span>
+  </div>
+  <nav class="tabs" id="tabs">
+    <button data-tab="today" class="tab active">🚀 今日</button>
+    <button data-tab="tasks" class="tab">✅ 任务</button>
+    <button data-tab="state" class="tab">📊 状态与差距</button>
+    <button data-tab="decide" class="tab">📖 复盘</button>
+  </nav>
+  <div class="topbar-right">
+    <span class="refreshed" id="refreshed">加载中…</span>
+    <button class="refresh-btn" id="refreshBtn" title="重新读取 vault">↻</button>
+  </div>
+</header>
+
+<main id="app">
+  <div class="loading">SYNCING VAULT · 正在从 Obsidian 读取事实源</div>
+</main>
+
+<footer class="footer">
+  PEOS v1 · 数据源：<code>obsidian x cc/vault</code>（只读）· 分数口径：HUMAN3.0 v3 · 判断顺序：Jarvis 协议
+</footer>
+
+<script src="particles.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

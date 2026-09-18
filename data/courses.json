@@ -1,0 +1,161 @@
+{
+  "semester": "2026 Fall",
+  "source": "ICS export + syllabi PDFs/docx/pptx from cuhk_attachments",
+  "start_date": "2026-09-07",
+  "end_date": "2026-12-23",
+  "session_count": 15,
+  "courses": [
+    {
+      "code": "MKT6019",
+      "name": "Big Data Processing in Digital Marketing",
+      "weekday": 1,
+      "weekday_cn": "周一",
+      "start_time": "18:00",
+      "end_time": "20:50",
+      "location": "Teaching C Bldg 308",
+      "first_date": "2026-09-07",
+      "sessions": 15,
+      "assessments": [
+        { "item": "Class engagement (attendance)", "weight": 5, "due": null, "note": "全勤得 5%" },
+        { "item": "Mid-term Paper Presentation (team)", "weight": 40, "due": null, "note": "30 min 演示+5 min 提问；从 top journals 选论文；15-20 slides；小组出席" },
+        { "item": "Final Project (solo or team)", "weight": 55, "due": null, "note": "组内互评 0-5 调整个人分；全员出席最终展示" }
+      ]
+    },
+    {
+      "code": "MKT5011",
+      "name": "Strategic Marketing Management",
+      "weekday": 2,
+      "weekday_cn": "周二",
+      "start_time": "18:00",
+      "end_time": "20:50",
+      "location": "Teaching Complex C402",
+      "first_date": "2026-09-08",
+      "sessions": 15,
+      "assessments": [
+        { "item": "In-class Exam", "weight": 50, "due": "2026-12-01", "note": "Dec 1 课堂考试" },
+        { "item": "Group Project", "weight": 30, "due": "2026-12-08", "note": "Dec 8 项目展示 (in-class presentation)" },
+        { "item": "Group cases/exercises", "weight": 10, "due": null, "note": "随堂小组练习" },
+        { "item": "Attendance & Participation", "weight": 10, "due": null, "note": "出勤+课堂参与" }
+      ]
+    },
+    {
+      "code": "MKT6013",
+      "name": "Customer Relationship Management",
+      "weekday": 3,
+      "weekday_cn": "周三",
+      "start_time": "13:30",
+      "end_time": "16:20",
+      "location": "Teaching C Bldg 407",
+      "first_date": "2026-09-09",
+      "sessions": 15,
+      "assessments": [
+        { "item": "Group Project 1 (Generative AI)", "weight": 30, "due": "2026-10-14", "note": "Oct 14 课堂展示；不需书面报告，提交 PPT+素材" },
+        { "item": "Group Project 2 (CRM Applications)", "weight": 30, "due": "2026-12-16", "note": "Dec 16 课堂展示；不需书面报告" },
+        { "item": "Classroom Exam", "weight": 30, "due": "2026-12-23", "note": "Dec 23 期末考试" },
+        { "item": "Attendance & Participation", "weight": 10, "due": null, "note": "出勤+课堂参与；学期末组内互评" }
+      ]
+    },
+    {
+      "code": "MKT6033",
+      "name": "Artificial Intelligence Applications in Marketing",
+      "weekday": 3,
+      "weekday_cn": "周三",
+      "start_time": "18:00",
+      "end_time": "20:50",
+      "location": "Teaching B Bldg 102",
+      "first_date": "2026-09-09",
+      "sessions": 15,
+      "assessments": [
+        { "item": "Assignment 1", "weight": null, "due": "2026-10-18", "note": "Oct 18 23:59 Blackboard 提交" },
+        { "item": "Group project first try", "weight": null, "due": "2026-10-23", "note": "Oct 23 23:59 Blackboard 提交" },
+        { "item": "Assignment 2", "weight": null, "due": "2026-11-01", "note": "Nov 01 23:59 Blackboard 提交" },
+        { "item": "Assignment 3", "weight": null, "due": "2026-11-15", "note": "Nov 15 23:59 Blackboard 提交" },
+        { "item": "Assignment 4", "weight": null, "due": "2026-11-29", "note": "Nov 29 23:59 Blackboard 提交" },
+        { "item": "Group project final + Peer evaluation", "weight": null, "due": "2026-12-11", "note": "Dec 11 23:59 Blackboard 提交项目报告+互评表" }
+      ]
+    },
+    {
+      "code": "MKT5012",
+      "name": "Marketing Research in the Digital Age",
+      "weekday": 4,
+      "weekday_cn": "周四",
+      "start_time": "09:00",
+      "end_time": "11:50",
+      "location": "Teaching C Bldg 308",
+      "first_date": "2026-09-10",
+      "sessions": 15,
+      "assessments": [
+        { "item": "Class participation", "weight": null, "due": null, "note": "课堂参与" },
+        { "item": "Individual Assignments x2", "weight": null, "due": null, "note": "两次个人作业，日期待公布" },
+        { "item": "Midterm Exam", "weight": null, "due": null, "note": "期中考试，日期待公布" },
+        { "item": "Final Exam", "weight": null, "due": null, "note": "期末考试" },
+        { "item": "Group Project + Presentation", "weight": null, "due": null, "note": "小组项目+展示；5% peer evaluation；随机分组" }
+      ]
+    },
+    {
+      "code": "MKT5018",
+      "name": "Big Data Marketing Strategy",
+      "weekday": 4,
+      "weekday_cn": "周四",
+      "start_time": "14:00",
+      "end_time": "16:50",
+      "location": "Teaching Complex C101",
+      "first_date": "2026-09-10",
+      "sessions": 15,
+      "assessments": [
+        { "item": "Attendance & participation", "weight": 10, "due": null, "note": "贯穿全学期" },
+        { "item": "Team Work 1: Textbook Case Lab", "weight": 15, "due": "2026-10-09", "note": "Weeks 5-8（约 10/9–10/30）" },
+        { "item": "Team Work 2: AI Marketing Project", "weight": 35, "due": "2026-12-21", "note": "Milestones through Dec 21" },
+        { "item": "Individual assignment", "weight": 10, "due": null, "note": "Deadline announced in class" },
+        { "item": "Final examination", "weight": 40, "due": null, "note": "Final assessment slot" }
+      ]
+    },
+    {
+      "code": "MKT6012",
+      "name": "Communications in the Digital Age",
+      "weekday": 5,
+      "weekday_cn": "周五",
+      "start_time": "09:00",
+      "end_time": "11:50",
+      "location": "Teaching A Bldg 101",
+      "first_date": "2026-09-11",
+      "sessions": 15,
+      "assessments": [
+        { "item": "Group Project", "weight": 25, "due": null, "note": "期末小组项目" },
+        { "item": "Final Exam (90 min)", "weight": 50, "due": null, "note": "期末 90 分钟考试；选择题 60%+案例简答；可带手写 A4 一面笔记" },
+        { "item": "Group Assignment (Social Media Video)", "weight": 10, "due": null, "note": "为品牌/创作者做原创短视频；须用 AI 工具" },
+        { "item": "In-class contribution (Attendance 10% + Participation 5%)", "weight": 15, "due": null, "note": "至少出席 10 次+参与 5 次" }
+      ]
+    },
+    {
+      "code": "CEC5000",
+      "name": "Theory and Practice of State-building in Contemporary China",
+      "weekday": 5,
+      "weekday_cn": "周五",
+      "start_time": "14:00",
+      "end_time": "15:50",
+      "location": "Administration Bldg E206",
+      "first_date": "2026-09-11",
+      "sessions": 15,
+      "assessments": [
+        { "item": "Participation", "weight": 40, "due": null, "note": "课堂参与/考勤" },
+        { "item": "Final Task (Exam/Essay/Report)", "weight": 60, "due": null, "note": "期末考核" }
+      ]
+    },
+    {
+      "code": "CEC5010",
+      "name": "Dialectics of Nature",
+      "weekday": 5,
+      "weekday_cn": "周五",
+      "start_time": "16:00",
+      "end_time": "16:50",
+      "location": "Administration Bldg E206",
+      "first_date": "2026-09-11",
+      "sessions": 15,
+      "assessments": [
+        { "item": "Participation", "weight": 40, "due": null, "note": "课堂参与/考勤" },
+        { "item": "Final Task (Exam/Essay/Report)", "weight": 60, "due": null, "note": "期末考核" }
+      ]
+    }
+  ]
+}

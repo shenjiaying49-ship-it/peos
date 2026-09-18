@@ -1,0 +1,355 @@
+{
+  "_comment": "PEOS 配置。所有数值均可手动调整；vault 路径只读。分数口径见 PRD 第 8 节待确认问题 #2。",
+  "vault_root": "/Users/jyshen/Documents/dev/obsidian x cc/vault",
+  "port": 8790,
+  "user": {
+    "name": "SJY",
+    "identity": "港中深 MSc Marketing 研一 · Jocelyn 大号主理人"
+  },
+  "quadrants": {
+    "_source": "HUMAN3.0 v3 (2026-04-29)。当前分与90天目标为 HUMAN3.0 原始口径；理想按用户要求改为 5 分制（2026-09-14）。",
+    "current_total": 1.8,
+    "after90_total": 2.15,
+    "ideal_total": 5.0,
+    "items": [
+      {
+        "id": "mind",
+        "name": "心智 Mind",
+        "icon": "🧠",
+        "current": 2.1,
+        "after90": 2.5,
+        "ideal": 5.0,
+        "stage": "不协调（2.1）",
+        "diagnosis": "成熟的个体主义者，已反叛被分配的脚本，但分析停在脑子里、无法落到行动。处在 2→3 跃迁入口。",
+        "action": "唯一 KPI：每周公开发布一篇。不读新书、不报新课、不再优化工作流——所有「想多学一点」转化为「先写完这周这篇」。",
+        "kpi_weekly": "公开输出 1 篇/周"
+      },
+      {
+        "id": "body",
+        "name": "身体 Body",
+        "icon": "💪",
+        "current": 2.0,
+        "after90": 2.1,
+        "ideal": 5.0,
+        "stage": "稳定（2.0）",
+        "diagnosis": "目前最完整的象限，执行肌肉、可迁移资源。不应急着优化。",
+        "action": "维持 12 周减脂增肌计划（65.9→61kg）。唯一允许新增：每周一次 30 分钟无手机散步。入学后节奏：游泳/攀岩/健身。",
+        "kpi_weekly": "运动 5 次/周 · 23:00 入睡 ≥5 天"
+      },
+      {
+        "id": "spirit",
+        "name": "精神 Spirit",
+        "icon": "🤝",
+        "current": 1.1,
+        "after90": 1.9,
+        "ideal": 5.0,
+        "stage": "不协调（1.1）",
+        "diagnosis": "深层卡点：被家庭训练成「功能性亲密但不共享内在状态」。Spirit 功课是打破代际默认，不只是找深度朋友。",
+        "action": "每月 4 次深度对话实验（含 1 次与爸妈的内在分享）。写作是「在文字里说真话」的轻量练习场，先行。",
+        "kpi_weekly": "深度对话 1 次/周"
+      },
+      {
+        "id": "vocation",
+        "name": "事业 Vocation",
+        "icon": "🚀",
+        "current": 1.1,
+        "after90": 2.15,
+        "ideal": 5.0,
+        "stage": "不协调（1.1）",
+        "diagnosis": "22 岁 + 女性 + AI 行业一线 insider + 真实表达 = 市场上几乎不存在的画像，但高杠杆位置还没被使用。通道入口已识别。",
+        "action": "直接进通道：AI 行业故事/观察公开输出。双线：内部转化（用作品定义岗位）+ 作品对外（6-9 个月作品集）。生态合作全线收紧，精力收到 B 池子（个人 IP）。",
+        "kpi_weekly": "大号内容 2–3 条/周"
+      }
+    ]
+  },
+  "fitness": {
+    "_note": "12周计划口径来自 workspace SKILL.md v1.1（2026-09-07，InBody 实测 65.9kg）。半年框架写 68→64 为旧口径，以前者为准。",
+    "plan": "12 周减脂增肌",
+    "start_date": "2026-09-08",
+    "weeks": 12,
+    "weight_start": 65.9,
+    "weight_target": 61.0,
+    "protein_target": 130,
+    "sleep_target": "23:00",
+    "sessions": [
+      {
+        "id": "strength-a",
+        "name": "力量 A · 下肢推 + 背",
+        "duration_min": 55,
+        "exercises": [
+          "杯式深蹲 4×10",
+          "臀推 4×10",
+          "高位下拉 3×10",
+          "坐姿划船 3×12",
+          "平板支撑 3×40秒"
+        ]
+      },
+      {
+        "id": "strength-b",
+        "name": "力量 B · 髋主导 + 上肢推",
+        "duration_min": 55,
+        "exercises": [
+          "罗马尼亚硬拉 4×8",
+          "保加利亚分腿蹲 3×10/侧",
+          "哑铃卧推 3×10",
+          "哑铃肩推 3×10",
+          "死虫 3×12/侧"
+        ]
+      },
+      {
+        "id": "recovery",
+        "name": "恢复训练",
+        "duration_min": 25,
+        "exercises": [
+          "快走 15 分钟",
+          "髋屈肌拉伸 2×45秒/侧",
+          "胸椎旋转 2×10/侧",
+          "泡沫轴放松 5 分钟"
+        ]
+      }
+    ]
+  },
+  "calendar_contexts": [
+    {
+      "id": "sanya-2026-09",
+      "start": "2026-09-17",
+      "end": "2026-09-21",
+      "location": "三亚",
+      "mode": "旅行 · 轻工作",
+      "summary": "三亚行程期间采用轻量工作节奏；旅行优先，但线上工作和大号内容继续。",
+      "fixed": [
+        "三亚旅行安排优先",
+        "保留必要的线上工作响应",
+        "每天推进一个大号内容最小动作"
+      ],
+      "work_policy": {
+        "online_work": true,
+        "large_account_content": true,
+        "max_deep_work_minutes": 90
+      }
+    }
+  ],
+  "kpi_weekly": {
+    "_note": "旧 KPI 看板目标（Bonjour BD/韩语等）已过时。新默认按 2026秋·半年框架拟定，待确认。",
+    "targets": [
+      {
+        "id": "dahao",
+        "label": "大号内容",
+        "target": 2,
+        "keywords": [
+          "大号",
+          "Jocelyn",
+          "发布"
+        ]
+      },
+      {
+        "id": "sport",
+        "label": "运动（游泳/攀岩/健身）",
+        "target": 5,
+        "keywords": [
+          "游泳",
+          "攀岩",
+          "健身",
+          "训练",
+          "运动"
+        ]
+      },
+      {
+        "id": "jp",
+        "label": "日语最低闭环",
+        "target": 6,
+        "keywords": [
+          "日语",
+          "假名"
+        ]
+      },
+      {
+        "id": "en",
+        "label": "英语/雅思",
+        "target": 4,
+        "keywords": [
+          "英语",
+          "IELTS",
+          "雅思"
+        ]
+      },
+      {
+        "id": "spirit",
+        "label": "深度对话/Spirit 实验",
+        "target": 1,
+        "keywords": [
+          "深度对话",
+          "coffee chat",
+          "Coffee Chat",
+          "社交"
+        ]
+      },
+      {
+        "id": "sleep",
+        "label": "23:00 入睡",
+        "target": 5,
+        "keywords": [
+          "23:00"
+        ]
+      }
+    ]
+  },
+  "semester": {
+    "name": "2026 秋 · 半年框架（09 → 01）",
+    "start": "2026-09-01",
+    "end": "2027-01-31",
+    "goals": [
+      {
+        "id": "fans",
+        "label": "大号粉丝翻倍（研究生博主赛道小标杆）",
+        "status": "进行中",
+        "note": "翻倍基数待确认（半年框架待办）",
+        "progress": null
+      },
+      {
+        "id": "grad-account",
+        "label": "研究生生活号建立 + 素材库",
+        "status": "未启动",
+        "note": "先跑两周看产出能力再定频率",
+        "progress": null
+      },
+      {
+        "id": "a-pool",
+        "label": "生态合作全线收紧（贵客松收尾/原子公社退出/tone 淡出）",
+        "status": "收尾中",
+        "note": "不新增任何生态合作",
+        "progress": null
+      },
+      {
+        "id": "body",
+        "label": "身体：65.9→61kg，体脂降一档",
+        "status": "进行中",
+        "note": "游泳/攀岩/健身日节奏",
+        "progress": null
+      },
+      {
+        "id": "interest",
+        "label": "兴趣探索：钢琴 + 攀岩（≤2 个并行）",
+        "status": "进行中",
+        "note": "每月轮换试新的，不设硬目标",
+        "progress": null
+      },
+      {
+        "id": "intern",
+        "label": "暑期实习：上半年开始关注信息",
+        "status": "未启动",
+        "note": "不用现在冲",
+        "progress": null
+      },
+      {
+        "id": "gpa",
+        "label": "学业：绩点够用就行",
+        "status": "进行中",
+        "note": "不给 GPA 焦虑",
+        "progress": null
+      },
+      {
+        "id": "money",
+        "label": "财务：兴趣支出留意预算",
+        "status": "观察中",
+        "note": "Yuki 4000/月 = 零花钱来源",
+        "progress": null
+      }
+    ]
+  },
+  "decision_methodology": [
+    {
+      "title": "排除法起步",
+      "body": "25 岁前不可能全知道「要什么」，但一定经历过「这个我绝对不要再做了」。决策从不要什么开始——你的反愿景清单就是决策起点。",
+      "source": "与开开的对话 · HUMAN3.0 Part 1.3"
+    },
+    {
+      "title": "指标即决定",
+      "body": "问指标 = 问你有没有给自己设过决定。「我有希望但哪儿都能完成」是逃避。每个目标必须能被一个数字追责。",
+      "source": "与开开的对话"
+    },
+    {
+      "title": "二选一原则",
+      "body": "要么自由，要么有一件你心甘情愿不自由的事。两者都没有 = 红灯。",
+      "source": "HUMAN3.0 反愿景"
+    },
+    {
+      "title": "跳槽触发条件（任一满足才重新讨论）",
+      "body": "① 已发 8 篇以上有质量公开内容 ② 出现能建立关键缺失能力的具体机会 ③ 当前岗位本质恶化 ④ 可客观证明团队是结构性消耗。四条都不满足时，「换工作」是优化者陷阱的伪装。",
+      "source": "HUMAN3.0 Part 3.4"
+    },
+    {
+      "title": "前-超谬误警告",
+      "body": "「我不需要亲密关系」若源于内在丰盈是 3.0；若源于从小被训练不靠近人是 1.0 伪装。先经历亲密、被看见，再选择从容。",
+      "source": "HUMAN3.0 Part 1.5"
+    },
+    {
+      "title": "调研以行动为导向",
+      "body": "明确知道要做什么，再去找最好案例。带目的和期限的调研，结果就是行动；否则是拖延的高级形态。",
+      "source": "与开开的对话"
+    },
+    {
+      "title": "优化者陷阱识别",
+      "body": "用心智活动伪装为发展：用「评估换工作」代替开始创作、读新书报新课、把框架本身当内容。出现即回到唯一 KPI：这周这篇写了吗？",
+      "source": "HUMAN3.0 Part 2.2 / 4.1"
+    },
+    {
+      "title": "通道打开信号",
+      "body": "写完立刻想写第二篇；通勤/睡前不由自主构思话题；有人问「能多写些吗」。持续出现 → 放掉其他方向全力加深。",
+      "source": "HUMAN3.0 Part 4.3"
+    }
+  ],
+  "decision_order": [
+    {
+      "id": "safety",
+      "name": "安全与医疗",
+      "desc": "健康红灯 > 一切。有红灯先处理，其余全部让位。"
+    },
+    {
+      "id": "fixed",
+      "name": "固定安排",
+      "desc": "课程、考试、注册、已约会议——不可移动的先保住。"
+    },
+    {
+      "id": "recovery",
+      "name": "睡眠恢复与饮食",
+      "desc": "睡眠 <6.5h 或精力 ≤2 → 今日降档：只保青蛙 + 语言最低闭环。"
+    },
+    {
+      "id": "finance",
+      "name": "财务安全",
+      "desc": "预算紧张 → 今日支出冻结，先处理财务红线。"
+    },
+    {
+      "id": "mainline",
+      "name": "当前主线",
+      "desc": "个人 IP 输出（大号本周这篇）。这是四象限里唯一在还债的主线。"
+    },
+    {
+      "id": "explore",
+      "name": "体验探索",
+      "desc": "钢琴/攀岩/校园活动。有余力才做，不设硬目标。"
+    },
+    {
+      "id": "convenience",
+      "name": "临时便利",
+      "desc": "杂事便利类。永远排最后，能砍就砍。"
+    }
+  ],
+  "agent": {
+    "_comment": "决策 agent。默认离线规则引擎；填 api_base + api_key（任何 OpenAI 兼容端点）+ model 即切换为 LLM 自由问答。也可用环境变量 PEOS_LLM_API_KEY / OPENAI_API_KEY / OPENROUTER_API_KEY。",
+    "api_base": "",
+    "api_key": "",
+    "model": "glm-4.6"
+  },
+  "finance": {
+    "_comment": "opening_balance 为期初余额（元）；notes 为预算备注，均可在本文件修改。",
+    "opening_balance": null,
+    "notes": [
+      "Yuki 小号：4000/月（零花钱主要来源）",
+      "家里支持：够花，但兴趣课支出需留意预算",
+      "原子公社 200/天已随 A 池收紧停止"
+    ],
+    "daily_budget": 100
+  }
+}
