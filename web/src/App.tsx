@@ -58,9 +58,9 @@ export default function App() {
   const rich = d.latest_rich_daily;
   const showDaily = today && today.total > 0 ? today : rich;
   const schedSrc = today?.schedule?.length
-    ? { rows: today.schedule, frogs: today.frogs || [], isToday: true, dateLabel: "" }
+    ? { rows: today.schedule, frogs: today.frogs || [], isToday: true, dateLabel: "", date: today.date }
     : rich?.schedule?.length
-      ? { rows: rich.schedule, frogs: rich.frogs || [], isToday: false, dateLabel: fmtDate(rich.date) }
+      ? { rows: rich.schedule, frogs: rich.frogs || [], isToday: false, dateLabel: fmtDate(rich.date), date: rich.date }
       : null;
   const q = d.config.quadrants;
   const todayWeek = d.week.find(w => w.date === d.today);
@@ -101,7 +101,7 @@ export default function App() {
           <div className="today-right" data-reveal>
             <div className="col-head mono">时间表 · 按时间排布</div>
             {schedSrc
-              ? <ScheduleRail rows={schedSrc.rows} frogs={schedSrc.frogs} isToday={schedSrc.isToday} dateLabel={schedSrc.dateLabel} todayCourses={d.today_courses || []} todayDeadlines={d.today_deadlines || []} />
+              ? <ScheduleRail rows={schedSrc.rows} frogs={schedSrc.frogs} isToday={schedSrc.isToday} dateLabel={schedSrc.dateLabel} todayCourses={d.today_courses || []} todayDeadlines={d.today_deadlines || []} date={schedSrc.date} onChanged={reload} />
               : <p className="muted">最近一篇 Daily 没有可解析的总览主表。</p>}
             <div style={{ marginTop: 34 }}>
               <ProgressPanel fitness={d.fitness} onChanged={reload} />

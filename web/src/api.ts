@@ -136,6 +136,8 @@ export const api = {
     fetch("/api/game", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) }).then(r => r.json()),
   taskAdd: (b: { date: string; time: string; text: string; quad: string }) =>
     fetch("/api/task/add", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(b) }).then(r => r.json()),
+  taskEdit: (b: { date: string; raw?: string; section?: string; task?: string; old_time?: string; text?: string; time?: string; quad?: string }): Promise<{ ok: boolean; time?: string; error?: string }> =>
+    fetch("/api/task/edit", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(b) }).then(r => r.json()),
   dayContext: (date?: string): Promise<DayContext> =>
     fetch(`/api/day-context?date=${date || new Date().toISOString().slice(0, 10)}`).then(r => r.json()),
   suggestions: (date?: string): Promise<{ ok: boolean; suggestions: ProgressSuggestion[] }> =>

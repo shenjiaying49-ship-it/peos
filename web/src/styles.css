@@ -637,6 +637,58 @@ input[type="range"] { width: 100%; accent-color: #fff; height: 24px; }
   font-family: var(--sans); font-size: 13px; padding: 8px 10px;
 }
 .cp-row input:focus, .cp-row select:focus { outline: none; border-color: #fff; }
+
+/* 分类 / 重要度 pill 选择器（Composer + 编辑表单共用） */
+.pill-row { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 8px; align-items: center; }
+.pill {
+  background: #0c0c0c; border: 1px solid #2c2c2c; color: var(--dim);
+  font-family: var(--sans); font-size: 12px; padding: 4px 10px; cursor: pointer;
+  transition: border-color .12s, color .12s;
+}
+.pill:hover { border-color: #555; }
+.pill.on { border-color: #fff; color: #fff; }
+.cp-sep { width: 1px; height: 16px; background: #2c2c2c; margin: 0 4px; }
+.cp-cancel {
+  background: none; border: 1px solid #2c2c2c; color: var(--dim);
+  font-family: var(--sans); font-size: 12.5px; padding: 7px 14px; cursor: pointer;
+}
+.cp-cancel:hover { color: #fff; border-color: #fff; }
+
+/* TODO 行内编辑 */
+.edit-btn {
+  flex: none; background: none; border: 0; color: var(--faint); cursor: pointer;
+  font-size: 12px; padding: 2px 4px; opacity: 0; transition: opacity .15s;
+}
+.lrow:hover .edit-btn, .lrow:focus-within .edit-btn { opacity: 1; }
+.lrow:hover .edit-btn { color: #000; }
+.edit-btn:hover { text-decoration: underline; }
+.tedit { border: 1px solid #2c2c2c; background: #0c0c0c; padding: 10px 12px; margin: 2px 0 8px; }
+.tedit input {
+  width: 100%; background: #000; border: 1px solid #2c2c2c; color: var(--ink);
+  font-family: var(--sans); font-size: 13px; padding: 7px 10px;
+}
+.tedit input:focus { outline: none; border-color: #fff; }
+
+/* 时间线：拖拽 + 微调 + 弹层编辑 */
+.grip { color: var(--faint); margin-right: 8px; font-size: 12px; cursor: grab; user-select: none; }
+.sched-row[draggable="true"] { cursor: grab; }
+.sched-row[draggable="true"]:active { cursor: grabbing; }
+.sched-row.dragging { opacity: .3; }
+.sched-row.drop-target { outline: 1px dashed #b5f07a; outline-offset: 2px; background: rgba(126, 211, 33, .05); }
+.sched-row .s-time { cursor: pointer; }
+.sched-row .s-time:hover { color: #fff; }
+.rail-ops { display: inline-flex; gap: 6px; margin-left: 10px; vertical-align: middle; }
+.mini-btn {
+  background: none; border: 1px solid #2c2c2c; color: var(--faint); cursor: pointer;
+  font-family: var(--mono); font-size: 10.5px; padding: 2px 7px;
+}
+.mini-btn:hover { color: #fff; border-color: #fff; }
+.rail-edit { border: 1px solid #2c2c2c; background: #0c0c0c; padding: 10px 12px; margin: 6px 0; }
+.rail-edit input {
+  width: 100%; background: #000; border: 1px solid #2c2c2c; color: var(--ink);
+  font-family: var(--sans); font-size: 13px; padding: 7px 10px;
+}
+.rail-edit input:focus { outline: none; border-color: #fff; }
 .t-todos { margin-top: 26px; }
 .tl-hint { margin-left: auto; font-size: 10px; color: #4a4a4a; letter-spacing: 1px; }
 .tl-group.eq-q1 .tl-head { color: #fff; }

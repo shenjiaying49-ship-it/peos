@@ -1552,6 +1552,156 @@ def add_task(body: dict):
     return {"ok": True, "time": time_str}
 
 
+def _locate_task(lines, raw_line: str, section: str = ""):
+    """定位 checkbox 行：优先匹配分区，其次全文首个。返回 (行号, 当前分区标题) 或 (None, '')。"""
+    cur, hits = "", []
+    for i, line in enumerate(lines):
+        m = re.match(r"^#{2,3}\s+(.*)$", line)
+        if m:
+            cur = m.group(1).strip()
+            continue
+        if line.strip() == raw_line and TASK_RE.match(line):
+            hits.append((i, cur))
+    for i, sec in hits:
+        if not section or strip_md(sec) == strip_md(section):
+            return i, sec
+    if hits:
+        return hits[0]
+    return None, ""
+
+
+def _norm_hm(s: str):
+    """校验半小时刻度时间段，返回规范化 'HH:MM–HH:MM'，不合法返回 None。"""
+    m = re.fullmatch(r"(\d{2}:\d{2})\s*[–—-]\s*(\d{2}:\d{2})", s.strip())
+    if not m:
+        return None
+    try:
+        sh, sm = (int(x) for x in m.group(1).split(":"))
+        eh, em = (int(x) for x in m.group(2).split(":"))
+    except ValueError:
+        return None
+    if sh > 23 or eh > 23 or sm not in (0, 30) or em not in (0, 30):
+        return None
+    if eh * 60 + em <= sh * 60 + sm:
+        return None
+    return f"{m.group(1)}–{m.group(2)}"
+
+
+def _sync_overview_row(lines, old_time: str, old_text: str, new_time: str,
+                       new_text: str, quad=None):
+    """把总览主表中「旧时间+旧文字」的行改成新值。返回是否命中。"""
+    if not old_time:
+        return False
+    for i, line in enumerate(lines):
+        s = line.strip()
+        if not s.startswith("|"):
+            continue
+        cells = [c.strip() for c in s.strip("|").split("|")]
+        if len(cells) < 4 or set(cells[0]) <= set("-— "):
+            continue
+        rm = re.fullmatch(r"(\d{1,2}:\d{2})\s*[–—-]\s*(\d{1,2}:\d{2})", cells[1])
+        if not rm or f"{rm.group(1)}–{rm.group(2)}" != old_time:
+            continue
+        if strip_md(cells[3]) != old_text:
+            continue
+        cells[1] = new_time
+        cells[3] = new_text
+        if quad:
+            cells[4] = f"{quad.split(' ', 1)[-1]} · 自定义"
+        lines[i] = "| " + " | ".join(cells) + " |"
+        return True
+    return False
+
+
+def edit_task(body: dict):
+    """编辑任务：改文字 / 时间 / 象限。raw 定位 checkbox 行；时间线拖拽可用 task+old_time 反查。"""
+    try:
+        d = dt.date.fromisoformat(str(body.get("date") or _today().isoformat()))
+    except ValueError:
+        return {"ok": False, "error": "日期格式无效"}
+    p = daily_path(d)
+    if not p.exists():
+        return {"ok": False, "error": f"Daily 不存在：{p.name}"}
+    lines = read(p).split("\n")
+
+    raw = str(body.get("raw") or "").strip()
+    task_hint = str(body.get("task") or "").strip()
+    old_time_in = str(body.get("old_time") or "").strip().replace("-", "–").replace("—", "–")
+    section = str(body.get("section") or "")
+
+    idx, cur_section, old_time, old_text = None, "", "", ""
+    if raw:
+        idx, cur_section = _locate_task(lines, raw, section)
+        if idx is None:
+            return {"ok": False, "error": "没找到该任务行，请刷新页面重试"}
+        mm = TASK_RE.match(lines[idx])
+        content = mm.group(2).strip()
+        om = TIME_RANGE_RE.search(content)
+        old_time = f"{om.group(1)}–{om.group(2)}" if om else ""
+        old_text = TIME_RANGE_RE.sub("", content).strip()
+    elif task_hint and old_time_in:
+        # 时间线拖拽：按「旧时间 + 任务文字」反查 checkbox 行
+        for i, line in enumerate(lines):
+            mm = TASK_RE.match(line)
+            if not mm:
+                continue
+            content = mm.group(2).strip()
+            om = TIME_RANGE_RE.search(content)
+            if om and f"{om.group(1)}–{om.group(2)}" == old_time_in \
+                    and TIME_RANGE_RE.sub("", content).strip() == task_hint:
+                idx, cur_section = i, ""
+                for j in range(i, -1, -1):        # 回溯所在分区标题
+                    hm = re.match(r"^#{2,3}\s+(.*)$", lines[j])
+                    if hm:
+                        cur_section = hm.group(1).strip()
+                        break
+                old_time, old_text = old_time_in, task_hint
+                break
+        if idx is None:
+            old_time, old_text = old_time_in, task_hint   # 仅总览表行（无对应 checkbox）
+    else:
+        return {"ok": False, "error": "缺少任务定位信息（raw 或 task+old_time）"}
+
+    # 新值（不传的保持原样）
+    new_text = str(body.get("text") or "").strip()[:60] or old_text
+    if not new_text:
+        return {"ok": False, "error": "任务内容不能为空"}
+    time_in = str(body.get("time") or "").strip()
+    if time_in:
+        nt = _norm_hm(time_in)
+        if not nt:
+            return {"ok": False, "error": "时间必须为半小时刻度（如 19:00–19:30），且结束晚于开始"}
+        new_time = nt
+    else:
+        new_time = old_time
+    quad = QUAD_SECTIONS.get(str(body.get("quad") or "")) if body.get("quad") else None
+
+    moved = False
+    if idx is not None:
+        done_mark = TASK_RE.match(lines[idx]).group(1)
+        new_line = f"- [{done_mark}] {new_time} {new_text}" if new_time else f"- [{done_mark}] {new_text}"
+        if quad and cur_section and quad != cur_section:
+            del lines[idx]                       # 象限变了 → 整行搬到新分区
+            try:
+                si = next(i for i, l in enumerate(lines) if l.strip() == f"## {quad}")
+                ei = next((i for i in range(si + 1, len(lines)) if lines[i].startswith("## ")), len(lines))
+                j = ei
+                while j - 1 > si and not lines[j - 1].strip():
+                    j -= 1
+                lines.insert(j, new_line)
+            except StopIteration:
+                lines += ["", f"## {quad}", "", new_line]
+            moved = True
+        else:
+            lines[idx] = new_line
+
+    synced = _sync_overview_row(lines, old_time, old_text, new_time, new_text, quad)
+    if idx is None and not synced:
+        return {"ok": False, "error": "没找到该任务（可能刚被改动，请刷新页面重试）"}
+    p.write_text("\n".join(lines), encoding="utf-8")
+    return {"ok": True, "time": new_time, "moved_quad": moved, "table_synced": synced}
+
+
 # ---------------------------------------------------------------- 每日计划自动生成（skill 体系 + 历史挖掘）
 
 import random as _random
@@ -2535,6 +2685,8 @@ class Handler(SimpleHTTPRequestHandler):
                 self._json(400, {"ok": False, "error": str(e)})
         elif self.path == "/api/task/add":
             self._json(200, add_task(body))
+        elif self.path == "/api/task/edit":
+            self._json(200, edit_task(body))
         elif self.path == "/api/plan":
             try:
                 # Save work context if provided, then generate plan
