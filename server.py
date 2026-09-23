@@ -955,25 +955,27 @@ LEVEL_SKILLS = {
 }
 
 # 奖励商店（四级分类）—— 用户真实爱好定价体系：真实价格 ×10 分
+# 奖励商店 · 双池制：每周池（周一刷新·上限2次/周）+ 每月池（1日刷新·高价值·上限1次/月）
 DEFAULT_REWARDS = [
-    # 小说/阅读
-    {"id": "r-book",    "label": "买一本想读的小说（≈¥50）", "cost": 500,  "tier": "medium"},
-    {"id": "r-ebook",   "label": "电子书充值买下一本（≈¥30）", "cost": 300,  "tier": "medium"},
-    {"id": "r-readday", "label": "半天沉浸式阅读（零打扰）",    "cost": 200,  "tier": "micro"},
-    # 徒步/户外
-    {"id": "r-hike",    "label": "周末徒步一日（≈¥30 路费零食）", "cost": 300, "tier": "medium"},
-    {"id": "r-gear",    "label": "买一件徒步小装备（≈¥100）",   "cost": 1000, "tier": "large"},
-    # 吃好吃的
-    {"id": "r-milk",    "label": "奶茶/咖啡一杯（≈¥25）",       "cost": 250,  "tier": "micro"},
-    {"id": "r-dessert", "label": "甜品/蛋糕自由一次（≈¥40）",   "cost": 400,  "tier": "medium"},
-    {"id": "r-meal",    "label": "吃一顿想吃的餐厅（≈¥80）",    "cost": 800,  "tier": "large"},
-    # 休息
-    {"id": "r-sleep",   "label": "睡到自然醒（不设闹钟）",       "cost": 300,  "tier": "medium"},
-    {"id": "r-rest",    "label": "半天完全休息（零任务）",        "cost": 200,  "tier": "micro"},
-    # 旅游
-    {"id": "r-trip",    "label": "短途一日游（≈¥200）",          "cost": 2000, "tier": "large"},
-    {"id": "r-travel",  "label": "过夜小旅行（≈¥500）",          "cost": 5000, "tier": "milestone"},
+    # ── 每周池（便宜 · 高频）──
+    {"id": "r-readday", "label": "半天沉浸式阅读（零打扰）",      "cost": 200,  "tier": "micro",  "pool": "weekly"},
+    {"id": "r-rest",    "label": "半天完全休息（零任务）",          "cost": 200,  "tier": "micro",  "pool": "weekly"},
+    {"id": "r-milk",    "label": "奶茶/咖啡一杯（≈¥25）",         "cost": 250,  "tier": "micro",  "pool": "weekly"},
+    {"id": "r-ebook",   "label": "电子书充值买下一本（≈¥30）",     "cost": 300,  "tier": "medium", "pool": "weekly"},
+    {"id": "r-hike",    "label": "周末徒步一日（≈¥30 路费零食）",   "cost": 300,  "tier": "medium", "pool": "weekly"},
+    {"id": "r-dessert", "label": "甜品/蛋糕自由一次（≈¥40）",       "cost": 400,  "tier": "medium", "pool": "weekly"},
+    {"id": "r-book",    "label": "买一本想读的小说（≈¥50）",        "cost": 500,  "tier": "medium", "pool": "weekly"},
+    # ── 每月池（高价值 · 低频）──
+    {"id": "r-sleep",   "label": "睡到自然醒（不设闹钟）",          "cost": 600,  "tier": "large",  "pool": "monthly"},
+    {"id": "r-meal",    "label": "吃一顿想吃的餐厅（≈¥80）",        "cost": 800,  "tier": "large",  "pool": "monthly"},
+    {"id": "r-gear",    "label": "买一件徒步小装备（≈¥100）",       "cost": 1000, "tier": "large",  "pool": "monthly"},
+    {"id": "r-trip",    "label": "短途一日游（≈¥200）",            "cost": 2000, "tier": "large",  "pool": "monthly"},
+    {"id": "r-travel",  "label": "过夜小旅行（≈¥500）",            "cost": 5000, "tier": "milestone", "pool": "monthly"},
 ]
+
+# 每池每窗口兑换上限（防上头机制）
+REWARD_POOL_CAPS = {"weekly": 2, "monthly": 1}
+
 
 REWARD_TIER_CFG = {
     "micro":     {"name": "🎯 即时小奖", "min_level": 1, "max_cost": 300},
@@ -999,6 +1001,9 @@ def _load_game() -> dict:
             base.update(g)
             if not base.get("rewards"):
                 base["rewards"] = list(DEFAULT_REWARDS)
+            for _r in base["rewards"]:
+                if not _r.get("pool"):
+                    _r["pool"] = "monthly" if int(_r.get("cost", 0)) > 500 else "weekly"
         except Exception:
             pass
     return base
@@ -1210,7 +1215,8 @@ def game_state():
         ledger_net += -points if entry.get("kind") in ("redeem", "precommit_stake") else points
     spent = sum(abs(int(e.get("points", 0))) for e in g["ledger"]
                 if e.get("kind") in ("redeem", "precommit_stake"))
-    total = base_pts + streak_bonus_total + ach_pts + ledger_net
+    total = base_pts + streak_bonus_total + ach_pts + ledger_net + int(g.get("points_offset", 0))
+    total = max(0, total)
     # Active double day doubles actual earned points for today's completed work.
     if _today().isoformat() in g.get("double_days", []):
         today_earned = sum(abs(int(e.get("points", 0))) for e in g["ledger"]
@@ -1270,6 +1276,10 @@ def game_state():
         "earth_done_total": stats["earth_done"],
         "earth_today_date": today_iso,
         "rewards": g["rewards"],
+        "pools": {
+            "weekly": {"cap": REWARD_POOL_CAPS["weekly"], "used": _pool_window_usage(g, "weekly"), "reset": "每周一刷新"},
+            "monthly": {"cap": REWARD_POOL_CAPS["monthly"], "used": _pool_window_usage(g, "monthly"), "reset": "每月 1 日刷新"},
+        },
         "rewards_tiered": rewards_tiered,
         "ledger": g["ledger"][-12:][::-1],
         "month_net": fin.get("month_net"),
@@ -1295,17 +1305,40 @@ def earth_toggle(idx: int, done: bool):
     return {"ok": True}
 
 
+def _pool_window_usage(g: dict, pool: str) -> int:
+    """当前窗口内该池已兑换次数（周=本周一至今；月=本月至今）"""
+    now = dt.datetime.now()
+    if pool == "weekly":
+        start = (now - dt.timedelta(days=now.weekday())).date()
+    else:
+        start = now.date().replace(day=1)
+    n = 0
+    for e in g["ledger"]:
+        if e.get("kind") != "redeem" or e.get("pool") != pool:
+            continue
+        try:
+            if dt.datetime.fromisoformat(e["ts"]).date() >= start:
+                n += 1
+        except Exception:
+            pass
+    return n
+
+
 def reward_add(body: dict):
     g = _load_game()
     label = str(body.get("label") or "").strip()[:40]
     cost = int(body.get("cost") or 0)
-    tier = str(body.get("tier") or "micro").strip().lower()
-    if tier not in ("micro", "medium", "large", "milestone"):
-        tier = "micro"
+    pool = str(body.get("pool") or ("monthly" if cost > 500 else "weekly")).strip().lower()
+    if pool not in ("weekly", "monthly"):
+        pool = "weekly"
+    if pool == "monthly":
+        tier = "milestone" if cost >= 3000 else "large"
+    else:
+        tier = "medium" if cost > 300 else "micro"
     if not label or cost <= 0:
         return {"ok": False, "error": "奖励名和积分必填"}
     g["rewards"].append({"id": f"r-{dt.datetime.now().strftime('%H%M%S')}",
-                         "label": label, "cost": cost, "tier": tier})
+                         "label": label, "cost": cost, "tier": tier, "pool": pool})
     _save_game(g)
     return {"ok": True}
 
@@ -1325,10 +1358,17 @@ def reward_redeem(rid: str):
     st = game_state()
     if st["points"] < r["cost"]:
         return {"ok": False, "error": f"积分不够（还差 {r['cost'] - st['points']}）"}
+    pool = r.get("pool") or ("monthly" if r["cost"] > 500 else "weekly")
+    used = _pool_window_usage(g, pool)
+    cap = REWARD_POOL_CAPS.get(pool, 99)
+    if used >= cap:
+        reset_txt = "下周一刷新" if pool == "weekly" else "每月 1 日刷新"
+        name = "每周池" if pool == "weekly" else "每月池"
+        return {"ok": False, "error": f"「{name}」本期已兑换 {used}/{cap}，{reset_txt}再来"}
     redeem_id = f"rd-{dt.datetime.now().strftime('%H%M%S')}"
     g["ledger"].append({"ts": dt.datetime.now().isoformat(timespec="seconds"),
                         "kind": "redeem", "label": r["label"], "points": r["cost"],
-                        "rid": redeem_id})
+                        "pool": pool, "rid": redeem_id})
     _save_game(g)
     return {"ok": True, "left": st["points"] - r["cost"],
             "redeem_id": redeem_id,

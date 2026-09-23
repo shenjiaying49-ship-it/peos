@@ -2,29 +2,27 @@ import { useEffect } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { fmtDate, pct } from "./api";
-import { useEngine, useFinance, useOverview, useReducedMotion } from "./hooks";
+import { useEngine, useOverview, useReducedMotion } from "./hooks";
 import Nav from "./components/Nav";
 import Section from "./components/Section";
 import WeatherBar from "./components/WeatherBar";
 import ScheduleRail from "./components/ScheduleRail";
-import SmartPlan from "./components/SmartPlan";
 import ProgressPanel from "./components/ProgressPanel";
 import GameBoard from "./components/GameBoard";
-import { TaskComposer, TodayTodos } from "./components/TodayTodos";
+import { TodayTodos } from "./components/TodayTodos";
 import DailyDataForm from "./components/DailyDataForm";
 import Radar from "./components/Radar";
 import Spark from "./components/Spark";
-import FinanceBoard from "./components/FinanceBoard";
 import MediaBoard from "./components/MediaBoard";
 import TopicsBoard from "./components/TopicsBoard";
 import CalibrationFlow from "./components/CalibrationFlow";
+import JarvisBoard, { DayTypePicker, NowCard, QuickCapture } from "./components/JarvisBoard";
 import { AgentChat, DiaryEditor, DiaryStream } from "./components/Review";
 
 gsap.registerPlugin(ScrollTrigger);
 
 export default function App() {
   const { data: d, error, reload } = useOverview();
-  const { data: fin, reload: finReload } = useFinance();
   const engine = useEngine();
   const reduced = useReducedMotion();
 
@@ -69,41 +67,40 @@ export default function App() {
     <div className="stage">
       <Nav />
 
-      {/* ───── CH1 今日 · 日程 ───── */}
+      {/* ───── CH1 今日 · 先看青蛙，再做现在，一句上表 ───── */}
       <Section id="today" index="01">
         <WeatherBar />
         <div className="today-grid">
           <div className="today-left">
             <div className="t-date">{fmtDate(d.today)}</div>
-            {!today && <div className="t-banner">⏳ 今日 Daily 未创建 —— 日程表显示最近一篇（{rich ? fmtDate(rich.date) : "无"}）；写日记或填身体数据会自动创建</div>}
-            <div className="t-focus">
-              <div className="col-head mono">今日焦点</div>
-              {showDaily?.frogs?.length
-                ? showDaily.frogs.map((f, i) => <div key={i} className="frog">🐸 {f}</div>)
-                : <p className="muted">这篇 Daily 没有写青蛙（最重要的事放上午做完，可写 1–3 只）</p>}
-              {showDaily?.conclusion && <p className="concl mono">「{showDaily.conclusion}」</p>}
+            {!today && <div className="t-banner">⏳ 今日 Daily 未创建——写日记或填数据会自动创建</div>}
+            <div className="sec-block">
+              <div className="col-head mono">⏱ 现在就做</div>
+              <NowCard rows={today?.schedule || rich?.schedule || []} />
             </div>
-            <div className="t-engine">
-              <div className="col-head mono">智能安排 · 填两个数就好</div>
-              <SmartPlan onPlanned={reload} budget={fin?.daily_budget ?? 100} spent={today?.spend} />
+            <div className="sec-block">
+              <div className="col-head mono">丢给我——一句话，自动上时间表</div>
+              <QuickCapture today={d.today} onChanged={reload} />
             </div>
-            <div className="t-todos">
-              <div className="col-head mono">今日 TODO · 按四象限 · 点击勾选</div>
+            <div className="sec-block">
+              <div className="col-head mono">今日 TODO · 四象限 · 悬停可改</div>
               <TodayTodos daily={today} onChanged={reload} />
-              <div className="col-head mono" style={{ marginTop: 22 }}>自定义任务 · 挑时间上时间表</div>
-              <TaskComposer date={d.today} onAdded={reload} />
             </div>
-            <div className="t-data">
-              <div className="col-head mono">今日数据 · 网页直填（写入 Daily）</div>
+            <div className="sec-block">
+              <div className="col-head mono">今日数据 · 网页直填</div>
               <DailyDataForm today={d.today} daily={today} onSaved={reload} />
             </div>
           </div>
           <div className="today-right" data-reveal>
-            <div className="col-head mono">时间表 · 按时间排布</div>
+            <div className="col-head mono">时间表 · 拖拽调整 · 悬停微调</div>
             {schedSrc
               ? <ScheduleRail rows={schedSrc.rows} frogs={schedSrc.frogs} isToday={schedSrc.isToday} dateLabel={schedSrc.dateLabel} todayCourses={d.today_courses || []} todayDeadlines={d.today_deadlines || []} date={schedSrc.date} onChanged={reload} />
-              : <p className="muted">最近一篇 Daily 没有可解析的总览主表。</p>}
-            <div style={{ marginTop: 34 }}>
+              : <p className="muted">最近一篇 Daily 没有可解析的总览主表——用左侧「丢给我」排第一版。</p>}
+            <div className="sec-block">
+              <div className="col-head mono">今日类型 · 决定今天的盘子多大</div>
+              <DayTypePicker today={d.today} />
+            </div>
+            <div className="sec-block">
               <ProgressPanel fitness={d.fitness} onChanged={reload} />
             </div>
           </div>
@@ -133,18 +130,13 @@ export default function App() {
         </div>
       </Section>
 
-      {/* ───── CH3 财务 ───── */}
-      <Section id="finance" index="03">
-        <FinanceBoard fin={fin} reload={finReload} />
-      </Section>
-
-      {/* ───── CH4 书影 ───── */}
-      <Section id="media" index="04">
+      {/* ───── CH3 书影 ───── */}
+      <Section id="media" index="03">
         <MediaBoard />
       </Section>
 
-      {/* ───── CH5 复盘 ───── */}
-      <Section id="review" index="05">
+      {/* ───── CH4 复盘 ───── */}
+      <Section id="review" index="04">
         <div className="review-grid">
           <div data-reveal>
             <div className="col-head mono">今日日记</div>
@@ -159,6 +151,11 @@ export default function App() {
             <DiaryStream cards={d.diary_cards} />
           </div>
         </div>
+      </Section>
+
+      {/* ───── CH5 JARVIS · 长期引擎（语义排程 / 长期目标 / 身心灵） ───── */}
+      <Section id="jarvis" index="05">
+        <JarvisBoard today={d.today} todayDaily={today} onChanged={reload} />
       </Section>
 
       {/* ───── CH6 成就（地球 Online） ───── */}
@@ -216,7 +213,7 @@ export default function App() {
 
       <footer className="footer mono">
         PEOS v2.1 · 数据源 <code>obsidian x cc/vault</code>（勾选/日记段/身体数据外只读）· 分数口径 HUMAN3.0 v3 · 理想 5 分制
-        <br />黑色数字剧场 · 原创像素视觉 · 本地运行 127.0.0.1:8790
+        <br />月光白 × 金水 · 原创排版 · 本地运行 127.0.0.1:8790 · JARVIS 长期引擎已接入
       </footer>
     </div>
   );

@@ -3,9 +3,9 @@ import { useEffect, useState } from "react";
 const ITEMS = [
   { id: "today", label: "今日" },
   { id: "tasks", label: "管道" },
-  { id: "finance", label: "财务" },
   { id: "media", label: "书影" },
   { id: "review", label: "复盘" },
+  { id: "jarvis", label: "长期" },
   { id: "game", label: "成就" },
   { id: "state", label: "状态" },
 ];

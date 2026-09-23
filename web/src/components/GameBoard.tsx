@@ -15,7 +15,8 @@ interface GameState {
   level_skills: string[];
   stats: Record<string, number>; unlocked: string[]; achievements: Ach[];
   earth_today: { idx: number; text: string; done: boolean }[]; earth_done_total: number;
-  rewards: { id: string; label: string; cost: number; tier: string }[];
+  rewards: { id: string; label: string; cost: number; tier: string; pool?: string }[];
+  pools: Record<string, { cap: number; used: number; reset: string }>;
   rewards_tiered: Record<string, TierReward>;
   ledger: { ts: string; kind: string; label: string; points: number }[];
   month_net: number | null;
@@ -181,35 +182,48 @@ export default function GameBoard() {
         )}
       </div>
 
-      {/* 奖励商店（分级） */}
+      {/* 奖励商店（每周池 / 每月池 · 带上限防上头） */}
       <div className="shop" data-reveal>
-        <div className="col-head mono">🎁 多巴胺菜单 · 分级奖励</div>
-        {g.rewards_tiered && Object.entries(g.rewards_tiered).map(([tk, tr]) => (
-          tr.items.length > 0 && (
-            <div key={tk} className="tier-section">
-              <div className="tier-title mono">{tr.name}</div>
-              {tr.items.map(r => (
-                <div key={r.id} className="shop-row">
-                  <span className="sr-label">{r.label}</span>
-                  <span className="sr-cost mono">{r.cost} 分</span>
-                  <button className="btn-solid sm" disabled={g.points < r.cost}
-                    onClick={async () => {
-                      const res = await api.gameAct({ action: "redeem", id: r.id });
-                      if (!res.ok) setMsg("✗ " + (res.error || "失败"));
-                      else {
-                        setMsg(res.savor_prompt || `🎁 已兑换「${r.label}」−${r.cost} 分`);
-                        if (res.redeem_id) setSavorRid(res.redeem_id);
-                      }
-                      load();
-                    }}>
-                    {g.points < r.cost ? `还差 ${r.cost - g.points}` : "兑换"}
-                  </button>
-                  <button className="fr-del" onClick={() => act({ action: "reward_delete", id: r.id })} aria-label="删除奖励">✕</button>
-                </div>
-              ))}
+        <div className="col-head mono">🎁 奖励池 · 限时限量，别玩太欢</div>
+        {msg && <p className="sp-msg mono">{msg}</p>}
+        {(["weekly", "monthly"] as const).map(pk => {
+          const pool = g.pools?.[pk] || { cap: pk === "weekly" ? 2 : 1, used: 0, reset: "" };
+          const items = g.rewards.filter(r => (r.pool || (r.cost > 500 ? "monthly" : "weekly")) === pk);
+          const left = pool.cap - pool.used;
+          return (
+            <div key={pk} className="tier-section">
+              <div className="tier-title mono">
+                {pk === "weekly" ? "🗓 每周池 · 每周一刷新" : "👑 每月池 · 每月 1 日刷新（高价值）"}
+                <span className={`mono pool-cap ${left <= 0 ? "cap-out" : ""}`}>
+                  本期 {pool.used}/{pool.cap}{left <= 0 ? " · 已用完，下期再来" : ""}
+                </span>
+              </div>
+              {items.map(r => {
+                const noCap = left <= 0;
+                const noPts = g.points < r.cost;
+                return (
+                  <div key={r.id} className="shop-row">
+                    <span className="sr-label">{r.label}</span>
+                    <span className="sr-cost mono">{r.cost} 分</span>
+                    <button className="btn-solid sm" disabled={noCap || noPts}
+                      onClick={async () => {
+                        const res = await api.gameAct({ action: "redeem", id: r.id });
+                        if (!res.ok) setMsg("✗ " + (res.error || "失败"));
+                        else {
+                          setMsg(res.savor_prompt || `🎁 已兑换「${r.label}」−${r.cost} 分`);
+                          if (res.redeem_id) setSavorRid(res.redeem_id);
+                        }
+                        load();
+                      }}>
+                      {noCap ? "已满" : noPts ? `还差 ${r.cost - g.points}` : "兑换"}
+                    </button>
+                    <button className="fr-del" onClick={() => act({ action: "reward_delete", id: r.id })} aria-label="删除奖励">✕</button>
+                  </div>
+                );
+              })}
             </div>
-          )
-        ))}
+          );
+        })}
         {/* 品味仪式 */}
         {savorRid && (
           <div className="savor-form">
@@ -223,18 +237,16 @@ export default function GameBoard() {
             }}>+5</button>
           </div>
         )}
-        {/* 上架新奖励 */}
+        {/* 上架新奖励（选池子） */}
         <div className="pp-form">
           <input value={label} onChange={e => setLabel(e.target.value)} placeholder="想要的奖励" aria-label="奖励名" />
           <input className="pp-total" value={cost} onChange={e => setCost(e.target.value)} inputMode="numeric" placeholder="所需积分" aria-label="所需积分" />
-          <select value={tier} onChange={e => setTier(e.target.value)} aria-label="分级">
-            <option value="micro">🎯 即时小奖</option>
-            <option value="medium">🎁 中规中矩</option>
-            <option value="large">🏆 大件</option>
-            <option value="milestone">👑 里程碑</option>
+          <select value={tier} onChange={e => setTier(e.target.value)} aria-label="池子">
+            <option value="weekly">🗓 每周池（周一刷新·限2次）</option>
+            <option value="monthly">👑 每月池（1日刷新·限1次）</option>
           </select>
           <button className="btn-solid" onClick={async () => {
-            const r = await api.gameAct({ action: "reward_add", label: label.trim(), cost: parseInt(cost) || 0, tier });
+            const r = await api.gameAct({ action: "reward_add", label: label.trim(), cost: parseInt(cost) || 0, pool: tier });
             if (!r.ok) setMsg("✗ " + r.error); else { setLabel(""); setCost(""); setMsg(""); }
             load();
           }}>上架</button>
@@ -246,12 +258,9 @@ export default function GameBoard() {
         )}
       </div>
 
-      {/* 成就墙 */}
-      <div className="achwall" data-reveal>
-        <div className="col-head mono">
-          🏆 成就墙 · {g.unlocked.length}/300
-          <span className="ach-progress"><span className="bar sm"><i style={{ width: `${pct(g.unlocked.length, 300)}%` }} /></span></span>
-        </div>
+      {/* 成就墙（默认收起 · 不刷成就） */}
+      <details className="achwall-collapse" data-reveal>
+        <summary className="col-head mono">🏆 成就墙 · 已解锁 {g.unlocked.length}/300（收起中，点开查看）</summary>
         <div className="cat-tabs">
           {cats.map(c => (
             <button key={c} className={`chip ${c === cat ? "on" : ""}`} onClick={() => setCat(c)}>{c}</button>
@@ -270,7 +279,7 @@ export default function GameBoard() {
             );
           })}
         </div>
-      </div>
+      </details>
     </div>
   );
 }

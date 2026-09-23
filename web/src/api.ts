@@ -56,8 +56,9 @@ export interface GameState {
   earth_today: { idx: number; text: string; done: boolean }[];
   earth_done_total: number;
   earth_today_date: string;
-  rewards: { id: string; label: string; cost: number; tier: string }[];
-  rewards_tiered: Record<string, { name: string; items: { id: string; label: string; cost: number; tier: string }[] }>;
+  rewards: { id: string; label: string; cost: number; tier: string; pool?: string }[];
+  pools: Record<string, { cap: number; used: number; reset: string }>;
+  rewards_tiered: Record<string, { name: string; items: { id: string; label: string; cost: number; tier: string; pool?: string }[] }>;
   ledger: { ts: string; kind: string; points: number; label: string }[];
   month_net: number | null;
   precommitments: { id: string; label: string; stake: number; days: number; start: string; frogs_required: number; frogs_done: number; resolved: boolean }[];

@@ -149,37 +149,44 @@ export function TodayTodos({ daily, onChanged }: { daily: Daily | null; onChange
     };
 
   return (
-    <div className="todolist">
-      {err && <p className="err">{err}</p>}
-      {Q_META.map(q => buckets[q.key].length ? (
-        <div key={q.key} className={`tl-group eq-${q.key}`}>
-          <div className="tl-head mono">{q.label}
-            <span className="tl-count">{buckets[q.key].filter(t => t.done).length}/{buckets[q.key].length}</span>
-            <span className="tl-hint">{q.hint}</span>
+    <div className="quad-cross">
+      <span className="qc-axis-v mono" aria-hidden="true">重要 ↑</span>
+      <span className="qc-axis-h mono" aria-hidden="true">紧急 →</span>
+      {/* 十字排布：q2 左上 / q1 右上 / q3 左下 / q4 右下 */}
+      {["q2", "q1", "q3", "q4"].map(key => {
+        const q = Q_META.find(x => x.key === key)!;
+        const list = buckets[q.key];
+        return (
+          <div key={q.key} className={`quad-cell eq-${q.key}`}>
+            <div className="qc-head mono">{q.label}
+              <span className="tl-count">{list.filter(t => t.done).length}/{list.length}</span>
+            </div>
+            <div className="qc-hint mono">{q.hint}</div>
+            {list.length === 0 && <p className="muted small qc-empty">空</p>}
+            {list.map((t, i) => {
+              const key2 = `${q.key}|${t.section}|${i}`;
+              return editing === key2 ? (
+                <TaskEditForm key={`e${key2}`}
+                  initText={stripTime(t.text).replace(/^[⭐⚡💤]\s*/, "")}
+                  initStart={timeOf(t.text)?.[0] || "12:00"}
+                  initEnd={timeOf(t.text)?.[1] || "12:30"}
+                  initQuad={quadOfSection(t.section)} initPrio={prioOf(t.text)}
+                  onSave={saveEdit(t, t.section)} onCancel={() => setEditing(null)} />
+              ) : (
+                <div key={key2} className={`lrow ${t.done ? "is-done" : ""} ${busy === key2 ? "busy" : ""}`}
+                  onClick={() => busy !== key2 && toggle(daily!.date, t.section, t.raw, key2, !t.done)}
+                  role="checkbox" aria-checked={t.done} tabIndex={0}
+                  onKeyDown={e => { if ((e.key === " " || e.key === "Enter") && busy !== key2) { e.preventDefault(); toggle(daily!.date, t.section, t.raw, key2, !t.done); } }}>
+                  <span className="lbox" data-on={t.done} aria-hidden="true" />
+                  <span className="ltxt">{stripTime(t.text)}</span>
+                  <button className="edit-btn" aria-label="编辑任务" title="编辑文字 / 时间 / 分类"
+                    onClick={e => { e.stopPropagation(); setEditing(key2); setErr(null); }}>✏️</button>
+                </div>
+              );
+            })}
           </div>
-          {buckets[q.key].map((t, i) => {
-            const key = `${q.key}|${t.section}|${i}`;
-            return editing === key ? (
-              <TaskEditForm key={`e${key}`}
-                initText={stripTime(t.text).replace(/^[⭐⚡💤]\s*/, "")}
-                initStart={timeOf(t.text)?.[0] || "12:00"}
-                initEnd={timeOf(t.text)?.[1] || "12:30"}
-                initQuad={quadOfSection(t.section)} initPrio={prioOf(t.text)}
-                onSave={saveEdit(t, t.section)} onCancel={() => setEditing(null)} />
-            ) : (
-              <div key={key} className={`lrow ${t.done ? "is-done" : ""} ${busy === key ? "busy" : ""}`}
-                onClick={() => busy !== key && toggle(daily!.date, t.section, t.raw, key, !t.done)}
-                role="checkbox" aria-checked={t.done} tabIndex={0}
-                onKeyDown={e => { if ((e.key === " " || e.key === "Enter") && busy !== key) { e.preventDefault(); toggle(daily!.date, t.section, t.raw, key, !t.done); } }}>
-                <span className="lbox" data-on={t.done} aria-hidden="true" />
-                <span className="ltxt">{stripTime(t.text)}</span>
-                <button className="edit-btn" aria-label="编辑任务" title="编辑文字 / 时间 / 分类"
-                  onClick={e => { e.stopPropagation(); setEditing(key); setErr(null); }}>✏️</button>
-              </div>
-            );
-          })}
-        </div>
-      ) : null)}
+        );
+      })}
     </div>
   );
 }
