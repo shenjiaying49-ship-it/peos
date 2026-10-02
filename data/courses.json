@@ -1,9 +1,27 @@
 {
   "semester": "2026 Fall",
-  "source": "ICS export + syllabi PDFs/docx/pptx from cuhk_attachments",
+  "source": "ICS export + syllabi PDFs/docx/pptx from cuhk_attachments + registry.cuhk.edu.cn academic calendar",
   "start_date": "2026-09-07",
-  "end_date": "2026-12-23",
+  "end_date": "2026-12-18",
+  "exam_week_start": "2026-12-20",
+  "exam_week_end": "2026-12-27",
+  "winter_break_start": "2026-12-28",
   "session_count": 15,
+  "holidays": [
+    "2026-09-25",
+    "2026-09-26",
+    "2026-09-27",
+    "2026-10-01",
+    "2026-10-02",
+    "2026-10-03",
+    "2026-10-04",
+    "2026-10-05",
+    "2026-10-06",
+    "2026-10-07"
+  ],
+  "makeup_days": {
+    "2026-09-20": 5
+  },
   "courses": [
     {
       "code": "MKT6019",
@@ -17,8 +35,9 @@
       "sessions": 15,
       "assessments": [
         { "item": "Class engagement (attendance)", "weight": 5, "due": null, "note": "全勤得 5%" },
-        { "item": "Mid-term Paper Presentation (team)", "weight": 40, "due": null, "note": "30 min 演示+5 min 提问；从 top journals 选论文；15-20 slides；小组出席" },
-        { "item": "Final Project (solo or team)", "weight": 55, "due": null, "note": "组内互评 0-5 调整个人分；全员出席最终展示" }
+        { "item": "Mid-term Paper Presentation (team)", "weight": 40, "due": "2026-10-02", "note": "10/2 起 30 min 演示+5 min 提问；从 top journals 选 2024 后论文；15-20 slides；小组出席。⚠️ 10/2 落国庆假期，以老师通知顺延为准" },
+        { "item": "Final Project Presentation (team)", "weight": 55, "due": "2026-11-19", "note": "11/19 起；组内互评 0-5 调整个人分；全员出席" },
+        { "item": "Final Project Written Report (team)", "weight": null, "due": "2026-12-13", "note": "12/13 周日 00:00 截止" }
       ]
     },
     {
@@ -32,10 +51,15 @@
       "first_date": "2026-09-08",
       "sessions": 15,
       "assessments": [
+        { "item": "Group Project: Topic Selection", "weight": null, "due": "2026-10-13", "note": "10/13 9:00 前邮件提交，先到先得，抄送全班" },
+        { "item": "Group Project: Questionnaire", "weight": null, "due": "2026-10-27", "note": "10/27 9:00 前" },
+        { "item": "Group Project: SPSS Data", "weight": null, "due": "2026-11-10", "note": "11/10 9:00 前" },
+        { "item": "Group Project: PPT", "weight": null, "due": "2026-11-24", "note": "11/24 9:00 前" },
         { "item": "In-class Exam", "weight": 50, "due": "2026-12-01", "note": "Dec 1 课堂考试" },
-        { "item": "Group Project", "weight": 30, "due": "2026-12-08", "note": "Dec 8 项目展示 (in-class presentation)" },
+        { "item": "Group Project: Presentation", "weight": 30, "due": "2026-12-08", "note": "Dec 8 项目展示" },
+        { "item": "Group Project: Written Report", "weight": null, "due": "2026-12-15", "note": "12/15 9:00 前" },
         { "item": "Group cases/exercises", "weight": 10, "due": null, "note": "随堂小组练习" },
-        { "item": "Attendance & Participation", "weight": 10, "due": null, "note": "出勤+课堂参与" }
+        { "item": "Attendance & Participation", "weight": 10, "due": null, "note": "出勤+课堂参与；学期末组内互评占 5%" }
       ]
     },
     {
@@ -49,9 +73,9 @@
       "first_date": "2026-09-09",
       "sessions": 15,
       "assessments": [
-        { "item": "Group Project 1 (Generative AI)", "weight": 30, "due": "2026-10-14", "note": "Oct 14 课堂展示；不需书面报告，提交 PPT+素材" },
-        { "item": "Group Project 2 (CRM Applications)", "weight": 30, "due": "2026-12-16", "note": "Dec 16 课堂展示；不需书面报告" },
-        { "item": "Classroom Exam", "weight": 30, "due": "2026-12-23", "note": "Dec 23 期末考试" },
+        { "item": "Group Project 1: AIGC Marketing (Presentation)", "weight": 30, "due": "2026-10-14", "note": "10/14 课堂展示；当天交 PPT+素材；个人 AIGC 视频 15% + 小组 deck 15%；≤35 页提案；7 人组各做 1 分钟视频" },
+        { "item": "Group Project 2: CRM Applications (Presentation)", "weight": 30, "due": "2026-12-16", "note": "12/16 课堂展示；不需书面报告" },
+        { "item": "Classroom Exam (Final)", "weight": 30, "due": "2026-12-23", "note": "12/23 期末考试" },
         { "item": "Attendance & Participation", "weight": 10, "due": null, "note": "出勤+课堂参与；学期末组内互评" }
       ]
     },
@@ -66,12 +90,12 @@
       "first_date": "2026-09-09",
       "sessions": 15,
       "assessments": [
-        { "item": "Assignment 1", "weight": null, "due": "2026-10-18", "note": "Oct 18 23:59 Blackboard 提交" },
-        { "item": "Group project first try", "weight": null, "due": "2026-10-23", "note": "Oct 23 23:59 Blackboard 提交" },
-        { "item": "Assignment 2", "weight": null, "due": "2026-11-01", "note": "Nov 01 23:59 Blackboard 提交" },
-        { "item": "Assignment 3", "weight": null, "due": "2026-11-15", "note": "Nov 15 23:59 Blackboard 提交" },
-        { "item": "Assignment 4", "weight": null, "due": "2026-11-29", "note": "Nov 29 23:59 Blackboard 提交" },
-        { "item": "Group project final + Peer evaluation", "weight": null, "due": "2026-12-11", "note": "Dec 11 23:59 Blackboard 提交项目报告+互评表" }
+        { "item": "Assignment 1", "weight": 10, "due": "2026-10-18", "note": "10/18 23:59 Blackboard 提交" },
+        { "item": "Group project first draft", "weight": null, "due": "2026-10-23", "note": "10/23 23:59 Blackboard 提交" },
+        { "item": "Assignment 2", "weight": 10, "due": "2026-11-01", "note": "11/01 23:59 Blackboard 提交" },
+        { "item": "Assignment 3", "weight": 10, "due": "2026-11-15", "note": "11/15 23:59 Blackboard 提交" },
+        { "item": "Assignment 4", "weight": 10, "due": "2026-11-29", "note": "11/29 23:59 Blackboard 提交" },
+        { "item": "Group project final + Peer evaluation", "weight": 40, "due": "2026-12-11", "note": "12/11 23:59 Blackboard 提交项目报告+互评表；互评=他人评分均值向上取整" }
       ]
     },
     {
@@ -86,10 +110,11 @@
       "sessions": 15,
       "assessments": [
         { "item": "Class participation", "weight": null, "due": null, "note": "课堂参与" },
-        { "item": "Individual Assignments x2", "weight": null, "due": null, "note": "两次个人作业，日期待公布" },
-        { "item": "Midterm Exam", "weight": null, "due": null, "note": "期中考试，日期待公布" },
+        { "item": "Assignment 1 (Individual): Conjoint + Regression", "weight": null, "due": "2026-10-22", "note": "10/22 23:00 Blackboard 交 PDF 答卷+可运行脚本；Part1 联合分析(20分) + Part2 线性回归(20分)" },
+        { "item": "Individual Assignment 2", "weight": null, "due": null, "note": "日期待公布" },
+        { "item": "Midterm Exam", "weight": null, "due": null, "note": "日期待公布" },
         { "item": "Final Exam", "weight": null, "due": null, "note": "期末考试" },
-        { "item": "Group Project + Presentation", "weight": null, "due": null, "note": "小组项目+展示；5% peer evaluation；随机分组" }
+        { "item": "Group Project + Presentation", "weight": null, "due": null, "note": "小组项目+展示；5% peer evaluation；L02 Group 8" }
       ]
     },
     {
@@ -104,10 +129,13 @@
       "sessions": 15,
       "assessments": [
         { "item": "Attendance & participation", "weight": 10, "due": null, "note": "贯穿全学期" },
-        { "item": "Team Work 1: Textbook Case Lab", "weight": 15, "due": "2026-10-09", "note": "Weeks 5-8（约 10/9–10/30）" },
-        { "item": "Team Work 2: AI Marketing Project", "weight": 35, "due": "2026-12-21", "note": "Milestones through Dec 21" },
-        { "item": "Individual assignment", "weight": 10, "due": null, "note": "Deadline announced in class" },
-        { "item": "Final examination", "weight": 40, "due": null, "note": "Final assessment slot" }
+        { "item": "Team Work 1: Textbook Case Lab", "weight": 15, "due": "2026-10-29", "note": "10/29 L01 场次；2,500–3,500 词案例+分析；placement memo+证据包+教学说明+展示" },
+        { "item": "Team Work 2: AI Marketing Project - Proposal", "weight": null, "due": "2026-10-15", "note": "10/15 交 3-4 页：问题/机制/方法/数据/AI工具/贡献/工作计划" },
+        { "item": "Team Work 2: AI Marketing Project - Midpoint Review", "weight": null, "due": "2026-11-19", "note": "11/19 证据/原型状态/初步结果/失败尝试/范围调整" },
+        { "item": "Team Work 2: AI Marketing Project - Presentation", "weight": null, "due": "2026-12-10", "note": "12/10 L01 场次；20 分钟展示+问答" },
+        { "item": "Team Work 2: AI Marketing Project - Final Submission", "weight": 35, "due": "2026-12-21", "note": "12/21 15-20 页报告+slides+可复现材料+AI使用披露" },
+        { "item": "Individual assignment", "weight": 10, "due": null, "note": "ROI Festival 案例 4-7 页 PDF，截止课上宣布" },
+        { "item": "Final examination", "weight": 40, "due": "2026-12-17", "note": "12/17 暂定，正式考试周 12/20-27，以教务公布为准" }
       ]
     },
     {
@@ -121,9 +149,11 @@
       "first_date": "2026-09-11",
       "sessions": 15,
       "assessments": [
-        { "item": "Group Project", "weight": 25, "due": null, "note": "期末小组项目" },
-        { "item": "Final Exam (90 min)", "weight": 50, "due": null, "note": "期末 90 分钟考试；选择题 60%+案例简答；可带手写 A4 一面笔记" },
-        { "item": "Group Assignment (Social Media Video)", "weight": 10, "due": null, "note": "为品牌/创作者做原创短视频；须用 AI 工具" },
+        { "item": "Group Information Sheet", "weight": null, "due": "2026-10-16", "note": "10/16 提交小组信息表；L2 Group 9" },
+        { "item": "Group Assignment: Social Media Video", "weight": 10, "due": "2026-10-31", "note": "10/31 提交；11/6 展示；≤12 页 deck；10 min+5 min Q&A；为品牌做原创短视频须用 AI" },
+        { "item": "Group Assignment Presentation", "weight": null, "due": "2026-11-06", "note": "11/6 L2 场次展示" },
+        { "item": "Group Project (IMC Plan)", "weight": 25, "due": "2026-12-11", "note": "12/11 或 12/18 L2 展示；为中国新产品做 IMC 方案；≤2 种 IMC 工具+≤4 个媒介载体" },
+        { "item": "Final Exam (90 min)", "weight": 50, "due": "2026-12-04", "note": "12/4 L2 场次；选择题 60%+案例简答；可带手写 A4 一面笔记" },
         { "item": "In-class contribution (Attendance 10% + Participation 5%)", "weight": 15, "due": null, "note": "至少出席 10 次+参与 5 次" }
       ]
     },
@@ -139,7 +169,7 @@
       "sessions": 15,
       "assessments": [
         { "item": "Participation", "weight": 40, "due": null, "note": "课堂参与/考勤" },
-        { "item": "Final Task (Exam/Essay/Report)", "weight": 60, "due": null, "note": "期末考核" }
+        { "item": "Final Task (Exam/Essay/Report)", "weight": 60, "due": null, "note": "期末考核；P/F 等级制" }
       ]
     },
     {
@@ -154,7 +184,7 @@
       "sessions": 15,
       "assessments": [
         { "item": "Participation", "weight": 40, "due": null, "note": "课堂参与/考勤" },
-        { "item": "Final Task (Exam/Essay/Report)", "weight": 60, "due": null, "note": "期末考核" }
+        { "item": "Final Task (Exam/Essay/Report)", "weight": 60, "due": null, "note": "期末考核；P/F 等级制" }
       ]
     }
   ]

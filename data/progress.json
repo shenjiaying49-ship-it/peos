@@ -1,3 +1,24 @@
 {
- "items": []
+ "items": [
+  {
+   "id": "20260924210915",
+   "kind": "book",
+   "title": "[小说] 大地上我们转瞬即逝的绚烂 · 王鸥行",
+   "current": 0,
+   "total": 268,
+   "date": "2026-09-24",
+   "daily_target": 30,
+   "finish_by": "2026-10-11"
+  },
+  {
+   "id": "20260924100950",
+   "kind": "book",
+   "title": "[商业] 纳瓦尔宝典 · Eric Jorgenson",
+   "current": 0,
+   "total": 256,
+   "date": "2026-09-24",
+   "daily_target": 20,
+   "finish_by": "2026-10-25"
+  }
+ ]
 }

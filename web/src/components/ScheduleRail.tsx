@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { api, type SchedRow, type CourseBlock, type Deadline } from "../api";
+import { api, type SchedRow, type CourseBlock, type Deadline, type CalendarInfo } from "../api";
 import { HALF_HOURS, PRIOS, QUADS, prioOf, quadOfSection, withMarker } from "./TodayTodos";
 
 const MAP: [string, string][] = [["🔴", "▰▰▰"], ["🟠", "▰▰▰"], ["🟡", "▰▰"], ["🟢", "▰"], ["🔵", "▰"]];
@@ -66,11 +66,12 @@ function RailEditForm({ row, date, onDone, onError }: {
   );
 }
 
-/** 时间轴：青蛙区 + 课程块 + 时间块 + 缓冲 + 「现在」高亮。
+/** 时间轴：今日重点区 + 课程块 + 时间块 + 缓冲 + 「现在」高亮。
  *  任务块可拖拽换时段（对齐半小时）、±30min 微调、点击时间编辑（参考飞书日历）。 */
-export default function ScheduleRail({ rows, frogs, isToday, dateLabel, todayCourses, todayDeadlines, date, onChanged }: {
+export default function ScheduleRail({ rows, frogs, isToday, dateLabel, todayCourses, todayDeadlines, date, calendar, upcomingDeadlines, onChanged }: {
   rows: SchedRow[]; frogs: string[]; isToday: boolean; dateLabel: string;
   todayCourses?: CourseBlock[]; todayDeadlines?: Deadline[];
+  calendar?: CalendarInfo; upcomingDeadlines?: Deadline[];
   date?: string; onChanged?: () => void;
 }) {
   const [nowMin, setNowMin] = useState(() => new Date().getHours() * 60 + new Date().getMinutes());
@@ -113,9 +114,9 @@ export default function ScheduleRail({ rows, frogs, isToday, dateLabel, todayCou
 
   const h = new Date().getHours();
   const morning = h >= 6 && h < 12;
-  const fzState = h < 6 ? "🌙 凌晨 —— 先睡，青蛙等早上的你"
-    : morning ? "🌅 上午窗口进行中 —— 现在就做青蛙"
-    : "🌤 已过上午 —— 青蛙顺延为下午第一优先级";
+  const fzState = h < 6 ? "🌙 凌晨 —— 先睡，重点等早上的你"
+    : morning ? "🌅 上午窗口进行中 —— 现在就做今日重点"
+    : "🌤 已过上午 —— 重点顺延为下午第一优先级";
 
   // 把课程块插入时间表
   const allBlocks: (SchedRow | CourseBlock | { buffer: number })[] = [];
@@ -151,9 +152,9 @@ export default function ScheduleRail({ rows, frogs, isToday, dateLabel, todayCou
   return (
     <div className="rail">
       <div className={`frog-zone ${morning && isToday ? "am" : ""}`}>
-        <div className="fz-head">🐸 今日青蛙 <span className="fz-sub">最重要的事 · 上午做完（1–3 只）</span></div>
+        <div className="fz-head">🎯 今日重点 <span className="fz-sub">最重要的事 · 先做（1–3 件）</span></div>
         {frogs.length ? frogs.map((f, i) => <div key={i} className="fz-item">▸ {f}</div>)
-          : <div className="fz-item muted">这篇 Daily 没写青蛙</div>}
+          : <div className="fz-item muted">这篇 Daily 没写重点</div>}
         {isToday && <div className="fz-state">{fzState}</div>}
       </div>
       {!isToday && !todayCourses?.length && <div className="rail-note mono">⏳ 今日无时间表 —— 显示 {dateLabel} 的总览主表</div>}
@@ -171,6 +172,39 @@ export default function ScheduleRail({ rows, frogs, isToday, dateLabel, todayCou
             </div>
           ))}
         </div>
+      )}
+
+      {/* 校历放假 / 调休提示 */}
+      {isToday && calendar?.is_holiday && (
+        <div className="holiday-banner">
+          <span className="hl-head">🏮 校历放假 · 今日无课</span>
+          <span className="hl-sub">假期任务照常记录；课程自动顺延，出勤分只按真实上课日计算</span>
+        </div>
+      )}
+      {isToday && calendar?.is_makeup && (
+        <div className="holiday-banner makeup">
+          <span className="hl-head">🔄 调休补课日</span>
+          <span className="hl-sub">今天按周{["一", "二", "三", "四", "五"][calendar.makeup_weekday! - 1]}课表上课</span>
+        </div>
+      )}
+
+      {/* 重要日子（未来 30 天截止/考试） */}
+      {upcomingDeadlines && upcomingDeadlines.length > 0 && (
+        <details className="keydays">
+          <summary>🎯 重要日子 · 未来 30 天（{upcomingDeadlines.length} 项）</summary>
+          {upcomingDeadlines.map((dl, i) => {
+            const dLeft = dl.days_away;
+            const urgency = dLeft <= 3 ? "hot" : dLeft <= 7 ? "warm" : "";
+            return (
+              <div key={i} className={`kd-item ${urgency}`}>
+                <span className="kd-date mono">{dl.date.slice(5)}</span>
+                <span className="kd-course">{dl.course}</span>
+                <span className="kd-task">{dl.item}{dl.weight ? `（${dl.weight}%）` : ""}</span>
+                <span className="kd-left">{dLeft === 0 ? "今天" : dLeft === 1 ? "明天" : `${dLeft} 天`}</span>
+              </div>
+            );
+          })}
+        </details>
       )}
 
       {err && <p className="err">{err}</p>}

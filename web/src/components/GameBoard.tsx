@@ -146,7 +146,7 @@ export default function GameBoard() {
             {activePc.map(pc => (
               <div key={pc.id} className="pc-card">
                 <span className="pc-label">{pc.label}</span>
-                <span className="pc-info mono">押金 {pc.stake} · {pc.frogs_done}/{pc.frogs_required} 青蛙</span>
+                <span className="pc-info mono">押金 {pc.stake} · {pc.frogs_done}/{pc.frogs_required} 天重点</span>
                 <button className="btn-solid sm" onClick={() => act({ action: "precommitment_resolve", id: pc.id })}>
                   结算
                 </button>

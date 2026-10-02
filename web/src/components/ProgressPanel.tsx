@@ -34,6 +34,29 @@ export default function ProgressPanel({ fitness, onChanged }: {
   const inc = async (id: string, d: number) => { await api.progressInc(id, d); load(); };
   const del = async (id: string) => { await api.progressDel(id); load(); };
 
+  // 微信读书同步（非官方 API · cookie 见 peos/data/weread_cookie.txt）
+  const [wrBusy, setWrBusy] = useState(false);
+  const [wrMsg, setWrMsg] = useState("");
+  const [wrOk, setWrOk] = useState(true);
+  const syncWeread = async () => {
+    setWrBusy(true); setWrMsg("");
+    try {
+      const r = await api.wereadSync();
+      if (r.ok) {
+        setWrOk(true);
+        setWrMsg(r.updated?.length ? `已同步：${r.updated.join("；")}` : (r.note || "没有可更新项"));
+        load();
+      } else {
+        setWrOk(false);
+        setWrMsg(r.error || "同步失败");
+      }
+    } catch (e) {
+      setWrOk(false);
+      setWrMsg("同步请求失败");
+    }
+    setWrBusy(false);
+  };
+
   const books = items.filter(x => x.kind === "book");
   const shows = items.filter(x => x.kind === "show");
 
@@ -129,6 +152,12 @@ export default function ProgressPanel({ fitness, onChanged }: {
       <div className="pp-group">📖 读书</div>
       {books.map(x => <Item key={x.id} x={x} />)}
       {!books.length && <p className="muted small">暂无在读追踪 —— 下方添加。</p>}
+      <div className="pp-weread">
+        <button className="mini-btn" onClick={syncWeread} disabled={wrBusy}>
+          {wrBusy ? "同步中…" : "🔄 同步微信读书"}
+        </button>
+        {wrMsg && <span className={`pp-weread-msg ${wrOk ? "" : "err-text"}`}>{wrMsg}</span>}
+      </div>
 
       <div className="pp-group">🎬 看剧</div>
       {shows.map(x => <Item key={x.id} x={x} />)}

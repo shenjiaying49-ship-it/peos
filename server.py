@@ -229,15 +229,33 @@ def parse_daily(path: Path, d: dt.date):
         if "日记" in title:
             data["diary"] = body.strip()
 
-    # 青蛙列表：所有含 🐸 的内容行（青蛙可多只 = 最重要的事放上午做完）
+    # 重点列表：「今日重点」标记行之后到下一个段落的列表行；
+    # 旧文件回退：所有含 🐸 的内容行
     data["frogs"] = []
+    in_focus = False
     for line in text.splitlines():
-        if line.strip().startswith("#") or "🐸" not in line:
+        s = line.strip()
+        if s.startswith("#"):
+            in_focus = False
             continue
-        f = strip_md(re.sub(r"^\s*[-*]?\s*(\d+[.、])?\s*", "", line))
-        f = re.sub(r"^青蛙[：:]\s*", "", f).replace("🐸", "").strip(" —-")
-        if len(f) > 4 and f not in data["frogs"]:
-            data["frogs"].append(f)
+        if s.startswith("**") and "重点" in s:
+            in_focus = True
+            continue
+        if s.startswith("**") or (in_focus and not s):
+            if s.startswith("**"):
+                in_focus = False
+            if not s:
+                continue
+        f = None
+        if in_focus and (s.startswith("-") or re.match(r"^\d+[.、]", s)):
+            f = s
+        elif "🐸" in s:
+            f = s
+        if f:
+            f = strip_md(re.sub(r"^\s*[-*]?\s*(\d+[.、])?\s*", "", f))
+            f = re.sub(r"^(青蛙|今日重点)[：:]\s*", "", f).replace("🐸", "").replace("⚡", "").strip(" —-")
+            if len(f) > 4 and f not in data["frogs"]:
+                data["frogs"].append(f)
 
     # 今日结论 / 明确不做（青蛙已由 frogs 列表覆盖）
     PLACEHOLDER = ("用一段话说明", "保留历史状态", "只写任务顺序")
@@ -320,7 +338,7 @@ def daily_card(data: dict, full_text: str) -> dict:
         done_texts = " ".join(t["text"] for sec in data["tasks_by_section"] for t in sec["tasks"] if t["done"])
         frog_done = any(sum(1 for w in [f[i:i + 6] for i in range(0, max(1, len(f) - 5), 3)]
                             if w and w in done_texts) >= 1 for f in frogs)
-        comment = ("🐸已冲线；" if frog_done else "🐸待冲线；") + comment
+        comment = ("🎯重点已做；" if frog_done else "🎯重点待做；") + comment
 
     return {"emoji": emoji, "summary": summary or "（无摘要）",
             "rating": rating, "comment": comment}
@@ -389,10 +407,32 @@ def load_courses():
     return _COURSES_CACHE
 
 
-def today_course_blocks(d=None):
-    """返回指定日期（默认今天）的课程时间块，按开始时间排序。"""
+def _is_holiday(d=None):
+    """判断指定日期是否在校历放假日内。"""
     d = d or _today()
-    wd = d.weekday()  # 0=周一
+    ds = d.isoformat() if isinstance(d, dt.date) else str(d)
+    holidays = load_courses().get("holidays", [])
+    return ds in holidays
+
+
+def _makeup_weekday(d=None):
+    """如果是调休补课日，返回应上的 weekday（1=周一…5=周五）；否则返回 None。"""
+    d = d or _today()
+    ds = d.isoformat() if isinstance(d, dt.date) else str(d)
+    makeup = load_courses().get("makeup_days", {})
+    return makeup.get(ds)
+
+
+def today_course_blocks(d=None):
+    """返回指定日期（默认今天）的课程时间块，按开始时间排序。
+    放假日无课；调休补课日按补课 weekday 排课。"""
+    d = d or _today()
+    # 放假日 → 无课
+    if _is_holiday(d):
+        return []
+    # 调休补课日 → 按映射的 weekday 排课
+    makeup_wd = _makeup_weekday(d)
+    wd = (makeup_wd - 1) if makeup_wd else d.weekday()  # 0=周一
     courses = load_courses().get("courses", [])
     blocks = []
     for c in courses:
@@ -408,6 +448,7 @@ def today_course_blocks(d=None):
                 "location": c["location"],
                 "session": f"第 {session_no}/{c['sessions']} 次",
                 "weekday_cn": c["weekday_cn"],
+                "is_makeup": makeup_wd is not None,
             })
     blocks.sort(key=lambda b: b["start"])
     return blocks
@@ -831,7 +872,8 @@ def _save_progress(pr: dict):
 
 
 def progress_suggestions(d=None):
-    """Suggest a small next step from persisted reading/viewing progress."""
+    """Suggest a small next step from persisted reading/viewing progress.
+    有 finish_by 时按剩余天数自适应配速（ceil 平分），否则用 daily_target。"""
     d = d or _today()
     out = []
     for item in _load_progress().get("items", []):
@@ -840,12 +882,113 @@ def progress_suggestions(d=None):
             continue
         remaining = total - current
         target = min(remaining, max(1, int(item.get("daily_target", 1))))
+        pace_note = ""
+        finish_by = item.get("finish_by")
+        if finish_by:
+            try:
+                days_left = max(1, (dt.date.fromisoformat(str(finish_by)) - d).days)
+                target = min(remaining, max(1, -(-remaining // days_left)))
+                pace_note = f"（{days_left} 天内读完，每天约 {target}{ '页' if item.get('kind') == 'book' else '集' }）"
+            except ValueError:
+                pass
         unit = "页" if item.get("kind") == "book" else "集"
         out.append({"id": item.get("id"), "kind": item.get("kind"),
                     "title": item.get("title"), "current": current, "total": total,
                     "suggested": target, "unit": unit,
-                    "text": f"{item.get('title')}：今天推进 {target}{unit}（{current}/{total}）"})
+                    "text": f"{item.get('title')}：今天读 {target}{unit}（已读 {current}/{total}）{pace_note}"})
     return out[:5]
+
+
+# ---------------------------------------------------------------- 微信读书同步（非官方 API · 实验性）
+
+WEREAD_COOKIE_PATH = DATA_DIR / "weread_cookie.txt"
+
+
+def _weread_cookie() -> str:
+    if WEREAD_COOKIE_PATH.exists():
+        c = WEREAD_COOKIE_PATH.read_text(encoding="utf-8").strip()
+        if c:
+            return c
+    return ""
+
+
+def _norm_title(s: str) -> str:
+    """书名宽松归一化：去书名号/括号前缀/空格/分隔符，取小写。"""
+    s = re.sub(r"[《》\[\]·\s\-—_:：]", "", str(s or ""))
+    return s.lower()
+
+
+def weread_status():
+    c = _weread_cookie()
+    return {"ok": True, "cookie_set": bool(c),
+            "hint": "把浏览器 weread.qq.com 请求头里的 Cookie 整行粘贴到 peos/data/weread_cookie.txt 即可启用"}
+
+
+def weread_sync():
+    """拉微信读书书架在读进度 → 回写 progress.json 的 current。
+    非官方 web API：cookie 失效时返回明确错误，进度回退手动 +N。"""
+    cookie = _weread_cookie()
+    if not cookie:
+        return {"ok": False, "error": "未配置 cookie：在浏览器登录 weread.qq.com → F12 复制请求 Cookie 整行 → 粘贴到 peos/data/weread_cookie.txt"}
+    req = urllib.request.Request(
+        "https://weread.qq.com/web/shelf/sync?userHashId=&synckeys=0",
+        headers={
+            "Cookie": cookie,
+            "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36",
+            "Accept": "application/json",
+            "Referer": "https://weread.qq.com/web/shelf",
+        })
+    try:
+        with urllib.request.urlopen(req, timeout=10) as resp:
+            payload = json.loads(resp.read().decode("utf-8"))
+    except urllib.error.HTTPError as e:
+        hint = "cookie 大概率过期了，重新抓一次 Cookie 覆盖 weread_cookie.txt" if e.code in (401, 403) else str(e)
+        return {"ok": False, "error": f"微信读书返回 HTTP {e.code}：{hint}"}
+    except Exception as e:
+        return {"ok": False, "error": f"请求失败：{e}"}
+
+    # 防御式遍历：书架 JSON 里所有带标题的对象，找进度字段（字段名随版本变动，多候选兼容）
+    found = {}
+    def _walk(o):
+        if isinstance(o, dict):
+            title = o.get("title")
+            if isinstance(title, str) and title:
+                for k in ("progress", "readProgress", "readingProgress"):
+                    v = o.get(k)
+                    if isinstance(v, (int, float)) and 0 < v < 1000:
+                        found[_norm_title(title)] = min(100.0, float(v))
+                        break
+            for v in o.values():
+                _walk(v)
+        elif isinstance(o, list):
+            for v in o:
+                _walk(v)
+    _walk(payload)
+    if not found:
+        return {"ok": False, "error": "书架解析不到在读进度字段（微信读书接口可能改版）——先手动 +N，回头再修同步"}
+
+    pr = _load_progress()
+    updated, unmatched = [], []
+    for item in pr.get("items", []):
+        key = _norm_title(item.get("title", ""))
+        # 宽松匹配：progress 标题去掉前缀后是 weread 书名的子串（或反过来）
+        hit = None
+        for k, v in found.items():
+            if k and key and (k in key or key in k):
+                hit = v
+                break
+        if hit is None:
+            unmatched.append(item.get("title"))
+            continue
+        new_cur = min(int(item.get("total", 0)) or 0, round(int(item.get("total", 0)) * hit / 100))
+        if new_cur > int(item.get("current", 0)):
+            item["current"] = new_cur
+            item["weread_synced"] = _today().isoformat()
+            updated.append(f"{item.get('title')} → {new_cur}/{item.get('total')}（{hit:.0f}%）")
+    if updated:
+        _save_progress(pr)
+    return {"ok": True, "shelf_progress": len(found), "updated": updated,
+            "unmatched": unmatched[:5], "note": "只更新进度，不改总量" if updated else "书架有在读书但没匹配到追踪项（标题需含书名）"}
 
 
 def add_progress(body: dict):
@@ -933,7 +1076,8 @@ LEVELS = [(0, "见习生"), (500, "行动者"), (1500, "节奏师"), (3000, "系
 # ── 脑科学积分体系 ────────────────────────────────────────────
 
 # 基础费率（递进难度：随等级上浮）
-POINTS_RATES = {"task": 10, "frog": 30, "diary": 15, "data": 5, "earth": 15}
+# course_day：确认上课出勤的单独奖励（不重复计入 task）
+POINTS_RATES = {"task": 10, "diary": 15, "data": 5, "earth": 15, "course_day": 25}
 
 # 可变比率强化：20% 概率触发 x2–x5 暴击（老虎机效应）
 VAR_RATIO_CHANCE = 20           # %
@@ -1087,10 +1231,14 @@ def game_state():
         pass
 
     # ── 扫描 90 天 Daily ──
+    COURSE_CODES = ("MKT5010", "MKT5011", "MKT5012", "MKT5018",
+                    "MKT6012", "MKT6013", "MKT6019", "MKT6033",
+                    "CEC5000", "CEC5010")
     stats = {k: 0 for k in ("tasks_done", "frogs_done", "diary_days", "data_days",
                             "lang_jp", "lang_en", "spirit_msg", "deep_talks",
                             "stretch_done", "sport_any", "budget_ok_days",
-                            "quad_mind", "quad_body", "quad_spirit", "quad_vocation")}
+                            "quad_mind", "quad_body", "quad_spirit", "quad_vocation",
+                            "course_days")}
     sport_kw = {"sport_climb": ["攀岩"], "sport_swim": ["游泳"], "sport_badminton": ["羽毛球"], "sport_slope": ["爬坡"]}
     for k in sport_kw:
         stats[k] = 0
@@ -1099,6 +1247,9 @@ def game_state():
         data = parse_daily(path, d)
         done_texts = "∥".join(t["text"] for sec in data["tasks_by_section"]
                               for t in sec["tasks"] if t["done"])
+        # 确认上课出勤：勾选的任务中包含课程代码 → 当天算出勤 1 次
+        if any(code in done_texts for code in COURSE_CODES):
+            stats["course_days"] += 1
         quad_map = {"心智": "quad_mind", "身体": "quad_body", "精神": "quad_spirit", "事业": "quad_vocation"}
         for sec in data["tasks_by_section"]:
             n_done = sum(1 for t in sec["tasks"] if t["done"])
@@ -1106,8 +1257,10 @@ def game_state():
                 if label in sec["section"]:
                     stats[key] += n_done
         stats["tasks_done"] += data["done"]
-        stats["frogs_done"] += done_texts.count("🐸") and sum(1 for sec in data["tasks_by_section"]
-                                                              for t in sec["tasks"] if t["done"] and "🐸" in t["text"])
+        # 重点完成量（旧文件看 🐸，新文件看「今日重点」任务被勾选）
+        stats["frogs_done"] += sum(1 for sec in data["tasks_by_section"]
+                                   for t in sec["tasks"] if t["done"]
+                                   and ("🐸" in t["text"] or "今日重点" in t["text"]))
         if data.get("diary"):
             stats["diary_days"] += 1
         if data.get("weight") or data.get("spend"):
@@ -1166,10 +1319,10 @@ def game_state():
     # 先估算初始等级（无需成就/支出）
     rough_pts = (
         stats["tasks_done"] * _base_points("task", 0) +
-        stats["frogs_done"] * _base_points("frog", 0) +
         stats["diary_days"] * _base_points("diary", 0) +
         stats["data_days"] * _base_points("data", 0) +
-        stats["earth_done"] * _base_points("earth", 0)
+        stats["earth_done"] * _base_points("earth", 0) +
+        stats["course_days"] * _base_points("course_day", 0)
     )
     lvl_i, _, _ = _level_for_points(rough_pts)
     month_net = max(0, fin.get("month_net") or 0)
@@ -1177,7 +1330,7 @@ def game_state():
     # 递进基础分（用当前等级）
     base_breakdown = {
         "任务": stats["tasks_done"] * _base_points("task", lvl_i),
-        "青蛙": stats["frogs_done"] * _base_points("frog", lvl_i),
+        "上课出勤": stats["course_days"] * _base_points("course_day", lvl_i),
         "日记": stats["diary_days"] * _base_points("diary", lvl_i),
         "数据回填": stats["data_days"] * _base_points("data", lvl_i),
         "地球任务": stats["earth_done"] * _base_points("earth", lvl_i),
@@ -1220,7 +1373,7 @@ def game_state():
     # Active double day doubles actual earned points for today's completed work.
     if _today().isoformat() in g.get("double_days", []):
         today_earned = sum(abs(int(e.get("points", 0))) for e in g["ledger"]
-                           if e.get("kind") in ("task", "frog", "diary", "data", "earth")
+                           if e.get("kind") in ("task", "frog", "diary", "data", "earth", "course_day")
                            and str(e.get("date", e.get("ts", "")))[:10] == _today().isoformat())
         total += today_earned
 
@@ -1379,7 +1532,7 @@ def reward_redeem(rid: str):
 
 
 def precommitment_create(body: dict):
-    """挑战押金：押 N 分，承诺未来 days 天完成全部青蛙。成功→+30%，失败→没收。"""
+    """挑战押金：押 N 分，承诺未来 days 天每天完成当日重点。成功→+30%，失败→没收。"""
     g = _load_game()
     label = str(body.get("label") or "挑战").strip()[:40]
     days = min(int(body.get("days") or 3), 14)
@@ -1398,14 +1551,14 @@ def precommitment_create(body: dict):
         "stake": stake,
         "days": days,
         "start": _today().isoformat(),
-        "frogs_required": days,   # 每天至少完成 1 只青蛙
+        "frogs_required": days,   # 每天至少完成 1 件当日重点
         "frogs_done": 0,
         "resolved": False,
     }
     g.setdefault("precommitments", []).append(pc)
     _save_game(g)
     return {"ok": True, "precommitment": pc,
-            "msg": f"🔥 挑战「{label}」已创建！押金 {stake} 分，{days} 天内完成 {days} 只青蛙 → 拿回 +{int(stake * 0.3)} 分"}
+            "msg": f"🔥 挑战「{label}」已创建！押金 {stake} 分，{days} 天内每天完成当日重点 → 拿回 +{int(stake * 0.3)} 分"}
 
 
 def precommitment_resolve(pcid: str):
@@ -1423,7 +1576,8 @@ def precommitment_resolve(pcid: str):
                 data = parse_daily(daily_path(d), d)
                 done_texts = "∥".join(t["text"] for sec in data["tasks_by_section"]
                                       for t in sec["tasks"] if t["done"])
-                if "🐸" in done_texts:
+                # 旧文件 🐸 + 新文件「今日重点」都算完成当日重点
+                if "🐸" in done_texts or "今日重点" in done_texts:
                     done += 1
             pc["frogs_done"] = done
             success = done >= total_needed
@@ -1552,10 +1706,12 @@ def add_task(body: dict):
     except ValueError:
         return {"ok": False, "error": "时间格式无效"}
     if sh > 23 or eh > 23 or sm not in (0, 30) or em not in (0, 30):
-        return {"ok": False, "error": "自定义任务必须使用整点或半点"}
+        return {"ok": False, "error": "任务时间必须对齐整点或半点"}
     start_min, end_min = sh * 60 + sm, eh * 60 + em
-    if end_min <= start_min or end_min - start_min != 30:
-        return {"ok": False, "error": "自定义任务必须严格为连续 30 分钟，且不能跨午夜"}
+    if end_min <= start_min:
+        return {"ok": False, "error": "结束时间必须晚于开始时间"}
+    if end_min - start_min > 240:
+        return {"ok": False, "error": "单任务最长 4 小时——更大的活拆成两段"}
     time_str = f"{m.group(1)}–{m.group(2)}"
     try:
         task_date = dt.date.fromisoformat(str(body.get("date") or _today().isoformat()))
@@ -1565,6 +1721,11 @@ def add_task(body: dict):
     if not p.exists():
         return {"ok": False, "error": "当天的 Daily 还没生成——先点「智能安排」"}
     lines = read(p).split("\n")
+
+    # 0) 去重：同分区已有一模一样的 checkbox 行 → 直接跳过（防双击/重复提交）
+    new_line = f"- [ ] {time_str} {text}"
+    if any(l.strip() == new_line for l in lines):
+        return {"ok": True, "time": time_str, "duplicate": True}
 
     # 1) 象限分区末尾追加复选框
     try:
@@ -1577,14 +1738,16 @@ def add_task(body: dict):
     except StopIteration:
         lines += ["", f"## {quad}", "", f"- [ ] {time_str} {text}"]
 
-    # 2) 总览主表追加行（找表尾：最后一个以 | 开头的行）
+    # 2) 总览主表追加行（找表尾；同时间同文本的行已存在则跳过）
     try:
         ti = next(i for i, l in enumerate(lines) if l.startswith("## ") and "总览" in l)
         te = ti
         for i in range(ti, len(lines)):
             if lines[i].strip().startswith("|"):
                 te = i
-        lines.insert(te + 1, f"| 自 | {time_str} | 🟡 中 | {text} | {quad.split(' ', 1)[-1]} · 自定义 | 完成即赢 |")
+        new_row = f"| 自 | {time_str} | 🟡 中 | {text} | {quad.split(' ', 1)[-1]} · 自定义 | 完成即赢 |"
+        if not any(l.strip() == new_row for l in lines[ti:te + 1]):
+            lines.insert(te + 1, new_row)
     except StopIteration:
         pass
 
@@ -1954,7 +2117,7 @@ def generate_today_plan(energy: float = 3, sleep: float = 7.0) -> dict:
 
     # 读书/追剧建议并入青蛙
     if book_show_text and len(frogs) < 3 and not low:
-        frogs.append(book_show_text[:40])
+        frogs.append(book_show_text[:60])
 
     # 选择架构：只保留真正需要执行的任务，不把休息或过渡列成待办。
 
@@ -1988,33 +2151,36 @@ def generate_today_plan(energy: float = 3, sleep: float = 7.0) -> dict:
 
     # ── 课程日程 vs 非课程日程 ──
     if has_courses:
-        _push("07:30–07:45", "起床后只做一件事：确认青蛙与课表（别刷手机）", mind)
-        _push("08:00–08:20", "课前预览：第一门课讲义标题过一遍，带 1 个问题进教室", mind)
+        # 每门课一条可勾选的出勤任务（勾选 = 确认上课 → 出勤积分）
+        for cb in course_blocks:
+            makeup_tag = "🔄调休" if cb.get("is_makeup") else ""
+            _push(f"{cb['start']}–{cb['end']}",
+                  f"📍 {cb['code']} {cb['name']}（{cb['session']}）{makeup_tag} 上课出勤", voc)
+        _push("07:30–07:45", "起床后只做一件事：确认重点与课表（别刷手机）", mind)
         _push("12:00–12:30", _ab("午餐 + 蛋白 ≥45g 同时听一段日语", "午餐 + 和同学约饭闲聊课程"), body)
         _push("12:45–13:05", "日语：认读 20 个假名 + 跟读 5 分钟（最低闭环）", mind)
         _push("13:05–13:15", "给一个真人发一条非事务性消息（分享或提问——不是任务）", spirit)
-        _push("16:50–17:20", "课后立刻把课上第 3 条观察写成短句（防止蒸发，直接喂选题库）", voc)
         _push("18:45–19:15", _ab("晚餐 + 和一位同学非事务性闲聊", "晚餐 + 听一段英文播客 10 分钟"), spirit)
         _push("20:00–20:45", f"自由块：{_ab(f'《{topic[:14]}》素材整理 25 分钟', '15 分钟发呆 + 钢琴 10 分钟')}" if topic
               else _ab("素材整理 25 分钟", "发呆 15 分钟 + 听歌一首"), voc)
         _push("21:00–21:15", _ab("英语口述 10 分钟（一个真实话题）", "IELTS Part 2 录音 2 分钟"), mind)
         _push("21:15–21:45", _ab(f"推进《{topic[:18]}》：写 200 字草稿", "改一段旧稿再发") if topic
-              else "把今天最好的一条课程观察整理成选题", voc)
+              else _ab("推进本周主线 45 分钟", "整理一次素材库"), voc)
         _push("21:45–21:55", "日记：今天最真实的一个瞬间（一句话）——然后合上电脑", spirit)
         if tier_score >= 3:
-            _push("22:00–22:15", _ab("读 6 页书（非功利）", "写下明天的 1 只青蛙"), spirit)
+            _push("22:00–22:15", _ab("读 6 页书（非功利）", "写下明天的 1 件要事"), spirit)
         _push("22:40–23:00", "拉伸 5 分钟 + 数据回填（体重 / 支出）+ 23:00 入睡", body)
 
     else:
-        _push("07:30–07:45", _ab("直接写今日青蛙 + 三件事", "先咖啡 10 分钟再回来写计划"), mind)
-        # 青蛙块（诱惑捆绑：难任务后跟愉快的）
-        frog_desc = f"🐸 青蛙：{frogs[0][:30]}" + (
+        _push("07:30–07:45", _ab("直接写今日重点 + 三件事", "先咖啡 10 分钟再回来写计划"), mind)
+        # 重点块（诱惑捆绑：难任务后跟愉快的）
+        frog_desc = f"⚡ 今日重点：{frogs[0][:30]}" + (
             "（番茄钟 25×4，每轮起身 1 分钟——如果卡住，只做 5 分钟也算赢）" if not low
             else "（简化版：25 分钟专注即可，做完就是胜利）")
         _push("09:00–11:00", frog_desc, voc)
 
         if topic and not low:
-                _push("11:20–12:00", _ab(f"青蛙续航：《{topic[:16]}》改可发版本",
+                _push("11:20–12:00", _ab(f"重点续航：《{topic[:16]}》改可发版本",
                   f"为《{topic[:16]}》配 1 张封面图 + 写 3 句简介"), voc)
 
         _push("12:00–12:30", _ab("午餐 + 蛋白 ≥45g", "午餐 + 听日语 10 分钟"), body)
@@ -2029,21 +2195,21 @@ def generate_today_plan(energy: float = 3, sleep: float = 7.0) -> dict:
                   else _ab("为本周这篇完成一个推进动作", "整理选题库里的 3 个可写点")), voc)
         _push("15:35–15:45", "通读今日素材，圈 1 个可写点（不展开）", mind)
 
-        # 读书/追剧建议
+        # 读书/追剧建议（45 分钟专注块，量按 finish_by 自动配速）
         if book_show_text and not low:
-            _push("16:00–16:25", f"📖 {book_show_text[:50]}", mind)
+            _push("16:00–16:45", f"📖 {book_show_text[:60]}", mind)
 
         if wd_num == 6:  # 周日
-            _push("15:45–16:05", "📊 数据复盘：只看观看 / 赞藏 / 净涨粉 3 个数字 + 记 1 条结论", voc)
+            _push("15:45–15:55", "📊 数据复盘：只看观看 / 赞藏 / 净涨粉 3 个数字 + 记 1 条结论", voc)
 
         if tier_score >= 3:  # 诱惑捆绑：高能日才配享兴趣探索
-            _push("16:10–16:35", _ab("钢琴自由弹 15 分钟（不带目标）", "日语泛听 15 分钟（不带目标）"), spirit)
+            _push("18:30–18:55", _ab("钢琴自由弹 15 分钟（不带目标）", "日语泛听 15 分钟（不带目标）"), spirit)
 
         if not low and sport and not fasted:
             _push(sport_time, f"{sport_task} · 本周第 {nth}/{total_sport} 次有氧", body)
 
         _push("21:00–21:15", _ab("英语口述 10 分钟（一个真实话题）", "IELTS Part 2 录音 2 分钟"), mind)
-        _push("21:15–21:25", _ab("写下明日青蛙候选 1 条", "写下今天做得最有意义的 1 件事"), voc)
+        _push("21:15–21:25", _ab("写下明天最重要的一件事", "写下今天做得最有意义的 1 件事"), voc)
         _push("21:45–21:55", "日记：今天最真实的一个瞬间（一句话）——然后合上电脑", spirit)
         _push("22:40–23:00", "拉伸 5 分钟 + 数据回填（体重 / 支出）+ 23:00 入睡", body)
 
@@ -2070,8 +2236,8 @@ def generate_today_plan(energy: float = 3, sleep: float = 7.0) -> dict:
         ("🚀 事业 Vocation", sorted(task_lines["voc"])),
     ]
 
-    three = [f"🐸 {frogs[0]}"]
-    three.append(f"🐸 {frogs[1]}" if len(frogs) > 1 else "语言最低闭环完成（日语 + 英语）")
+    three = [frogs[0]]
+    three.append(frogs[1] if len(frogs) > 1 else "语言最低闭环完成（日语 + 英语）")
     three.append("晚间数据回填（体重 / 支出 / 日记一句话）")
 
     # 总览主表
@@ -2087,7 +2253,7 @@ def generate_today_plan(energy: float = 3, sleep: float = 7.0) -> dict:
                          "task": txt[:30], "type": typ, "goal": goal})
         if fasted and sport and not low:
             _row("块 A", "07:40–08:25", f"{sport}（空腹有氧）", "身体", "有氧完成即赢", "▰ 恢复")
-        _row("块 A", "09:00–11:00", f"🐸 {frogs[0][:20]}", "青蛙 / 主线", "上午做完青蛙", "🔴 高")
+        _row("块 A", "09:00–11:00", f"⚡ {frogs[0][:20]}", "今日重点 / 主线", "上午做完重点", "🔴 高")
         _row("块 B", "12:40–13:10", "语言（日语）+ 一条非事务性消息", "心智 / 精神", "两件小事闭环")
         _row("块 C", "14:00–15:40", "内容推进 + 素材圈点", "事业", "一个可保留的中间产物")
         if sport and not fasted and not low:
@@ -2132,8 +2298,11 @@ def generate_today_plan(energy: float = 3, sleep: float = 7.0) -> dict:
     if course_blocks:
         course_lines = ["", "**今日固定课程**：", ""]
         for cb in course_blocks:
-            course_lines.append(f"- {cb['start']}–{cb['end']}｜{cb['code']} {cb['name']}（{cb['session']}）｜{cb['location']}")
+            makeup_tag = "（🔄 调休补课）" if cb.get("is_makeup") else ""
+            course_lines.append(f"- {cb['start']}–{cb['end']}｜{cb['code']} {cb['name']}（{cb['session']}）{makeup_tag}｜{cb['location']}")
         course_lines.append("")
+    elif _is_holiday(_today()):
+        course_lines = ["", "**🏮 今日校历放假，无课**（中秋/国庆假期）。", ""]
 
     md = ["---", *fm_lines, "tags:", "  - daily/plan", "---", "",
           f"# {_today().isoformat()} · 今日计划（PEOS 生成 · {tier_name} · 预算 ¥100）", "",
@@ -2142,8 +2311,8 @@ def generate_today_plan(energy: float = 3, sleep: float = 7.0) -> dict:
     if fresh_start:
         md += [fresh_start, ""]
     md += course_lines
-    md += [f"**青蛙（上午完成，1–3 只）**："]
-    md += [f"- 🐸 {f}" for f in frogs]
+    md += [f"**今日重点（上午先做）**："]
+    md += [f"- {f}" for f in frogs]
     md += ["", "**每天只做三件事**："]
     md += [f"{i + 1}. {t}" for i, t in enumerate(three)]
     md += ["", f"**今天明确不做**：{not_do}。", "",
@@ -2165,11 +2334,9 @@ def generate_today_plan(energy: float = 3, sleep: float = 7.0) -> dict:
         for t, txt in sorted(items):
             md += [f"- [ ] {t} {txt}"]
 
-    md += ["", "## 📖 今日日记", ""]
+    # 日记/闭环：没写过就不预写空模板（写日记时 DiaryEditor 会自动创建对应段落）
     if old_diary:
-        md += [old_diary, ""]
-    md += ["## ✨ 每日闭环（晚上填写）", "",
-           "- 做成：", "- 卡住：", "- 一句话洞察：", ""]
+        md += ["## 📖 今日日记", "", old_diary, ""]
     p.parent.mkdir(parents=True, exist_ok=True)
     p.write_text("\n".join(md), encoding="utf-8")
     return {"ok": True, "tier": tier_name, "frogs": frogs,
@@ -2179,7 +2346,9 @@ def generate_today_plan(energy: float = 3, sleep: float = 7.0) -> dict:
             "progress_suggestions": progress_sugs,
             "strength_day": is_strength_day,
             "strength_text": strength_text if is_strength_day and strength_text else None,
-            "book_show": book_show_text}
+            "book_show": book_show_text,
+            "is_holiday": _is_holiday(_today()),
+            "is_makeup": _makeup_weekday(_today()) is not None}
 
 
 def ensure_today_plan():
@@ -2543,6 +2712,12 @@ def build_overview():
         "today_courses": today_course_blocks(),
         "upcoming_deadlines": upcoming_deadlines(30),
         "today_deadlines": today_deadlines(),
+        "calendar": {
+            "is_holiday": _is_holiday(_today()),
+            "is_makeup": _makeup_weekday(_today()) is not None,
+            "makeup_weekday": _makeup_weekday(_today()),
+            "holidays": load_courses().get("holidays", []),
+        },
         "decisions": decisions[::-1][:30],
         "kpi_counts": estimate_kpi(dailies),
         "fitness": {
@@ -2614,6 +2789,9 @@ class Handler(SimpleHTTPRequestHandler):
             qs = parse_qs(urlparse(self.path).query)
             date = (qs.get("date") or [_today().isoformat()])[0]
             self._json(200, _day_context(_parse_date(date, _today())))
+            return
+        if self.path.startswith("/api/weread/status"):
+            self._json(200, weread_status())
             return
         if self.path.startswith("/api/suggestions"):
             qs = parse_qs(urlparse(self.path).query)
@@ -2695,6 +2873,8 @@ class Handler(SimpleHTTPRequestHandler):
                 self._json(400, {"ok": False, "error": str(e)})
         elif self.path == "/api/progress/delete":
             self._json(200, delete_progress(str(body.get("id", ""))))
+        elif self.path == "/api/weread/sync":
+            self._json(200, weread_sync())
         elif self.path == "/api/game":
             action = body.get("action")
             try:
@@ -2750,14 +2930,45 @@ class Handler(SimpleHTTPRequestHandler):
             self._json(404, {"ok": False, "error": "not found"})
 
 
+def _lan_ip() -> str:
+    """取本机局域网 IP（手机同 WiFi 访问用）。
+    优先 192.168/10.x 网段；排除 VPN TUN 常用的 198.18/100.64 段。"""
+    import socket
+    cands = []
+    try:
+        for info in socket.getaddrinfo(socket.gethostname(), None, socket.AF_INET):
+            ip = info[4][0]
+            if not ip.startswith("127."):
+                cands.append(ip)
+    except Exception:
+        pass
+    for ip in cands:
+        if ip.startswith(("192.168.", "10.")):
+            return ip
+    for ip in cands:
+        if not ip.startswith(("198.18.", "198.19.", "100.64.", "172.16.", "172.31.")):
+            return ip
+    # 兜底：UDP 路由探测
+    s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    try:
+        s.connect(("8.8.8.8", 80))
+        return s.getsockname()[0]
+    except Exception:
+        return "127.0.0.1"
+    finally:
+        s.close()
+
+
 def main():
     port = CONFIG.get("port", 8790)
-    url = f"http://127.0.0.1:{port}"
+    lan = _lan_ip()
     print(f"PEOS · SJY Personal Executive OS")
     print(f"vault（只读）: {VAULT}")
-    print(f"驾驶舱     : {url}   ← 浏览器打开")
+    print(f"本机访问   : http://127.0.0.1:{port}")
+    print(f"手机访问   : http://{lan}:{port}   ← 手机连同一 WiFi 打开")
     print("Ctrl+C 停止")
-    ThreadingHTTPServer(("127.0.0.1", port), Handler).serve_forever()
+    # 0.0.0.0：允许同一局域网内手机访问；服务无对外依赖，仅家庭/校园网内可达
+    ThreadingHTTPServer(("0.0.0.0", port), Handler).serve_forever()
 
 
 if __name__ == "__main__":

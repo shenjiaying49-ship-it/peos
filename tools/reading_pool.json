@@ -1,0 +1,58 @@
+[
+  {
+    "area": "小说",
+    "title": "大地上我们转瞬即逝的绚烂",
+    "author": "王鸥行",
+    "source": "manual",
+    "hint": "微信读书收录（本周在读）"
+  },
+  {
+    "area": "哲学",
+    "title": "道德经（白话直译版）",
+    "author": "老子",
+    "source": "auto",
+    "gutenberg_id": 49965
+  },
+  {
+    "area": "社科",
+    "title": "中国小说史略",
+    "author": "鲁迅",
+    "source": "auto",
+    "gutenberg_id": 25559
+  },
+  {
+    "area": "AI",
+    "title": "为什么伟大不能被计划",
+    "author": "Kenneth Stanley",
+    "source": "manual",
+    "hint": "深圳图书馆App免费借 / 微信读书"
+  },
+  {
+    "area": "增长",
+    "title": "增长黑客",
+    "author": "Sean Ellis",
+    "source": "manual",
+    "hint": "深圳图书馆App免费借 / 微信读书"
+  },
+  {
+    "area": "商业",
+    "title": "纳瓦尔宝典",
+    "author": "Eric Jorgenson",
+    "source": "manual",
+    "hint": "官网 navalmanack.com 有官方免费 PDF（英文）；中文版深圳图书馆/微信读书"
+  },
+  {
+    "area": "小说",
+    "title": "警世通言",
+    "author": "冯梦龙",
+    "source": "auto",
+    "gutenberg_id": 24141
+  },
+  {
+    "area": "艺术",
+    "title": "艺术的故事",
+    "author": "贡布里希",
+    "source": "manual",
+    "hint": "深圳图书馆App免费借；艺术杂志类 worldmags.net 手动逛"
+  }
+]

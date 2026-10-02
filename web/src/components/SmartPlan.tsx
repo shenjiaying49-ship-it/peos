@@ -29,7 +29,7 @@ export default function SmartPlan({ onPlanned, budget, spent }: {
         if (r.day_context?.active) ctxParts.push(`📍 ${r.day_context.mode}`);
         if (r.strength_day) ctxParts.push("💪 力量日");
         if (r.progress_suggestions?.length) ctxParts.push(`📖 ${r.progress_suggestions[0].title} +${r.progress_suggestions[0].suggested}${r.progress_suggestions[0].unit}`);
-        setMsg(`✓ ${r.tier}方案 · 青蛙 ${(r.frogs || []).length} 只 · ${r.tasks ?? 0} 项任务${ctxParts.length ? " · " + ctxParts.join(" · ") : ""}`);
+        setMsg(`✓ ${r.tier}方案 · 重点 ${(r.frogs || []).length} 件 · ${r.tasks ?? 0} 项任务${ctxParts.length ? " · " + ctxParts.join(" · ") : ""}`);
         onPlanned();
       } else setMsg("✗ " + r.error);
     } catch (e) { setMsg("✗ " + String(e)); }
@@ -89,7 +89,7 @@ export default function SmartPlan({ onPlanned, budget, spent }: {
         </div>
       </details>
       <p className="sp-note mono">
-        {tier}档：{tier === "低精力" ? "只保青蛙 + 语言最低闭环，其余自动删除"
+        {tier}档：{tier === "低精力" ? "只保重点 + 语言最低闭环，其余自动删除"
           : tier === "满血" ? "三件事 + 运动一项 + 兴趣探索"
           : "三件事 + 运动，不贪"}　·　每天首次刷新会按历史自动生成
       </p>

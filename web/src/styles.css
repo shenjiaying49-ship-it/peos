@@ -218,6 +218,44 @@ input[type="range"] { width: 100%; accent-color: var(--gold); height: 24px; }
 .dl-weight { color: var(--faint); font-size: 11.5px; }
 .dl-note { color: var(--dim); font-size: 12px; }
 
+/* 校历放假 / 调休横幅 — 水色 */
+.holiday-banner {
+  border: 1px solid rgba(61, 107, 133, .35); background: rgba(61, 107, 133, .06);
+  padding: 13px 15px; margin-bottom: 16px;
+}
+.holiday-banner.makeup { border-color: rgba(169, 134, 44, .4); background: var(--gold-soft); }
+.hl-head { font-size: 12px; font-weight: 800; color: var(--water); letter-spacing: 1px; display: block; margin-bottom: 4px; }
+.makeup .hl-head { color: var(--gold-strong); }
+.hl-sub { font-size: 12.5px; color: var(--dim); }
+
+/* 重要日子列表（未来 30 天截止/考试） */
+.keydays {
+  border: 1px solid var(--line); background: rgba(245, 244, 237, .6);
+  padding: 10px 14px; margin-bottom: 16px;
+}
+.keydays summary {
+  cursor: pointer; font-size: 12px; font-weight: 700; color: var(--gold-strong);
+  letter-spacing: 1px; user-select: none; list-style: none;
+}
+.keydays summary::before { content: "▸ "; }
+.keydays[open] summary::before { content: "▾ "; }
+.kd-item {
+  display: flex; gap: 10px; align-items: baseline; font-size: 12.5px;
+  padding: 5px 0 4px 8px; border-left: 2px solid var(--line); margin-top: 5px;
+}
+.kd-item.hot { border-left-color: #B4552D; background: rgba(180, 85, 45, .05); }
+.kd-item.warm { border-left-color: var(--gold-strong); }
+.kd-date { color: var(--faint); flex-shrink: 0; }
+.kd-course { font-weight: 700; color: var(--water); flex-shrink: 0; min-width: 62px; }
+.kd-task { flex: 1; color: var(--ink); }
+.kd-left { color: var(--faint); font-size: 11.5px; flex-shrink: 0; }
+.kd-item.hot .kd-left { color: #B4552D; font-weight: 700; }
+
+/* 微信读书同步 */
+.pp-weread { display: flex; gap: 8px; align-items: baseline; margin-top: 6px; flex-wrap: wrap; }
+.pp-weread-msg { font-size: 11.5px; color: var(--dim); }
+.pp-weread-msg.err-text { color: #B4552D; }
+
 /* ───────── 任务台账 ───────── */
 .tasks-grid { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(260px, 1fr); gap: 56px; }
 .ledger-day { margin-bottom: 26px; }
@@ -882,3 +920,61 @@ input[type="range"] { width: 100%; accent-color: var(--gold); height: 24px; }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
   }
+
+/* ───────── 手机 H5（≤640px） ───────── */
+@media (max-width: 640px) {
+  body { font-size: 14.5px; }
+  .chapter { padding: 4vh 14px 4vh; }
+  .ghost { font-size: clamp(70px, 24vw, 110px); }
+  .ch-corner { font-size: 10px; letter-spacing: 2px; }
+
+  /* 导航：横向滚动，logo 收缩 */
+  .nav { padding: 10px 14px; }
+  .nav-logo span { display: none; }        /* 只留 mark，省宽度 */
+  .nav-link { font-size: 12.5px; padding: 6px 2px; }
+
+  /* 四象限十字：竖屏单列，坐标轴隐藏 */
+  .quad-cross { grid-template-columns: 1fr; margin-left: 0; }
+  .qc-axis-v, .qc-axis-h { display: none; }
+  .quad-cell { min-height: 0; padding: 10px 10px 6px; }
+
+  /* 时间轴：时间列收窄，操作按钮加大到可点 */
+  .s-time { width: 42px; font-size: 11px; }
+  .mini-btn { padding: 5px 9px; font-size: 12px; }
+  .sched-row { gap: 8px; }
+  .buffer .s-meta { font-size: 11px; }
+
+  /* 今日重点区 / Now 卡 */
+  .now-card { padding: 13px 14px; }
+  .now-card .n-task { font-size: 16px; }
+  .fz-head { font-size: 13px; }
+
+  /* 输入控件 16px：防 iOS 聚焦自动放大 */
+  input, select, textarea { font-size: 16px; }
+
+  /* 表单网格统一单列/双列适配 */
+  .media-form { grid-template-columns: 1fr 1fr; }
+  .media-form textarea { grid-column: 1 / -1; }
+  .ddform { grid-template-columns: 1fr 1fr; }
+  .sp-row { flex-direction: column; align-items: stretch; }
+  .pp-form input { min-width: 0; }
+  .pp-form .pp-total { flex: 1 1 96px; }
+
+  /* 进度行：名称/条/数字/按钮 允许换行不挤爆 */
+  .pp-row { flex-wrap: wrap; row-gap: 2px; }
+  .pp-row .pp-bar { flex: 1 1 90px; }
+
+  /* 重要日子行换行 */
+  .kd-item { flex-wrap: wrap; row-gap: 1px; }
+  .kd-task { flex-basis: 100%; order: 3; padding-left: 2px; }
+
+  /* 书影 / 日记流：两列以内 */
+  .dstream { grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); }
+  .media-grid { gap: 28px; }
+
+  /* 状态页四联卡 */
+  .state-bottom { grid-template-columns: 1fr 1fr; gap: 18px; }
+
+  /* 触屏无 hover：凡 hover 才出现的样式给个常显兜底 */
+  .lrow { -webkit-tap-highlight-color: rgba(169, 134, 44, .15); }
+}

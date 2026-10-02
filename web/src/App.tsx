@@ -14,7 +14,6 @@ import DailyDataForm from "./components/DailyDataForm";
 import Radar from "./components/Radar";
 import Spark from "./components/Spark";
 import MediaBoard from "./components/MediaBoard";
-import TopicsBoard from "./components/TopicsBoard";
 import CalibrationFlow from "./components/CalibrationFlow";
 import JarvisBoard, { DayTypePicker, NowCard, QuickCapture } from "./components/JarvisBoard";
 import { AgentChat, DiaryEditor, DiaryStream } from "./components/Review";
@@ -67,7 +66,7 @@ export default function App() {
     <div className="stage">
       <Nav />
 
-      {/* ───── CH1 今日 · 先看青蛙，再做现在，一句上表 ───── */}
+      {/* ───── CH1 今日 · 先看重点，再做现在，一句上表 ───── */}
       <Section id="today" index="01">
         <WeatherBar />
         <div className="today-grid">
@@ -79,8 +78,8 @@ export default function App() {
               <NowCard rows={today?.schedule || rich?.schedule || []} />
             </div>
             <div className="sec-block">
-              <div className="col-head mono">丢给我——一句话，自动上时间表</div>
-              <QuickCapture today={d.today} onChanged={reload} />
+              <div className="col-head mono">丢给我——什么时候做不用管，我来自动排</div>
+              <QuickCapture today={d.today} todayDaily={today} courses={d.today_courses || []} onChanged={reload} />
             </div>
             <div className="sec-block">
               <div className="col-head mono">今日 TODO · 四象限 · 悬停可改</div>
@@ -94,7 +93,7 @@ export default function App() {
           <div className="today-right" data-reveal>
             <div className="col-head mono">时间表 · 拖拽调整 · 悬停微调</div>
             {schedSrc
-              ? <ScheduleRail rows={schedSrc.rows} frogs={schedSrc.frogs} isToday={schedSrc.isToday} dateLabel={schedSrc.dateLabel} todayCourses={d.today_courses || []} todayDeadlines={d.today_deadlines || []} date={schedSrc.date} onChanged={reload} />
+              ? <ScheduleRail rows={schedSrc.rows} frogs={schedSrc.frogs} isToday={schedSrc.isToday} dateLabel={schedSrc.dateLabel} todayCourses={d.today_courses || []} todayDeadlines={d.today_deadlines || []} calendar={d.calendar} upcomingDeadlines={d.upcoming_deadlines || []} date={schedSrc.date} onChanged={reload} />
               : <p className="muted">最近一篇 Daily 没有可解析的总览主表——用左侧「丢给我」排第一版。</p>}
             <div className="sec-block">
               <div className="col-head mono">今日类型 · 决定今天的盘子多大</div>
@@ -107,20 +106,28 @@ export default function App() {
         </div>
       </Section>
 
-      {/* ───── CH2 管道（待写 + 截止；任务勾选在今日页，不再重复） ───── */}
+      {/* ───── CH2 截止与重要日子（课程作业 / 考试 / 时间线） ───── */}
       <Section id="tasks" index="02">
         <div className="tasks-grid">
           <div data-reveal>
-            <div className="col-head mono">内容管道 · 我的待写（手动维护）</div>
-            <TopicsBoard />
-            <div className="col-head mono" style={{ marginTop: 28 }}>已发布参考</div>
-            {d.content.recent_published.slice(0, 5).map((p, i) => (
-              <div key={i} className="todo-row"><span className="mono tr-st">{p.date}</span>
-                <span className="tr-t">{p.topic}</span></div>
-            ))}
+            <div className="col-head mono">🎯 重要日子 · 课程作业与考试（30 天）</div>
+            {d.upcoming_deadlines?.length ? d.upcoming_deadlines.map((dl, i) => {
+              const hot = dl.days_away <= 3, warm = !hot && dl.days_away <= 7;
+              return (
+                <div key={i} className={`kd-item ${hot ? "hot" : warm ? "warm" : ""}`}>
+                  <span className="kd-date mono">{dl.date.slice(5)}</span>
+                  <span className="kd-course">{dl.course}</span>
+                  <span className="kd-task">{dl.item}{dl.weight ? `（${dl.weight}%）` : ""}</span>
+                  <span className="kd-left">{dl.days_away === 0 ? "今天" : dl.days_away === 1 ? "明天" : `${dl.days_away} 天`}</span>
+                </div>
+              );
+            }) : <p className="muted">30 天内没有课程截止。</p>}
+            {d.today_deadlines?.length ? (
+              <p className="dl-note" style={{ marginTop: 10 }}>⚠️ 今天截止：{d.today_deadlines.map(t => `${t.course} ${t.item}`).join("；")}</p>
+            ) : null}
           </div>
           <div data-reveal>
-            <div className="col-head mono">近期截止</div>
+            <div className="col-head mono">近期时间线 · 60 天</div>
             {d.timeline.length ? d.timeline.map((t, i) => (
               <div key={i} className="todo-row"><span className="mono tr-st">{t.date.slice(5)}</span>
                 <span className="tr-t">{t.item}</span>

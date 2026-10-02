@@ -49,8 +49,8 @@ const timeOf = (s: string): [string, string] | null => {
 function classify(text: string): string {
   const explicit = PRIOS.find(p => p.marker && text.includes(p.marker));
   if (explicit) return explicit.key;
-  if (/🐸|青蛙|上课|完成.{0,4}课程|考试|截止/.test(text)) return "q1";
-  if (/回填|预览|回复|记 1 条|短句|明日青蛙|确认.{0,2}课表/.test(text)) return "q3";
+  if (/⚡|今日重点|🐸|青蛙|上课|完成.{0,4}课程|考试|截止/.test(text)) return "q1";
+  if (/回填|预览|回复|记 1 条|短句|明日青蛙|明天最重要|确认.{0,2}课表/.test(text)) return "q3";
   if (/自由块|发呆|闲聊|散步|泡沫轴|兴趣|泛听/.test(text)) return "q4";
   return "q2";
 }

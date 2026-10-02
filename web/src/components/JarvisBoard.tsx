@@ -1,12 +1,13 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { api, type Daily, type SchedRow } from "../api";
+import { withMarker } from "./TodayTodos";
 
 /* ═══════════════════════════════════════════════════════════
    JARVIS · 长期引擎
    - QuickCapture：CH1 首屏「丢给我」（取代自定义任务板块）
    - NowCard：CH1 首屏「现在就做」
    - JarvisBoard：06 章（观察 / 长期目标 / 身心灵 / 闪念箱 / 手表同步）
-   积分沿用成就系统（任务/青蛙/日记/数据自动计分），本板块不发分。
+   积分沿用成就系统（任务/出勤/日记/数据自动计分），本板块不发分。
    ═══════════════════════════════════════════════════════════ */
 
 const KEY = "jarvis-adhd-v3";
@@ -50,44 +51,84 @@ const BODY_KW = ["健身", "游泳", "跑步", "飞盘", "攀岩", "羽毛球", 
 const LIGHT_KW = ["回消息", "邮件", "杂事", "整理", "收拾", "买", "订", "预约", "回复", "缴费", "洗"];
 const DEEP_KW = ["写", "论文", "作业", "复习", "准备", "改", "剪", "录", "复盘", "规划", "学", "课程", "方案", "稿"];
 const cnNum = (w: string) => (CNUM[w] !== undefined ? CNUM[w] : /^\d+$/.test(w) ? parseInt(w) : null);
-interface PTask { text: string; time: string; dur: number; prio: 0 | 1 | 2; quad: string; flags: string[] }
+interface PTask { text: string; time: string; dur: number; prio: 0 | 1 | 2; quad: string; flags: string[]; isBody: boolean }
 function parseOne(raw: string): PTask | null {
   let text = raw.trim(); if (!text) return null;
   const flags: string[] = [];
-  let time = "", dur = 45;
+  let time = "", end = "", dur = 30;
+
+  /* 显式时间点：下午3点 / 15:30 / 中午12点 */
   const tp = text.match(/(早上|上午|中午|下午|晚上)?\s*(\d{1,2})[点:：时]\s*(半|\d{1,2})?分?/);
   if (tp) {
-    let h = parseInt(tp[2]); const m = tp[3] ? (tp[3] === "半" ? 30 : parseInt(tp[3])) : 0;
+    let h = parseInt(tp[2]); let m = tp[3] ? (tp[3] === "半" ? 30 : parseInt(tp[3])) : 0;
     const p = tp[1];
     if ((p === "下午" || p === "晚上") && h < 12) h += 12;
     else if (p === "中午" && h < 12) h = 12;
     else if (!p && h < 8) h += 12;
+    m = m < 15 ? 0 : m < 45 ? 30 : 60;          // 一律对齐半点
+    if (m === 60) { m = 0; h += 1; }
     time = fmtMin(h * 60 + m);
   }
-  const td = text.match(/([\d一两二三四五六七八九十]+)\s*个?\s*(小时|h)|(\d+)\s*分钟/);
-  if (td) {
-    if (td[1] !== undefined) { const n = cnNum(td[1]); if (n) dur = Math.round(n * 60); }
-    else if (td[3]) dur = parseInt(td[3]);
+
+  /* 显式时间段：14:00-16:00 / 晚上8-10点 / 9点到11点（优先级高于单点，能定时长） */
+  const tr = text.match(/(?<![\d:])(\d{1,2})(?::(\d{2}))?\s*(?:到|-|–|—|至)\s*(\d{1,2})(?::(\d{2}))?/);
+  if (tr) {
+    let h1 = parseInt(tr[1]), h2 = parseInt(tr[3]);
+    const m1 = tr[2] ? parseInt(tr[2]) : 0, m2 = tr[4] ? parseInt(tr[4]) : 0;
+    const pm = /(下午|晚上)/.test(text), am = /(早上|上午)/.test(text);
+    if (pm && h1 < 12) h1 += 12;
+    if (pm && h2 < 12) h2 += 12;
+    if (am && h1 === 12) h1 = 0;
+    if (h2 * 60 + m2 <= h1 * 60 + m1) h2 += 12;
+    time = fmtMin(h1 * 60 + m1); end = fmtMin(h2 * 60 + m2);
+    dur = Math.max(30, h2 * 60 + m2 - (h1 * 60 + m1));
   }
+
+  /* 时长：半小时 / 一个半小时 / 1.5小时 / 两小时 / 45分钟 */
+  const hHalf = text.match(/([\d一两二三四五六七八九十]+)\s*个?半\s*小时/);
+  const hNum = text.match(/([\d.．]+|[\d一两二三四五六七八九十]+)\s*个?\s*小时|h(?![a-z])/);
+  const mMin = text.match(/(\d+)\s*分钟/);
+  if (hHalf) {
+    const n = cnNum(hHalf[1]) ?? parseFloat(hHalf[1]);
+    dur = Math.round(((isNaN(n) ? 1 : n) + 0.5) * 60);       // 一个半小时 = 90
+  } else if (mMin) {
+    dur = parseInt(mMin[1]);
+  } else if (hNum) {
+    const raw2 = hNum[1].replace(/个/g, "");
+    const n = /[\d.]/.test(raw2) ? parseFloat(raw2) : (cnNum(raw2) ?? 1);
+    dur = Math.round((isNaN(n) ? 1 : n) * 60);
+  } else if (/半小时|半个小时/.test(text)) {
+    dur = 30;
+  }
+  if (time && end) dur = Math.max(30, parseT(end) - parseT(time));
+  if (/半小时/.test(text) && !hHalf && !mMin && !end) dur = 30;
+
+  /* 象限判定：信号从强到弱，默认 q2 */
   let prio: 0 | 1 | 2 = 1;
-  if (/截止|deadline|必须|紧急|马上|今天一定|交/.test(text)) prio = 0;
-  else if (/有空|顺便|看看|了解|随便|或许|也许/.test(text)) prio = 2;
+  if (/截止|deadline|必须|紧急|马上|今天一定|今天要|交|面[试谈]|考试|上课|今日重点|⚡|青蛙|🐸/.test(text)) prio = 0;
+  else if (/有空|顺便|看看|了解|随便|想|或许|也许|不一定/.test(text)) prio = 2;
   const body = BODY_KW.some(k => text.includes(k));
-  const light = !body && LIGHT_KW.some(k => text.includes(k));
-  const deep = !body && !light && DEEP_KW.some(k => text.includes(k)) && dur >= 60;
+  const light = !body && (LIGHT_KW.some(k => text.includes(k)) || prio === 2);
+  const deep = !body && !light && DEEP_KW.some(k => text.includes(k));
   let quad = "q2";
-  if (prio === 0 || /🐸|青蛙|上课|考试/.test(text)) quad = "q1";
-  else if (light || prio === 2) quad = "q3";
-  else if (deep) quad = "q2";
-  if (time && parseT(time) >= 23 * 60) flags.push("排在睡觉时间了——建议提前");
+  if (prio === 0 || /⚡|今日重点|🐸|青蛙|上课|考试/.test(text)) quad = "q1";
+  else if (light) quad = "q3";
+  else if (deep && dur >= 60) quad = "q2";
+  else if (time && (time.startsWith("18") || parseInt(time) >= 18 * 60)) quad = "q1";  // 固定晚约=当天必做
   if (dur > 180) { flags.push("超过 3 小时的大活，建议拆两段"); dur = 180; }
+  dur = Math.max(30, Math.round(dur / 30) * 30);   // 对齐 30 分钟粒度
   const clean = text
+    .replace(/(早上|上午|中午|下午|晚上)?\s*\d{1,2}(?:[:：]\d{2}|[点:：时]\s*(?:半|\d{1,2})?\s*分?)\s*(?:到|-|–|—|至)\s*\d{1,2}(?:[:：]\d{2}|[点:：时]?\s*(?:半|\d{1,2})?)?\s*分?/g, "")
     .replace(/(早上|上午|中午|下午|晚上)?\s*\d{1,2}[点:：时]\s*(半|\d{1,2})?分?\s*/, "")
-    .replace(/[（(]?[^）)]*(截止|deadline)[^）)]*[）)]?/, "")
+    .replace(/[（(][^（）()]*?(?:截止|deadline)[^（）()]*[）)]/g, "")
+    .replace(/\s*[\d.．一两二三四五六七八九十]+\s*个?半?\s*小时|\s*\d+\s*分钟|\s*半小时/g, "")
     .replace(/[，,；;]\s*$/, "").trim();
-  return { text: clean || text, time, dur, prio, quad, flags };
+  return { text: clean || text, time, dur, prio, quad, flags, isBody: body };
 }
 const parseAll = (raw: string) => raw.split(/\n|；|;|。/).map(parseOne).filter(Boolean) as PTask[];
+
+/** 自选时间块：只有半小时一格的选项（06:00–23:30），没有其他粒度 */
+const HALF_SLOTS = Array.from({ length: 36 }, (_, i) => fmtMin(6 * 60 + i * 30));
 
 /* ───────── sparkline ───────── */
 function Spark2({ log }: { log: { d: string; v: number }[] }) {
@@ -101,7 +142,7 @@ function Spark2({ log }: { log: { d: string; v: number }[] }) {
 
 /* ═════════════ DayTypePicker：今日类型（取代智能安排） ═════════════ */
 const DAY_TYPES = [
-  { key: "work", label: "正常工作日", load: "100%", hint: "满负荷：青蛙 + 全部安排照跑，TODO 排满也没事" },
+  { key: "work", label: "正常工作日", load: "100%", hint: "满负荷：重点 + 全部安排照跑，TODO 排满也没事" },
   { key: "low",  label: "低精力日",   load: "80%",  hint: "只保青蛙 + 一件要事，其余自动顺延不焦虑" },
   { key: "play", label: "游玩日",     load: "50%",  hint: "玩就是正事：只留一只小青蛙，其余别看" },
 ];
@@ -154,25 +195,118 @@ export function NowCard({ rows }: { rows: SchedRow[] }) {
 }
 
 /* ═════════════ QuickCapture：丢给我（取代自定义任务） ═════════════ */
-export function QuickCapture({ today, onChanged }: { today: string; onChanged: () => void }) {
+
+/** 把无时间的任务智能排进空闲槽：q1 最先 → q2 → q3/q4 靠后；避课程/已有日程；按今日类型卡截止线 */
+function autoSchedule(ts: PTask[], busy: [number, number][], dtype: string): PTask[] {
+  const HARD_END = 23 * 60;
+  const dayEnd = (dtype === "play" ? 18 : dtype === "low" ? 20.5 : 22) * 60;
+  const now = Math.ceil(nowMin() / 30) * 30;
+  const taken: [number, number][] = [...busy];
+  const overlaps = (s: number, e: number) => taken.some(([bs, be]) => s < be && e > bs);
+  const freeSlot = (s: number) => !taken.some(([bs, be]) => s < be && bs < s + 30);
+
+  const findRun = (n: number, limit: number, from: number): number => {
+    let s = Math.max(from, Math.ceil(nowMin() / 30) * 30);
+    while (s + n * 30 <= Math.min(limit, HARD_END)) {
+      let ok = true;
+      for (let i = 0; i < n; i++) {
+        if (!freeSlot(s + i * 30)) {
+          const bl = taken.find(([bs, be]) => s + i * 30 < be && bs < s + i * 30 + 30);
+          s = Math.ceil((bl ? bl[1] : s + 30) / 30) * 30;
+          ok = false;
+          break;
+        }
+      }
+      if (ok) return s;
+    }
+    return -1;
+  };
+
+  const order: Record<string, number> = { q1: 0, q2: 1, q3: 2, q4: 3 };
+  const sorted = [...ts].sort((a, b) => order[a.quad] - order[b.quad]);
+  for (const t of sorted) {
+    const slots = Math.max(1, Math.round(t.dur / 30));
+    if (t.time) {
+      // 显式时间：锚定并占位（允许与其他任务并行——你说的并行场景）
+      const s = parseT(t.time);
+      for (let i = 0; i < slots; i++) taken.push([s + i * 30, s + (i + 1) * 30]);
+      continue;
+    }
+    // 三道防线：①今日容量线内找空位 ②放宽到 23:00 ③并行兜底（绝不允许任务没落位）
+    let start = findRun(slots, dayEnd, now);
+    if (start === -1) {
+      start = findRun(slots, HARD_END, now);
+      if (start >= 21 * 60) t.flags = [...t.flags, "排到很晚了——今天太满，考虑顺延明天"];
+    }
+    if (start === -1) {
+      const lastEnd = taken.length ? Math.max(...taken.map(([, be]) => be)) : now;
+      start = Math.min(Math.max(Math.ceil(lastEnd / 30) * 30, now), 22 * 60);
+      t.flags = [...t.flags, "今天排满了——与现有安排并行完成"];
+    }
+    t.time = fmtMin(start);
+    for (let i = 0; i < slots; i++) taken.push([start + i * 30, start + (i + 1) * 30]);
+  }
+  return ts;
+}
+
+/** q1..q4 → PEOS 生命周期分区（服务端要求 mind/body/spirit/voc） */
+function sectionOf(t: PTask): string {
+  if (t.isBody) return "body";
+  return t.quad === "q1" || t.quad === "q2" ? "voc" : "mind";
+}
+
+export function QuickCapture({ today, todayDaily, courses, onChanged }: {
+  today: string;
+  todayDaily: Daily | null;
+  courses: { start: string; end: string }[];
+  onChanged: () => void;
+}) {
   const [raw, setRaw] = useState("");
   const [parsed, setParsed] = useState<PTask[] | null>(null);
   const [msg, setMsg] = useState("");
-  const flash = (m: string) => { setMsg(m); window.setTimeout(() => setMsg(""), 2400); };
+  const flash = (m: string) => { setMsg(m); window.setTimeout(() => setMsg(""), 2600); };
+  const busyOf = (): [number, number][] => {
+    const out: [number, number][] = [];
+    (courses || []).forEach(c => out.push([parseT((c.start || "").slice(0, 5)), parseT((c.end || "").slice(0, 5))]));
+    (todayDaily?.schedule || []).forEach(r => out.push([parseT((r.start || "").slice(0, 5)), parseT((r.end || r.start || "").slice(0, 5))]));
+    return out.filter(([s, e]) => e > s);
+  };
   const patch = (i: number, p: Partial<PTask>) =>
-    setParsed(prev => (prev ? prev.map((t, j) => (j === i ? { ...t, ...p } : t)) : prev));
+    setParsed(prev => {
+      if (!prev) return prev;
+      const next = prev.map((t, j) => (j === i ? { ...t, ...p } : t));
+      // 时间/时长改动后，只保留显式锚点，重跑排期（确定性）
+      return autoSchedule(next, busyOf(), localStorage.getItem(`peos.daytype.${today}`) || "work");
+    });
+  const doParse = () => {
+    const ts = parseAll(raw);
+    if (!ts.length) { flash("先写点事进来"); return; }
+    setParsed(autoSchedule(ts, busyOf(), localStorage.getItem(`peos.daytype.${today}`) || "work"));
+  };
+  const [committing, setCommitting] = useState(false);
   const commit = async () => {
-    if (!parsed) return;
-    let ok = 0, fail = 0;
-    for (const t of parsed) {
-      const end = fmtMin(parseT(t.time) + t.dur);
-      try {
-        const r = await api.taskAdd({ date: today, time: `${t.time}–${end}`, text: t.text, quad: t.quad });
-        if (r && (r as { ok?: boolean }).ok === false) fail++; else ok++;
-      } catch { fail++; }
+    if (!parsed || committing) return;
+    setCommitting(true);
+    let ok = 0, fail = 0, firstErr = "";
+    try {
+      for (const t of parsed) {
+        try {
+          // 一个任务 = 一行完整时间段（服务端已支持 30min~4h），不再切块
+          const r = await api.taskAdd({
+            date: today,
+            time: `${t.time}–${fmtMin(parseT(t.time) + t.dur)}`,
+            text: withMarker(t.text, t.quad),
+            quad: sectionOf(t),
+          });
+          if (r && (r as { ok?: boolean }).ok === false) { fail++; if (!firstErr) firstErr = (r as { error?: string }).error || ""; }
+          else ok++;
+        } catch { fail++; }
+      }
+    } finally {
+      setCommitting(false);
     }
     setParsed(null); setRaw("");
-    flash(`${ok} 件已上时间表${fail ? `（${fail} 件失败）` : ""}`);
+    flash(`${ok} 件已上时间表${fail ? `（${fail} 件失败：${firstErr}）` : ""} —— TODO 和时间表刷新即可见`);
     onChanged();
   };
   return (
@@ -180,20 +314,16 @@ export function QuickCapture({ today, onChanged }: { today: string; onChanged: (
       {msg && <div className="jv-toast mono">{msg}</div>}
       <textarea
         value={raw} onChange={e => setRaw(e.target.value)}
-        placeholder={"一行一件：\n下午3点开会一小时\n写论文两小时（截止今天）\n健身"}
+        placeholder={"一行一件，什么时候做不用管，我来排：\n写论文两小时（截止今天）\n健身\n下午3点开会一小时\n回邮件"}
         rows={3}
       />
       <div className="jv-nl-actions">
-        <button className="btn-solid" onClick={() => {
-          const ts = parseAll(raw);
-          if (!ts.length) { flash("先写点事进来"); return; }
-          setParsed(ts);
-        }}>解析并上时间表</button>
-        <span className="jv-hint mono">自动判象限 · 写「截止」升重要 · 「下午3点」直接落位</span>
+        <button className="btn-solid" onClick={doParse}>解析并智能排期</button>
+        <span className="jv-hint mono">没写时间的自动找空位（避课程、q1 先排、按今日类型卡线）· 「下午3点」写的直接落位</span>
       </div>
       {parsed && (
         <div className="jv-preview">
-          <div className="jv-ph mono">解析结果（{parsed.length} 件）——改完再落地</div>
+          <div className="jv-ph mono">排期结果（{parsed.length} 件）——时间可改，改完重新错开</div>
           {parsed.map((t, i) => (
             <div key={i} className="jv-ptask">
               <div className="jv-pt-top">
@@ -202,20 +332,19 @@ export function QuickCapture({ today, onChanged }: { today: string; onChanged: (
               </div>
               {t.flags.length > 0 && <div className="jv-flags">⚠️ {t.flags.join("；")}</div>}
               <div className="jv-pt-row">
-                <input type="time" value={t.time} onChange={e => patch(i, { time: e.target.value })} />
-                <select value={t.quad} onChange={e => patch(i, { quad: e.target.value })}>
-                  <option value="q1">q1 重要·紧急</option>
-                  <option value="q2">q2 重要·不紧急</option>
-                  <option value="q3">q3 紧急·不重要</option>
-                  <option value="q4">q4 可选</option>
+                <select value={t.time} onChange={e => patch(i, { time: e.target.value })} aria-label="开始时间（半小时一格）">
+                  {HALF_SLOTS.map(s => <option key={s} value={s}>{s}</option>)}
                 </select>
-                <span className="mono jv-dur">{t.dur}min</span>
+                <select value={t.dur} onChange={e => patch(i, { dur: parseInt(e.target.value) })}>
+                  {[30, 60, 90, 120, 180].map(d => <option key={d} value={d}>{d} 分钟</option>)}
+                </select>
+                <span className="mono jv-dur">{sectionOf(t) === "voc" ? "事业" : sectionOf(t) === "body" ? "身体" : "心智"}</span>
               </div>
             </div>
           ))}
           <div className="jv-pt-actions">
-            <button className="btn-solid" onClick={commit}>全部写进时间表</button>
-            <button className="btn-outline sm" onClick={() => setParsed(null)}>取消</button>
+            <button className="btn-solid" onClick={commit} disabled={committing}>{committing ? "写入中…" : "确认写入（防重复）"}</button>
+            <button className="btn-outline sm" onClick={() => setParsed(null)} disabled={committing}>取消</button>
           </div>
         </div>
       )}

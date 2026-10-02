@@ -12,8 +12,9 @@ export interface Daily {
 }
 export interface Quad { id: string; name: string; icon: string; current: number; after90: number; ideal: number; stage: string; diagnosis: string; action: string; kpi_weekly: string }
 export interface DiaryCard { date: string; weekday: string; emoji: string; summary: string; rating: number; comment: string; done: number; total: number }
-export interface CourseBlock { code: string; name: string; start: string; end: string; location: string; session: string; weekday_cn: string }
+export interface CourseBlock { code: string; name: string; start: string; end: string; location: string; session: string; weekday_cn: string; is_makeup?: boolean }
 export interface Deadline { date: string; days_away: number; course: string; course_name: string; item: string; weight?: number | null; note: string; weekday_cn: string }
+export interface CalendarInfo { is_holiday: boolean; is_makeup: boolean; makeup_weekday: number | null; holidays: string[] }
 export interface Overview {
   today: string; today_daily: Daily | null; latest_daily: Daily | null; latest_rich_daily: Daily | null;
   week: WeekDay[]; body_trend: Record<string, any>[]; diary_cards: DiaryCard[];
@@ -22,6 +23,7 @@ export interface Overview {
   today_courses: CourseBlock[];
   upcoming_deadlines: Deadline[];
   today_deadlines: Deadline[];
+  calendar?: CalendarInfo;
   decisions: { date: string; text: string }[];
   kpi_counts: Record<string, number>;
   fitness: Record<string, any>;
@@ -132,6 +134,10 @@ export const api = {
     fetch("/api/progress/inc", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ id, delta }) }).then(r => r.json()),
   progressDel: (id: string) =>
     fetch("/api/progress/delete", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ id }) }).then(r => r.json()),
+  wereadStatus: (): Promise<{ ok: boolean; cookie_set: boolean; hint?: string }> =>
+    fetch("/api/weread/status").then(r => r.json()),
+  wereadSync: (): Promise<{ ok: boolean; updated?: string[]; unmatched?: string[]; error?: string; note?: string }> =>
+    fetch("/api/weread/sync", { method: "POST", headers: { "Content-Type": "application/json" }, body: "{}" }).then(r => r.json()),
   game: (): Promise<GameState> => fetch("/api/game").then(r => r.json()),
   gameAct: (body: Record<string, unknown>) =>
     fetch("/api/game", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) }).then(r => r.json()),
@@ -160,7 +166,7 @@ const ORDER_NAMES: Record<string, string> = {
 const VERDICTS: Record<string, string> = {
   safety: "今天只做一件事：处理健康问题。其余全部冻结。",
   fixed: "先把不可移动的保住（课程/考试/已约会议），剩余精力按档位分配。",
-  recovery: "降档运行：只保青蛙 + 语言最低闭环。删任务，不压时间。",
+  recovery: "降档运行：只保重点 + 语言最低闭环。删任务，不压时间。",
   finance: "今日支出冻结，先清财务红线，再做别的。",
   mainline: "主线还债：大号本周这篇。四象限里唯一在推进 1.X → 2.X 的杠杆动作。",
   explore: "有余力：钢琴/攀岩/校园活动，不带 KPI 地做。",
@@ -178,7 +184,7 @@ export function runEngine(st: EngineState) {
   const seq = ["safety", "fixed", "recovery", "finance", "mainline", "explore", "convenience"];
   const first = seq.find(s => hits.includes(s)) || "mainline";
   let plan: string;
-  if (st.energy <= 2) plan = "低精力方案：青蛙 + 语言最低闭环，其余全砍。目标是明天满血。";
+  if (st.energy <= 2) plan = "低精力方案：重点 + 语言最低闭环，其余全砍。目标是明天满血。";
   else if (st.energy <= 4) plan = "默认方案：三件事 + 固定安排。不贪。";
   else plan = "满血方案：默认 + 一项兴趣探索 + 提前还一篇稿债。";
   if (st.sleep < 6.5) plan += ` 睡眠 ${st.sleep}h 不足 → 今晚 23:00 前收尾是硬约束。`;

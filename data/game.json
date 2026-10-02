@@ -105,5 +105,8 @@
  "surprise_dates": [],
  "double_days": [],
  "savor_log": [],
- "points_offset": -5086
+ "points_offset": -4191,
+ "month_reset": {
+  "2026-10": true
+ }
 }

@@ -23,3 +23,7 @@ Thumbs.db
 # Env
 .env
 .env.local
+# Secrets — never commit
+data/weread_cookie.txt
+*.cookie
+data/*.cookie
