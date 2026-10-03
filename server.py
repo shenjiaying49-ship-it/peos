@@ -991,6 +991,71 @@ def weread_sync():
             "unmatched": unmatched[:5], "note": "只更新进度，不改总量" if updated else "书架有在读书但没匹配到追踪项（标题需含书名）"}
 
 
+# ---------------------------------------------------------------- 近 7 天生活信号（弱点可视化）
+
+def recent_insights(days: int = 7):
+    """近 N 天生活信号：睡眠 / 日记缺口 / 完成率 / 运动 / 超支 / 最弱象限。
+    数据全部来自 Daily frontmatter 与勾选记录 —— 日记和回填越勤，信号越准。"""
+    days = max(3, min(int(days or 7), 30))
+    budget = CONFIG.get("finance", {}).get("daily_budget", 100)
+    sleeps, diary_missing, overspend, sport_days = [], [], 0, 0
+    done_all = total_all = 0
+    quad_done = {"心智": 0, "身体": 0, "精神": 0, "事业": 0}
+    for d, path in list_recent_dailies(days + 1):
+        if d >= _today():
+            continue   # 今天还没过完，不计入弱点信号
+        data = parse_daily(path, d)
+        if data.get("sleep_hours"):
+            try:
+                sleeps.append(float(data["sleep_hours"]))
+            except (TypeError, ValueError):
+                pass
+        if not data.get("diary"):
+            diary_missing.append(d)
+        if data.get("spend"):
+            try:
+                if float(data["spend"]) > budget:
+                    overspend += 1
+            except (TypeError, ValueError):
+                pass
+        done_all += data["done"]
+        total_all += data["total"]
+        done_texts = ""
+        for sec in data["tasks_by_section"]:
+            done_texts += " ".join(t["text"] for t in sec["tasks"] if t["done"]) + " "
+            for label in quad_done:
+                if label in sec["section"]:
+                    quad_done[label] += sum(1 for t in sec["tasks"] if t["done"])
+        if any(k in done_texts for k in ("攀岩", "游泳", "羽毛球", "爬坡", "有氧", "力量训练", "散步")):
+            sport_days += 1
+
+    signals = []
+    if sleeps:
+        avg = sum(sleeps) / len(sleeps)
+        if avg < 7:
+            signals.append({"icon": "🌙", "text": f"平均睡眠 {avg:.1f}h（{len(sleeps)} 天记录）—— 低于 7h，试试把收尾块整体提前 30 分钟"})
+        else:
+            signals.append({"icon": "🌙", "text": f"平均睡眠 {avg:.1f}h，节奏在线"})
+    else:
+        signals.append({"icon": "🌙", "text": f"近 {days} 天没记过睡眠 —— 晚间数据回填断了，弱点信号会失准"})
+    if diary_missing:
+        last = max(diary_missing).isoformat()[5:]
+        signals.append({"icon": "📓", "text": f"{len(diary_missing)} 天没写日记（最近断在 {last}）—— 日记是系统替你安排生活的唯一输入"})
+    if total_all >= 5:
+        rate = done_all / total_all
+        if rate < 0.5:
+            signals.append({"icon": "⚠️", "text": f"任务完成率 {rate:.0%}（{done_all}/{total_all}）—— 每天排太多了，完成比数量重要"})
+        else:
+            signals.append({"icon": "✅", "text": f"任务完成率 {rate:.0%}（{done_all}/{total_all}）"})
+    signals.append({"icon": "🏃", "text": f"运动 {sport_days}/{days} 天" + ("—— 动起来了" if sport_days >= days * 0.5 else "")})
+    if overspend:
+        signals.append({"icon": "💸", "text": f"{overspend} 天超日预算 ¥{budget}"})
+    if total_all >= 5 and any(quad_done.values()):
+        weakest, cnt = min(quad_done.items(), key=lambda kv: kv[1])
+        signals.append({"icon": "🎯", "text": f"最弱象限：{weakest}（{cnt} 件）—— 明天给它排一件 15 分钟的小事"})
+    return {"ok": True, "days": days, "signals": signals}
+
+
 def add_progress(body: dict):
     pr = _load_progress()
     title = str(body.get("title") or "").strip()[:60]
@@ -2066,7 +2131,22 @@ def generate_today_plan(energy: float = 3, sleep: float = 7.0) -> dict:
     if sport:
         fast_tag = "空腹" if fasted else "餐后"
         sport_task = (f"{sport}（{fast_tag} · {intensity}）")
-        sport_time = "07:40–08:25" if fasted else ("17:30–18:40" if has_courses else "17:00–18:15")
+        # 运动时段避开课程：白天课结束顺延 30min；有晚课（≥18:00 开课）压到 16:40–17:30
+        sport_time = "17:00–18:15"
+        if has_courses and not fasted:
+            def _hm(t):
+                h, m = t.split(":")
+                return int(h) * 60 + int(m)
+            def _fmt(mins):
+                return f"{mins // 60:02d}:{mins % 60:02d}"
+            latest_end = max(_hm(cb["end"]) for cb in course_blocks)
+            if any(_hm(cb["start"]) >= 18 * 60 for cb in course_blocks):
+                sport_time = "16:40–17:30"
+            else:
+                st = min(max(latest_end + 30, 17 * 60), 19 * 60)
+                sport_time = f"{_fmt(st)}–{_fmt(st + 50)}"
+        if fasted:
+            sport_time = "07:40–08:25"
         if is_travel:
             sport_task = f"{sport}（旅行·灵活安排）"
             sport_time = "灵活安排"
@@ -2119,12 +2199,6 @@ def generate_today_plan(energy: float = 3, sleep: float = 7.0) -> dict:
     if book_show_text and len(frogs) < 3 and not low:
         frogs.append(book_show_text[:60])
 
-    # 选择架构：只保留真正需要执行的任务，不把休息或过渡列成待办。
-
-    def _ab(a_text, b_text):
-        """选择架构：A/B 双选项，提升自主感与承诺。"""
-        return f"A: {a_text} / B: {b_text}（二选一）"
-
     # 新鲜开始效应：周一 / 月初
     wd_num = _today().weekday()
     dom = _today().day
@@ -2156,78 +2230,77 @@ def generate_today_plan(energy: float = 3, sleep: float = 7.0) -> dict:
             makeup_tag = "🔄调休" if cb.get("is_makeup") else ""
             _push(f"{cb['start']}–{cb['end']}",
                   f"📍 {cb['code']} {cb['name']}（{cb['session']}）{makeup_tag} 上课出勤", voc)
-        _push("07:30–07:45", "起床后只做一件事：确认重点与课表（别刷手机）", mind)
-        _push("12:00–12:30", _ab("午餐 + 蛋白 ≥45g 同时听一段日语", "午餐 + 和同学约饭闲聊课程"), body)
-        _push("12:45–13:05", "日语：认读 20 个假名 + 跟读 5 分钟（最低闭环）", mind)
-        _push("13:05–13:15", "给一个真人发一条非事务性消息（分享或提问——不是任务）", spirit)
-        _push("18:45–19:15", _ab("晚餐 + 和一位同学非事务性闲聊", "晚餐 + 听一段英文播客 10 分钟"), spirit)
-        _push("20:00–20:45", f"自由块：{_ab(f'《{topic[:14]}》素材整理 25 分钟', '15 分钟发呆 + 钢琴 10 分钟')}" if topic
-              else _ab("素材整理 25 分钟", "发呆 15 分钟 + 听歌一首"), voc)
-        _push("21:00–21:15", _ab("英语口述 10 分钟（一个真实话题）", "IELTS Part 2 录音 2 分钟"), mind)
-        _push("21:15–21:45", _ab(f"推进《{topic[:18]}》：写 200 字草稿", "改一段旧稿再发") if topic
-              else _ab("推进本周主线 45 分钟", "整理一次素材库"), voc)
-        _push("21:45–21:55", "日记：今天最真实的一个瞬间（一句话）——然后合上电脑", spirit)
-        if tier_score >= 3:
-            _push("22:00–22:15", _ab("读 6 页书（非功利）", "写下明天的 1 件要事"), spirit)
-        _push("22:40–23:00", "拉伸 5 分钟 + 数据回填（体重 / 支出）+ 23:00 入睡", body)
+        _push("12:30–12:50", "午餐 + 蛋白 ≥45g", body)
+        _push("12:50–13:10", "日语 20 分钟：假名 + 跟读", mind)
+        _push("13:10–13:20", "给朋友发条非事务消息", spirit)
+        _push("18:40–19:10", "晚餐 + 和同学闲聊 / 听播客", spirit)
+        _push("21:10–21:20", "英语口述 10 分钟", mind)
+        _push("21:20–21:50", (f"《{topic[:18]}》推进 30 分钟" if topic else "本周主线推进 30 分钟"), voc)
+        _push("21:50–22:00", "日记一句话 · 合上电脑", spirit)
+        _push("22:30–22:50", "拉伸 + 数据回填 · 23:00 入睡", body)
 
     else:
-        _push("07:30–07:45", _ab("直接写今日重点 + 三件事", "先咖啡 10 分钟再回来写计划"), mind)
-        # 重点块（诱惑捆绑：难任务后跟愉快的）
-        frog_desc = f"⚡ 今日重点：{frogs[0][:30]}" + (
-            "（番茄钟 25×4，每轮起身 1 分钟——如果卡住，只做 5 分钟也算赢）" if not low
-            else "（简化版：25 分钟专注即可，做完就是胜利）")
+        # 重点块（番茄钟脚手架保留，长度砍半）
+        frog_desc = f"⚡ 今日重点：{frogs[0][:30]}" + ("（番茄钟 25×4）" if not low else "（做 25 分钟就算赢）")
         _push("09:00–11:00", frog_desc, voc)
 
         if topic and not low:
-                _push("11:20–12:00", _ab(f"重点续航：《{topic[:16]}》改可发版本",
-                  f"为《{topic[:16]}》配 1 张封面图 + 写 3 句简介"), voc)
+            _push("11:20–12:00", f"《{topic[:16]}》续航：改可发版本 / 配图加简介", voc)
 
-        _push("12:00–12:30", _ab("午餐 + 蛋白 ≥45g", "午餐 + 听日语 10 分钟"), body)
-        _push("12:45–13:05", "日语：认读 20 个假名 + 跟读 5 分钟", mind)
-        _push("13:05–13:15", "给一个真人发一条非事务性消息（分享或提问）", spirit)
+        _push("12:00–12:30", "午餐 + 蛋白 ≥45g", body)
+        _push("12:45–13:05", "日语 20 分钟：假名 + 跟读", mind)
+        _push("13:05–13:15", "给朋友发条非事务消息", spirit)
 
-        # 力量训练或内容动作
+        # 力量训练或内容动作（重点已是这篇时不再重复排）
         if is_strength_day and strength_text:
             _push("14:00–15:00", strength_text, body)
-        else:
-            _push("14:00–15:30", (f"内容动作：{_ab(f'《{topic[:16]}》写/改/配图三选一推进', f'拆结构 + 写 3 个小标题')}" if topic
-                  else _ab("为本周这篇完成一个推进动作", "整理选题库里的 3 个可写点")), voc)
-        _push("15:35–15:45", "通读今日素材，圈 1 个可写点（不展开）", mind)
+        elif topic and not low:
+            if topic[:10] in frogs[0]:
+                _push("14:00–15:00", "线上工作 / 选题库整理（重点之外的第二线）", voc)
+            else:
+                _push("14:00–15:30", f"内容动作：《{topic[:16]}》写 / 改 / 配图任选其一", voc)
+        elif not low and "大号" not in frogs[0] and "这篇" not in frogs[0]:
+            _push("14:00–15:30", "本周这篇：完成一个可发表的推进动作", voc)
 
         # 读书/追剧建议（45 分钟专注块，量按 finish_by 自动配速）
         if book_show_text and not low:
             _push("16:00–16:45", f"📖 {book_show_text[:60]}", mind)
 
         if wd_num == 6:  # 周日
-            _push("15:45–15:55", "📊 数据复盘：只看观看 / 赞藏 / 净涨粉 3 个数字 + 记 1 条结论", voc)
+            _push("15:45–15:55", "📊 周复盘：看 3 个数字 + 记 1 条结论", voc)
 
         if tier_score >= 3:  # 诱惑捆绑：高能日才配享兴趣探索
-            _push("18:30–18:55", _ab("钢琴自由弹 15 分钟（不带目标）", "日语泛听 15 分钟（不带目标）"), spirit)
+            _push("18:30–18:55", "钢琴自由弹 15 分钟 或 日语泛听", spirit)
 
-        if not low and sport and not fasted:
-            _push(sport_time, f"{sport_task} · 本周第 {nth}/{total_sport} 次有氧", body)
+        _push("21:00–21:15", "英语口述 10 分钟", mind)
+        _push("21:45–21:55", "日记一句话 · 合上电脑", spirit)
+        _push("22:40–23:00", "拉伸 + 数据回填 · 23:00 入睡", body)
 
-        _push("21:00–21:15", _ab("英语口述 10 分钟（一个真实话题）", "IELTS Part 2 录音 2 分钟"), mind)
-        _push("21:15–21:25", _ab("写下明天最重要的一件事", "写下今天做得最有意义的 1 件事"), voc)
-        _push("21:45–21:55", "日记：今天最真实的一个瞬间（一句话）——然后合上电脑", spirit)
-        _push("22:40–23:00", "拉伸 5 分钟 + 数据回填（体重 / 支出）+ 23:00 入睡", body)
-
-    # 运动任务插入（低精力档删运动）
+    # 运动任务插入（只插一次；低精力档删运动）
     if sport_task and not low:
-        body.append((sport_time, f"{sport_task} · 本周第 {nth}/{total_sport} 次有氧"))
+        body.append((sport_time, f"{sport_task} · 第 {nth}/{total_sport} 次"))
     elif not low and not sport and not is_strength_day:
-        body.append(("17:00–17:30", "今日无有氧：散步或泡沫轴放松 20 分钟（恢复周）"))
+        body.append(("17:00–17:30", "今日无有氧：散步或泡沫轴 20 分钟"))
 
     # 每周六：本周唯一一次深度对话实验
     if _today().weekday() == 5 and not low:
-        spirit.append(("20:00–20:30", _ab("🎙️ 深度对话实验：从问题清单挑一个，问一个真人",
-                      "用提问代替闲聊：「你最近在思考什么？」")))
+        spirit.append(("20:00–20:30", "🎙️ 深度对话 30 分钟：问一个真人「最近在思考什么」"))
+
+    # ── 去重兜底：同分区同文本只保留第一条（防双重插入回归）──
+    def _dedupe(bucket):
+        seen, out = set(), []
+        for t, txt in bucket:
+            key = re.sub(r"\s+", "", txt)[:24]
+            if key in seen:
+                continue
+            seen.add(key)
+            out.append((t, txt))
+        return out
 
     # ── Sort into section buckets ──
     task_lines = {"mind": [], "body": [], "spirit": [], "voc": []}
     for bucket_key, bucket in [("mind", mind), ("body", body), ("spirit", spirit), ("voc", voc)]:
-        task_lines[bucket_key] = bucket
+        task_lines[bucket_key] = _dedupe(bucket)
 
     sections = [
         ("🧠 心智 Mind", sorted(task_lines["mind"])),
@@ -2243,7 +2316,12 @@ def generate_today_plan(energy: float = 3, sleep: float = 7.0) -> dict:
     # 总览主表
     rows = list(sched)  # 课表行放最前面
     if has_courses:
-        rows.append({"block": "块 E", "start": "18:30", "end": "23:00", "energy": "🔵 回落",
+        def _hm2(t):
+            h, m = t.split(":")
+            return int(h) * 60 + int(m)
+        e_start = max(_hm2(cb["end"]) for cb in course_blocks) + 10
+        rows.append({"block": "块 E", "start": f"{e_start // 60:02d}:{e_start % 60:02d}", "end": "23:00",
+                     "energy": "🔵 回落",
                      "task": "语言线 + 内容推进 + 收尾", "type": "学习 / 收尾",
                      "goal": "语言线完成；23:00 入睡"})
     else:
@@ -2792,6 +2870,14 @@ class Handler(SimpleHTTPRequestHandler):
             return
         if self.path.startswith("/api/weread/status"):
             self._json(200, weread_status())
+            return
+        if self.path.startswith("/api/insights"):
+            qs = parse_qs(urlparse(self.path).query)
+            days = int((qs.get("days") or ["7"])[0] or 7)
+            try:
+                self._json(200, recent_insights(days))
+            except Exception as e:
+                self._json(500, {"ok": False, "error": str(e)})
             return
         if self.path.startswith("/api/suggestions"):
             qs = parse_qs(urlparse(self.path).query)

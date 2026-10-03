@@ -14,6 +14,7 @@ import DailyDataForm from "./components/DailyDataForm";
 import Radar from "./components/Radar";
 import Spark from "./components/Spark";
 import MediaBoard from "./components/MediaBoard";
+import InsightsPanel from "./components/InsightsPanel";
 import CalibrationFlow from "./components/CalibrationFlow";
 import JarvisBoard, { DayTypePicker, NowCard, QuickCapture } from "./components/JarvisBoard";
 import { AgentChat, DiaryEditor, DiaryStream } from "./components/Review";
@@ -98,6 +99,10 @@ export default function App() {
             <div className="sec-block">
               <div className="col-head mono">今日类型 · 决定今天的盘子多大</div>
               <DayTypePicker today={d.today} />
+            </div>
+            <div className="sec-block">
+              <div className="col-head mono">近 7 天信号 · 你的弱点在哪</div>
+              <InsightsPanel />
             </div>
             <div className="sec-block">
               <ProgressPanel fitness={d.fitness} onChanged={reload} />

@@ -138,6 +138,8 @@ export const api = {
     fetch("/api/weread/status").then(r => r.json()),
   wereadSync: (): Promise<{ ok: boolean; updated?: string[]; unmatched?: string[]; error?: string; note?: string }> =>
     fetch("/api/weread/sync", { method: "POST", headers: { "Content-Type": "application/json" }, body: "{}" }).then(r => r.json()),
+  insights: (days = 7): Promise<{ ok: boolean; days: number; signals: { icon: string; text: string }[] }> =>
+    fetch(`/api/insights?days=${days}`).then(r => r.json()),
   game: (): Promise<GameState> => fetch("/api/game").then(r => r.json()),
   gameAct: (body: Record<string, unknown>) =>
     fetch("/api/game", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) }).then(r => r.json()),
