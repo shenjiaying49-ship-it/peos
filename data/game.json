@@ -7,87 +7,94 @@
  },
  "rewards": [
   {
-   "id": "r-book",
-   "label": "买一本想读的小说（≈¥50）",
-   "cost": 500,
-   "tier": "medium",
-   "pool": "weekly"
-  },
-  {
-   "id": "r-ebook",
-   "label": "电子书充值买下一本（≈¥30）",
-   "cost": 300,
-   "tier": "medium",
-   "pool": "weekly"
-  },
-  {
-   "id": "r-readday",
-   "label": "半天沉浸式阅读（零打扰）",
-   "cost": 200,
-   "tier": "micro",
-   "pool": "weekly"
-  },
-  {
-   "id": "r-hike",
-   "label": "周末徒步一日（≈¥30 路费零食）",
-   "cost": 300,
-   "tier": "medium",
-   "pool": "weekly"
-  },
-  {
-   "id": "r-gear",
-   "label": "买一件徒步小装备（≈¥100）",
-   "cost": 1000,
-   "tier": "large",
-   "pool": "monthly"
-  },
-  {
    "id": "r-milk",
-   "label": "奶茶/咖啡一杯（≈¥25）",
+   "label": "奶茶/咖啡一杯",
    "cost": 250,
    "tier": "micro",
    "pool": "weekly"
   },
   {
    "id": "r-dessert",
-   "label": "甜品/蛋糕自由一次（≈¥40）",
+   "label": "甜品/蛋糕自由一次",
    "cost": 400,
-   "tier": "medium",
+   "tier": "micro",
    "pool": "weekly"
   },
   {
-   "id": "r-meal",
-   "label": "吃一顿想吃的餐厅（≈¥80）",
-   "cost": 800,
-   "tier": "large",
-   "pool": "monthly"
-  },
-  {
    "id": "r-sleep",
-   "label": "睡到自然醒（不设闹钟）",
+   "label": "一觉睡到自然醒（无闹钟日）",
    "cost": 300,
-   "tier": "medium",
+   "tier": "micro",
    "pool": "weekly"
   },
   {
    "id": "r-rest",
-   "label": "半天完全休息（零任务）",
+   "label": "半天彻底躺平（零任务）",
    "cost": 200,
    "tier": "micro",
    "pool": "weekly"
   },
   {
-   "id": "r-trip",
-   "label": "短途一日游（≈¥200）",
-   "cost": 2000,
+   "id": "r-book",
+   "label": "买一本想读的书",
+   "cost": 500,
+   "tier": "medium",
+   "pool": "weekly"
+  },
+  {
+   "id": "r-eat",
+   "label": "点一顿想吃的外卖",
+   "cost": 500,
+   "tier": "medium",
+   "pool": "weekly"
+  },
+  {
+   "id": "r-lipstick",
+   "label": "香奈儿口红/小样一件（≈¥450）",
+   "cost": 4500,
+   "tier": "medium",
+   "pool": "monthly"
+  },
+  {
+   "id": "r-skin",
+   "label": "一次光子/水光医美（≈¥500）",
+   "cost": 5000,
    "tier": "large",
    "pool": "monthly"
   },
   {
-   "id": "r-travel",
-   "label": "过夜小旅行（≈¥500）",
-   "cost": 5000,
-   "tier": "milestone",
+   "id": "r-trip-sz",
+   "label": "深圳周边周末游（≈¥400）",
+   "cost": 4000,
+   "tier": "large",
+   "pool": "monthly"
+  },
+  {
+   "id": "r-class",
+   "label": "报一个想上的班/课（≈¥2000）",
+   "cost": 20000,
+   "tier": "large",
+   "pool": "monthly"
+  },
+  {
+   "id": "r-kr",
+   "label": "🇰🇷 韩国游（≈¥4000）",
+   "cost": 40000,
+   "tier": "large",
+   "pool": "monthly"
+  },
+  {
+   "id": "r-xj",
+   "label": "🏜️ 新疆游（≈¥6000）",
+   "cost": 60000,
+   "tier": "large",
+   "pool": "monthly"
+  },
+  {
+   "id": "r-chanel",
+   "label": "💄 全套香奈儿化妆品（≈¥8000）",
+   "cost": 80000,
+   "tier": "large",
    "pool": "monthly"
   }
  ],

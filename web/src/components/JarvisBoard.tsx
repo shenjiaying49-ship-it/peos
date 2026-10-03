@@ -166,8 +166,21 @@ export function DayTypePicker({ today }: { today: string }) {
 }
 
 /* ═════════════ NOW 卡：现在就做（CH1 首屏） ═════════════ */
-export function NowCard({ rows }: { rows: SchedRow[] }) {
+
+/* 搭子语料：随机陪伴/夸奖——用户点名要「假装一起做」的实时反馈 */
+export const BUDDY_START = [
+  "我在，一起。", "开搞？我盯着呢。", "行，这件先来。", "计时开始，我在旁边。",
+  "别想太多，就 25 分钟。", "你一动手我就放心了。",
+];
+export const BUDDY_CHEER = [
+  "漂亮，勾掉一件。", "这件算数，积分到账。", "可以啊，继续。", "干掉一件，少焦虑一件。",
+  "说到做到，我喜欢。", "又近一步，攒着换新疆。", "这才叫过日子。",
+];
+export const buddyPick = (pool: string[]) => pool[Math.floor(Math.random() * pool.length)];
+
+export function NowCard({ rows, compact }: { rows: SchedRow[]; compact?: boolean }) {
   const [, force] = useState(0);
+  const [buddy] = useState(() => buddyPick(BUDDY_START));
   useEffect(() => { const iv = setInterval(() => force(x => x + 1), 30000); return () => clearInterval(iv); }, []);
   const nm = nowMin();
   const cur = rows.find(r => {
@@ -178,18 +191,20 @@ export function NowCard({ rows }: { rows: SchedRow[] }) {
     const left = Math.max(0, parseT((cur.end || cur.start).slice(0, 5)) - nm);
     const lh = Math.floor(left / 60);
     return (
-      <div className="now-card">
+      <div className={`now-card ${compact ? "compact" : ""}`}>
         <div className="n-head mono">NOW · {cur.start}–{cur.end} · 还剩 {lh > 0 ? `${lh} 小时 ` : ""}{left % 60} 分</div>
         <div className="n-task">{cur.task || cur.block || "当前时段"}</div>
-        {cur.goal && <div className="n-goal mono">目标 {cur.goal}</div>}
+        {!compact && cur.goal && <div className="n-goal mono">目标 {cur.goal}</div>}
+        <div className="n-buddy">🫂 {buddy}</div>
       </div>
     );
   }
   const next = rows.find(r => parseT((r.start || "").slice(0, 5)) > nm);
   return (
-    <div className="now-card none">
+    <div className={`now-card none ${compact ? "compact" : ""}`}>
       <div className="n-head mono">当前无安排</div>
-      <div className="n-task">{next ? `下一件 ${next.start} · ${next.task || next.block}` : "时间表已走完 / 还没排——下面丢一句就行"}</div>
+      <div className="n-task">{next ? `下一件 ${next.start} · ${next.task || next.block}` : "时间表已走完 / 还没排——丢一句就行"}</div>
+      <div className="n-buddy">🫂 {next ? buddy : "歇着也行，别刷小红书就行。"}</div>
     </div>
   );
 }

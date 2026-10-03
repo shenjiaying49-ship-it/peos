@@ -124,6 +124,11 @@ body[data-scene="review"]::after { background: radial-gradient(900px 500px at 50
 .sec-block { border-top: 1px solid var(--line); padding-top: 16px; margin-top: 26px; }
 .sec-block .col-head { margin-bottom: 10px; }
 .today-left .sec-block:first-of-type, .today-right .sec-block:first-of-type { margin-top: 22px; }
+/* 对齐：右栏首个标题与左栏区块同规格（同边框同内距，两栏顶部齐平） */
+.today-right > .col-head:first-child {
+  border-top: 1px solid var(--line); padding-top: 16px; margin-top: 22px; margin-bottom: 14px;
+}
+.today-left .t-date { font-size: 13px; color: var(--faint); letter-spacing: 2px; margin-bottom: 18px; }
 
 /* 青蛙大卡：第一屏的绝对重点 */
 .frog-big { background: var(--gold-soft); border: 1px solid var(--gold-line); padding: 16px 18px; }
@@ -261,6 +266,47 @@ input[type="range"] { width: 100%; accent-color: var(--gold); height: 24px; }
 .ins-row { display: flex; gap: 9px; align-items: baseline; font-size: 13px; line-height: 1.55; }
 .ins-icon { flex: none; }
 .ins-text { color: var(--ink); }
+
+/* ───────── 今日一眼 Hero（重点 / 现在 / 截止） ───────── */
+.today-hero {
+  display: grid; grid-template-columns: 1.3fr 1fr 1fr; gap: 0;
+  border: 1px solid var(--line); background: var(--card);
+  margin-bottom: 40px;
+}
+.th-block { padding: 16px 20px 14px; }
+.th-block + .th-block { border-left: 1px solid var(--line); }
+.th-head { font-size: 11px; color: var(--faint); letter-spacing: 3px; margin-bottom: 9px; }
+.th-item { font-size: 13.5px; line-height: 1.6; padding: 2px 0; display: flex; gap: 6px; align-items: baseline; }
+.th-item.hot { color: #B4552D; font-weight: 700; }
+.th-left { margin-left: auto; color: var(--faint); font-size: 11px; flex: none; }
+.now-card.compact { background: transparent; color: var(--ink); padding: 0; }
+.now-card.compact .n-head { color: var(--gold-strong); }
+.now-card.compact .n-task { font-size: 15px; color: var(--ink); }
+.now-card.compact .n-goal { color: var(--dim); }
+.n-buddy { font-size: 12px; margin-top: 8px; color: var(--water); }
+
+/* 四象限折叠 */
+.quad-collapse > summary {
+  cursor: pointer; font-size: 12px; font-weight: 700; color: var(--gold-strong);
+  letter-spacing: 1px; user-select: none; list-style: none; padding: 2px 0 10px;
+}
+.quad-collapse > summary::before { content: "▸ "; }
+.quad-collapse[open] > summary::before { content: "▾ "; }
+.quad-collapse > summary::-webkit-details-marker { display: none; }
+
+/* 勾选夸奖 toast */
+.cheer-toast {
+  position: absolute; top: -14px; right: 0; z-index: 30;
+  background: var(--gold); color: #fff; font-size: 12.5px; font-weight: 700;
+  padding: 7px 14px; animation: cheer-pop 2.6s ease forwards;
+  pointer-events: none; white-space: nowrap;
+}
+@keyframes cheer-pop {
+  0% { opacity: 0; transform: translateY(6px); }
+  12% { opacity: 1; transform: translateY(0); }
+  80% { opacity: 1; }
+  100% { opacity: 0; }
+}
 
 /* ───────── 任务台账 ───────── */
 .tasks-grid { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(260px, 1fr); gap: 56px; }
@@ -934,6 +980,10 @@ input[type="range"] { width: 100%; accent-color: var(--gold); height: 24px; }
   .chapter { padding: 4vh 14px 4vh; }
   .ghost { font-size: clamp(70px, 24vw, 110px); }
   .ch-corner { font-size: 10px; letter-spacing: 2px; }
+
+  /* 今日一眼 Hero：手机竖排 */
+  .today-hero { grid-template-columns: 1fr; margin-bottom: 24px; }
+  .th-block + .th-block { border-left: none; border-top: 1px solid var(--line); }
 
   /* 导航：横向滚动，logo 收缩 */
   .nav { padding: 10px 14px; }

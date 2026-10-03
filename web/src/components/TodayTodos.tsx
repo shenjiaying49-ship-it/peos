@@ -1,5 +1,6 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { api, type Daily, type Task } from "../api";
+import { BUDDY_CHEER, buddyPick } from "./JarvisBoard";
 
 export const stripTime = (s: string) => s.replace(/^\d{1,2}:\d{2}\s*[–—-]\s*\d{1,2}:\d{2}\s*/, "");
 
@@ -120,13 +121,22 @@ export function TodayTodos({ daily, onChanged }: { daily: Daily | null; onChange
   const [busy, setBusy] = useState<string | null>(null);
   const [err, setErr] = useState<string | null>(null);
   const [editing, setEditing] = useState<string | null>(null);
+  const [cheer, setCheer] = useState<string | null>(null);
+  useEffect(() => {
+    if (!cheer) return;
+    const t = setTimeout(() => setCheer(null), 2600);
+    return () => clearTimeout(t);
+  }, [cheer]);
 
   const toggle = async (date: string, section: string, raw: string, key: string, nowDone: boolean) => {
     setBusy(key); setErr(null);
     const r = await api.toggle({ date, section, raw, done: nowDone });
     setBusy(null);
     if (!r.ok) setErr(r.error || "写回失败");
-    else onChanged();
+    else {
+      if (!nowDone) setCheer(`🫂 ${buddyPick(BUDDY_CHEER)}`);
+      onChanged();
+    }
   };
 
   const all = (daily?.tasks_by_section || []).flatMap(g =>
@@ -150,6 +160,7 @@ export function TodayTodos({ daily, onChanged }: { daily: Daily | null; onChange
 
   return (
     <div className="quad-cross">
+      {cheer && <div className="cheer-toast">{cheer}</div>}
       <span className="qc-axis-v mono" aria-hidden="true">重要 ↑</span>
       <span className="qc-axis-h mono" aria-hidden="true">紧急 →</span>
       {/* 十字排布：q2 左上 / q1 右上 / q3 左下 / q4 右下 */}

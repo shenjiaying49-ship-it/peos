@@ -67,25 +67,44 @@ export default function App() {
     <div className="stage">
       <Nav />
 
-      {/* ───── CH1 今日 · 先看重点，再做现在，一句上表 ───── */}
+      {/* ───── CH1 今日 · 一眼看清：重点 / 现在 / 截止 ───── */}
       <Section id="today" index="01">
         <WeatherBar />
+        {/* 今日一眼：重点 + 现在 + 截止（用户指定的首屏三件事） */}
+        <div className="today-hero" data-reveal>
+          <div className="th-block th-focus">
+            <div className="th-head mono">🎯 今日重点</div>
+            {schedSrc?.frogs.length ? schedSrc.frogs.slice(0, 3).map((f, i) => (
+              <div key={i} className="th-item">▸ {f}</div>
+            )) : <div className="th-item muted">今天没写重点——丢一句给我</div>}
+          </div>
+          <div className="th-block th-now">
+            <div className="th-head mono">⏱ 现在</div>
+            <NowCard rows={today?.schedule || rich?.schedule || []} compact />
+          </div>
+          <div className="th-block th-dl">
+            <div className="th-head mono">🔥 截止预警</div>
+            {(d.upcoming_deadlines || []).slice(0, 3).map((dl, i) => (
+              <div key={i} className={`th-item ${dl.days_away <= 3 ? "hot" : ""}`}>
+                <span className="mono">{dl.date.slice(5)}</span> {dl.course} {dl.item.slice(0, 14)}
+                <span className="th-left mono">{dl.days_away === 0 ? "今天!" : `${dl.days_away}天`}</span>
+              </div>
+            ))}
+            {!(d.upcoming_deadlines || []).length && <div className="th-item muted">30 天内没有截止</div>}
+          </div>
+        </div>
         <div className="today-grid">
           <div className="today-left">
             <div className="t-date">{fmtDate(d.today)}</div>
             {!today && <div className="t-banner">⏳ 今日 Daily 未创建——写日记或填数据会自动创建</div>}
             <div className="sec-block">
-              <div className="col-head mono">⏱ 现在就做</div>
-              <NowCard rows={today?.schedule || rich?.schedule || []} />
-            </div>
-            <div className="sec-block">
               <div className="col-head mono">丢给我——什么时候做不用管，我来自动排</div>
               <QuickCapture today={d.today} todayDaily={today} courses={d.today_courses || []} onChanged={reload} />
             </div>
-            <div className="sec-block">
-              <div className="col-head mono">今日 TODO · 四象限 · 悬停可改</div>
+            <details className="quad-collapse sec-block">
+              <summary>📋 今日 TODO · 四象限（点开编辑）</summary>
               <TodayTodos daily={today} onChanged={reload} />
-            </div>
+            </details>
             <div className="sec-block">
               <div className="col-head mono">今日数据 · 网页直填</div>
               <DailyDataForm today={d.today} daily={today} onSaved={reload} />
@@ -101,7 +120,7 @@ export default function App() {
               <DayTypePicker today={d.today} />
             </div>
             <div className="sec-block">
-              <div className="col-head mono">近 7 天信号 · 你的弱点在哪</div>
+              <div className="col-head mono">近 7 天信号 · 说你该听的</div>
               <InsightsPanel />
             </div>
             <div className="sec-block">

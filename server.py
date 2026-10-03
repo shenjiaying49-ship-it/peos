@@ -203,8 +203,8 @@ def parse_daily(path: Path, d: dt.date):
         if tasks:
             data["tasks_by_section"].append({"section": strip_md(title), "tasks": tasks})
             all_tasks.extend(tasks)
-        # 闭环数据补填（frontmatter 空时的回退源）
-        if "闭环" in title:
+        # 闭环数据补填（frontmatter 空时的回退源）：「每日闭环」或「睡前三问」
+        if "闭环" in title or "三问" in title:
             for line in body.splitlines():
                 m = re.match(r"^\s*-\s*([\u4e00-\u9fff]+)\s*[：:]\s*([0-9.]+)", line)
                 if m and m.group(1) in NUM_FIELDS:
@@ -212,6 +212,14 @@ def parse_daily(path: Path, d: dt.date):
                         data[NUM_FIELDS[m.group(1)]] = float(m.group(2))
                     except ValueError:
                         pass
+            # 入睡时间 hh:mm → 推算睡眠时长（按夜型 10:30 起床口径）
+            m = re.search(r"入睡时间\s*[：:]\s*(\d{1,2})[：:](\d{2})", body)
+            if m and not data.get("sleep_hours"):
+                sh, sm = int(m.group(1)) % 24, int(m.group(2))
+                wake = 10 * 60 + 30
+                slept = (wake - (sh * 60 + sm)) % (24 * 60)
+                if 180 <= slept <= 780:   # 3–13h 之间才可信
+                    data["sleep_hours"] = round(slept / 60, 1)
         if "即时决策" in title:
             for line in body.splitlines():
                 m = re.match(r"^\s*-\s+(.+)$", line)
@@ -1033,26 +1041,29 @@ def recent_insights(days: int = 7):
     if sleeps:
         avg = sum(sleeps) / len(sleeps)
         if avg < 7:
-            signals.append({"icon": "🌙", "text": f"平均睡眠 {avg:.1f}h（{len(sleeps)} 天记录）—— 低于 7h，试试把收尾块整体提前 30 分钟"})
+            signals.append({"icon": "🌙", "text": f"平均睡眠 {avg:.1f}h。你不是要体脂 22% 吗？睡不够练了也白练，今天 00:00 给我躺下。"})
         else:
-            signals.append({"icon": "🌙", "text": f"平均睡眠 {avg:.1f}h，节奏在线"})
+            signals.append({"icon": "🌙", "text": f"平均睡眠 {avg:.1f}h，这条线守住了。"})
     else:
-        signals.append({"icon": "🌙", "text": f"近 {days} 天没记过睡眠 —— 晚间数据回填断了，弱点信号会失准"})
+        signals.append({"icon": "🌙", "text": f"近 {days} 天没记过入睡时间 —— 三问里的「入睡时间」一行都不填，我只能瞎猜你的状态。30 秒的事。"})
     if diary_missing:
         last = max(diary_missing).isoformat()[5:]
-        signals.append({"icon": "📓", "text": f"{len(diary_missing)} 天没写日记（最近断在 {last}）—— 日记是系统替你安排生活的唯一输入"})
+        signals.append({"icon": "📓", "text": f"{len(diary_missing)} 天没写日记（最近断在 {last}）。不写日记我就不知道你过得怎么样，排程只能瞎排——别让系统瞎。"})
     if total_all >= 5:
         rate = done_all / total_all
         if rate < 0.5:
-            signals.append({"icon": "⚠️", "text": f"任务完成率 {rate:.0%}（{done_all}/{total_all}）—— 每天排太多了，完成比数量重要"})
+            signals.append({"icon": "⚠️", "text": f"任务完成率 {rate:.0%}（{done_all}/{total_all}）。看清楚了，这是你自己的日子不是我的。今天只勾一件也行，勾。"})
         else:
-            signals.append({"icon": "✅", "text": f"任务完成率 {rate:.0%}（{done_all}/{total_all}）"})
-    signals.append({"icon": "🏃", "text": f"运动 {sport_days}/{days} 天" + ("—— 动起来了" if sport_days >= days * 0.5 else "")})
+            signals.append({"icon": "✅", "text": f"任务完成率 {rate:.0%}（{done_all}/{total_all}），就这样干。"})
+    if sport_days < days * 0.5:
+        signals.append({"icon": "🏃", "text": f"运动 {sport_days}/{days} 天。说好的每天晨泳呢？水又不会自己来游你。"})
+    else:
+        signals.append({"icon": "🏃", "text": f"运动 {sport_days}/{days} 天，动起来了。"})
     if overspend:
-        signals.append({"icon": "💸", "text": f"{overspend} 天超日预算 ¥{budget}"})
+        signals.append({"icon": "💸", "text": f"{overspend} 天超日预算 ¥{budget}。你自己说的爱花钱——预算不是跟我商量，是跟钱包商量。"})
     if total_all >= 5 and any(quad_done.values()):
         weakest, cnt = min(quad_done.items(), key=lambda kv: kv[1])
-        signals.append({"icon": "🎯", "text": f"最弱象限：{weakest}（{cnt} 件）—— 明天给它排一件 15 分钟的小事"})
+        signals.append({"icon": "🎯", "text": f"最弱象限：{weakest}（{cnt} 件）。今天给它 15 分钟，就 15 分钟，别跟我讨价还价。"})
     return {"ok": True, "days": days, "signals": signals}
 
 
@@ -2012,15 +2023,11 @@ def _energy_tier(energy: float, sleep: float, ysig: dict = None) -> int:
 
 
 def _week_sport_plan():
-    """本周 4 天有氧 × 4 种运动各一次（周种子 → 每次刷新结果稳定）。"""
-    week_start = _today() - dt.timedelta(days=_today().weekday())
-    rng = _random.Random(f"peos-sport-{week_start.isoformat()}")
-    days = sorted(rng.sample(range(7), 4))
-    order = SPORT_POOL[:]
-    rng.shuffle(order)
-    plan = {d: order[i] for i, d in enumerate(days)}
-    fasted = {d: rng.random() < 0.4 for d in days}
-    return plan, fasted, days
+    """用户偏好（2026-10 问卷）：游泳第一（每天晨泳，周日休）；力量周一/周四下午健身房。
+    攀岩鞋没买→不排；羽毛球不排；爬坡/跑步作为天气好时的备选不主动排。"""
+    plan = {d: "游泳" for d in range(6)}          # 0-5 = 周一…周六
+    fasted = {d: False for d in range(6)}
+    return plan, fasted, sorted(plan)
 
 
 def _yesterday_signal():
@@ -2043,18 +2050,13 @@ def _yesterday_signal():
 
 
 def _today_sport(ysig):
-    """今天的有氧安排：周计划 → 避开昨天做过的 → 换一种不重复的。"""
+    """今天的有氧：晨泳（周日休）。昨天若日记提到疲惫→标注低强度。"""
     plan, fasted, days = _week_sport_plan()
     wd = _today().weekday()
     if wd not in plan:
-        return None, False, 0, 4
-    sport = plan[wd]
-    if sport in (ysig.get("sports") or []):          # 昨天做过同款 → 换
-        alt = [s for s in SPORT_POOL if s not in ysig["sports"]]
-        if alt:
-            sport = alt[_random.Random(f"peos-swap-{_today().isoformat()}").randrange(len(alt))]
+        return None, False, 0, 6
     nth = sum(1 for d in days if d <= wd)
-    return sport, fasted[wd], nth, len(days)
+    return plan[wd], fasted[wd], nth, len(days)
 
 
 def generate_today_plan(energy: float = 3, sleep: float = 7.0) -> dict:
@@ -2129,29 +2131,38 @@ def generate_today_plan(energy: float = 3, sleep: float = 7.0) -> dict:
 
     intensity = "低强度" if tired_yday else ("中高强度" if good_yday else "中等强度")
     if sport:
-        fast_tag = "空腹" if fasted else "餐后"
-        sport_task = (f"{sport}（{fast_tag} · {intensity}）")
-        # 运动时段避开课程：白天课结束顺延 30min；有晚课（≥18:00 开课）压到 16:40–17:30
-        sport_time = "17:00–18:15"
-        if has_courses and not fasted:
-            def _hm(t):
-                h, m = t.split(":")
-                return int(h) * 60 + int(m)
-            def _fmt(mins):
-                return f"{mins // 60:02d}:{mins % 60:02d}"
-            latest_end = max(_hm(cb["end"]) for cb in course_blocks)
-            if any(_hm(cb["start"]) >= 18 * 60 for cb in course_blocks):
-                sport_time = "16:40–17:30"
-            else:
-                st = min(max(latest_end + 30, 17 * 60), 19 * 60)
-                sport_time = f"{_fmt(st)}–{_fmt(st + 50)}"
-        if fasted:
-            sport_time = "07:40–08:25"
+        def _hm(t):
+            h, m = t.split(":")
+            return int(h) * 60 + int(m)
+        def _fmt(mins):
+            return f"{mins // 60:02d}:{mins % 60:02d}"
+        # 晨泳（夜型作息 10:30 起）：无早课 11:15–12:00；有早课（<12:00 开课）下课即游
+        sport_task = f"游泳（{intensity} · 目标体脂 22%）"
+        sport_time = "11:15–12:00"
+        if has_courses and any(_hm(cb["start"]) < 12 * 60 for cb in course_blocks):
+            st = max(_hm(cb["end"]) for cb in course_blocks if _hm(cb["start"]) < 12 * 60) + 10
+            sport_time = f"{_fmt(st)}–{_fmt(st + 45)}"
         if is_travel:
             sport_task = f"{sport}（旅行·灵活安排）"
             sport_time = "灵活安排"
     else:
         sport_task = None
+
+    # 力量（周一/四）：有晚课 → 15:30–17:00；无晚课 → 最后一节课后 20min
+    strength_time = None
+    if is_strength_day and today_strength:
+        def _hm3(t):
+            h, m = t.split(":")
+            return int(h) * 60 + int(m)
+        def _fmt3(mins):
+            return f"{mins // 60:02d}:{mins % 60:02d}"
+        if has_courses and any(_hm3(cb["start"]) >= 18 * 60 for cb in course_blocks):
+            strength_time = "15:30–17:00"
+        elif has_courses:
+            st = max(_hm3(cb["end"]) for cb in course_blocks) + 20
+            strength_time = f"{_fmt3(st)}–{_fmt3(st + 75)}"
+        else:
+            strength_time = "16:30–17:45"
 
     # 今日截止
     today_dl = today_deadlines()
@@ -2159,39 +2170,27 @@ def generate_today_plan(energy: float = 3, sleep: float = 7.0) -> dict:
     if today_dl:
         dl_note = "📌 今日截止：" + "；".join(f"{d['item']}（{d['course']}）" for d in today_dl)
 
-    # ── 青蛙（基于工作上下文 + 进度）──
+    # ── 今日重点（用户 2026-10 问卷：第一梯队 = 原子公社商务 > 大号 > 课程作业）──
     frogs = []
-    has_user_context = bool(work_ctx.get("focus") or work_ctx.get("dahao_stage"))
-    if has_courses:
-        courses_list = " + ".join(cb["code"] for cb in course_blocks)
-        frogs.append(f"完成今天全部课程（{courses_list}），每门课记 1 条知识点或观察")
-
-    # 从工作上下文读取大号推进方向
+    focus = work_ctx.get("focus", "")
+    if focus:
+        frogs.append(f"🥇 {focus[:40]}")
     dahao_stage = work_ctx.get("dahao_stage", "")
     if dahao_stage and dahao_stage not in ("", "选题"):
         stage_verbs = {"素材": "收集素材", "草稿": "写草稿", "修改": "修改现有草稿",
                        "发布": "准备发布", "复盘": "复盘数据", "大纲": "写大纲/搭框架"}
-        verb = stage_verbs.get(dahao_stage, "推进")
-        frogs.append(f"大号任务：{verb}（工作上下文）")
+        frogs.append(f"🥈 大号：用发布工作台{stage_verbs.get(dahao_stage, '推进')}")
     elif topic:
-        frogs.append(f"推进《{topic[:22]}》：产出一段可直接发布的草稿")
+        frogs.append(f"🥈 大号：用发布工作台推进《{topic[:20]}》")
     else:
-        frogs.append("大号本周这篇：完成一个可发表的推进动作")
-
-    # 在线工作主线（来自工作上下文）—— 有课时也加入，排在课程青蛙后
-    focus = work_ctx.get("focus", "")
-    if focus:
-        frogs.append(f"在线工作：{focus[:30]}")
-
-    if not frogs:
-        frogs.append("大号本周这篇：完成一个可发表的推进动作")
+        frogs.append("🥈 大号：发布工作台推进本周这篇")
+    if has_courses:
+        courses_list = " + ".join(cb["code"] for cb in course_blocks)
+        frogs.append(f"🥉 课程：上完（{courses_list}）+ 作业推进 45 分钟")
+    else:
+        frogs.append("🥉 课程作业：推进最近的截止项 60 分钟")
     if low:
-        # 低精力时保留用户主动填写的上下文青蛙，砍掉自动生成的内容青蛙
-        context_frogs = [f for f in frogs if "工作上下文" in f or "在线工作" in f]
-        if context_frogs:
-            frogs = context_frogs[:1]
-        else:
-            frogs = frogs[:1]
+        frogs = frogs[:1]
     if dl_note:
         frogs.insert(0, dl_note)
 
@@ -2223,68 +2222,61 @@ def generate_today_plan(energy: float = 3, sleep: float = 7.0) -> dict:
         ex_list = " · ".join(today_strength.get("exercises", [])[:3])
         strength_text += f"（{ex_list}）"
 
-    # ── 课程日程 vs 非课程日程 ──
+    # ── 课程日程 vs 非课程日程（夜型作息：10:30 起床 / 00:00 入睡）──
     if has_courses:
         # 每门课一条可勾选的出勤任务（勾选 = 确认上课 → 出勤积分）
         for cb in course_blocks:
             makeup_tag = "🔄调休" if cb.get("is_makeup") else ""
             _push(f"{cb['start']}–{cb['end']}",
                   f"📍 {cb['code']} {cb['name']}（{cb['session']}）{makeup_tag} 上课出勤", voc)
-        _push("12:30–12:50", "午餐 + 蛋白 ≥45g", body)
-        _push("12:50–13:10", "日语 20 分钟：假名 + 跟读", mind)
-        _push("13:10–13:20", "给朋友发条非事务消息", spirit)
-        _push("18:40–19:10", "晚餐 + 和同学闲聊 / 听播客", spirit)
-        _push("21:10–21:20", "英语口述 10 分钟", mind)
-        _push("21:20–21:50", (f"《{topic[:18]}》推进 30 分钟" if topic else "本周主线推进 30 分钟"), voc)
-        _push("21:50–22:00", "日记一句话 · 合上电脑", spirit)
-        _push("22:30–22:50", "拉伸 + 数据回填 · 23:00 入睡", body)
+        # 游泳后的午餐（早课日泳在下课后，午餐顺延；无早课日 12:15）
+        _push("12:15–12:45" if not any(cb["start"] < "12:00" for cb in course_blocks) else "13:00–13:30",
+              "午餐（食堂 / 宿舍微波炉 3 分钟食谱）", body)
+        # 13:00-14:00 犯困带：轻输入
+        _push("13:30–14:15", f"📖 犯困带 · 换脑子读一会儿：{book_show_text[:40] if book_show_text else '任意在读书 30 分钟'}", mind)
+        # 下午主力：商务块（原子公社第一梯队）
+        _push("14:30–16:30", "🥇 原子公社商务块（120 分钟 · 番茄钟 25×4）", voc)
+        # 力量（周一/四，时段已在上面算好，避开课）
+        if strength_time and strength_text:
+            _push(strength_time, strength_text, body)
+        # 晚课后收尾
+        _push("21:00–21:30", "晚餐（下课顺路吃 / 宿舍简餐）", body)
+        _push("21:30–21:50", "语言 20 分钟：日语假名跟读 / 英语口述（隔天轮）", mind)
+        _push("21:50–22:35", "🥈 大号内容 · 用发布工作台推进本周这篇（45 分钟）", voc)
+        _push("22:35–23:20", "🥉 课程作业（最近的截止优先）", voc)
+        _push("23:40–23:45", "睡前三问 + 体重 / 支出 · 00:00 睡", spirit)
 
     else:
-        # 重点块（番茄钟脚手架保留，长度砍半）
+        # 非课日：上午重点块（起床洗漱吃brunch后 12:30 开工）
         frog_desc = f"⚡ 今日重点：{frogs[0][:30]}" + ("（番茄钟 25×4）" if not low else "（做 25 分钟就算赢）")
-        _push("09:00–11:00", frog_desc, voc)
+        _push("12:30–14:30", frog_desc, voc)
 
-        if topic and not low:
-            _push("11:20–12:00", f"《{topic[:16]}》续航：改可发版本 / 配图加简介", voc)
+        _push("14:30–15:00", "午餐（食堂 / 微波炉 3 分钟食谱）", body)
 
-        _push("12:00–12:30", "午餐 + 蛋白 ≥45g", body)
-        _push("12:45–13:05", "日语 20 分钟：假名 + 跟读", mind)
-        _push("13:05–13:15", "给朋友发条非事务消息", spirit)
-
-        # 力量训练或内容动作（重点已是这篇时不再重复排）
-        if is_strength_day and strength_text:
-            _push("14:00–15:00", strength_text, body)
-        elif topic and not low:
-            if topic[:10] in frogs[0]:
-                _push("14:00–15:00", "线上工作 / 选题库整理（重点之外的第二线）", voc)
-            else:
-                _push("14:00–15:30", f"内容动作：《{topic[:16]}》写 / 改 / 配图任选其一", voc)
-        elif not low and "大号" not in frogs[0] and "这篇" not in frogs[0]:
-            _push("14:00–15:30", "本周这篇：完成一个可发表的推进动作", voc)
-
-        # 读书/追剧建议（45 分钟专注块，量按 finish_by 自动配速）
+        # 犯困带读书（13:30-14:15，和总览表块 C 对齐）
         if book_show_text and not low:
-            _push("16:00–16:45", f"📖 {book_show_text[:60]}", mind)
+            _push("13:30–14:15", f"📖 犯困带换脑子 · {book_show_text[:55]}", mind)
 
-        if wd_num == 6:  # 周日
-            _push("15:45–15:55", "📊 周复盘：看 3 个数字 + 记 1 条结论", voc)
+        _push("15:00–15:50", "🥈 第二梯队：海外内容运营学习 / 大号工作台（挑一样）", voc)
 
-        if tier_score >= 3:  # 诱惑捆绑：高能日才配享兴趣探索
-            _push("18:30–18:55", "钢琴自由弹 15 分钟 或 日语泛听", spirit)
+        # 力量（非课日兜底时段）
+        if strength_time and strength_text:
+            _push(strength_time, strength_text, body)
 
-        _push("21:00–21:15", "英语口述 10 分钟", mind)
-        _push("21:45–21:55", "日记一句话 · 合上电脑", spirit)
-        _push("22:40–23:00", "拉伸 + 数据回填 · 23:00 入睡", body)
+        _push("19:00–19:30", "晚餐", body)
+        _push("20:00–20:40", "语言 40 分钟：日语 20 + 英语 20", mind)
+        _push("20:40–21:40", "🥉 课程作业 / 商务收尾（60 分钟）", voc)
+        _push("23:40–23:45", "睡前三问 + 体重 / 支出 · 00:00 睡", spirit)
 
     # 运动任务插入（只插一次；低精力档删运动）
     if sport_task and not low:
-        body.append((sport_time, f"{sport_task} · 第 {nth}/{total_sport} 次"))
+        body.append((sport_time, f"{sport_task} · 本周第 {nth}/{total_sport} 次"))
     elif not low and not sport and not is_strength_day:
         body.append(("17:00–17:30", "今日无有氧：散步或泡沫轴 20 分钟"))
 
-    # 每周六：本周唯一一次深度对话实验
+    # 每周六：深度对话（排在作业块后，避免和语言块撞车）
     if _today().weekday() == 5 and not low:
-        spirit.append(("20:00–20:30", "🎙️ 深度对话 30 分钟：问一个真人「最近在思考什么」"))
+        spirit.append(("22:00–22:30", "🎙️ 深度对话 30 分钟：问一个真人「最近在思考什么」"))
 
     # ── 去重兜底：同分区同文本只保留第一条（防双重插入回归）──
     def _dedupe(bucket):
@@ -2320,24 +2312,22 @@ def generate_today_plan(energy: float = 3, sleep: float = 7.0) -> dict:
             h, m = t.split(":")
             return int(h) * 60 + int(m)
         e_start = max(_hm2(cb["end"]) for cb in course_blocks) + 10
-        rows.append({"block": "块 E", "start": f"{e_start // 60:02d}:{e_start % 60:02d}", "end": "23:00",
+        rows.append({"block": "块 E", "start": f"{e_start // 60:02d}:{e_start % 60:02d}", "end": "23:45",
                      "energy": "🔵 回落",
-                     "task": "语言线 + 内容推进 + 收尾", "type": "学习 / 收尾",
-                     "goal": "语言线完成；23:00 入睡"})
+                     "task": "语言 + 大号工作台 + 作业 + 三问", "type": "学习 / 收尾",
+                     "goal": "三件事闭环；00:00 入睡"})
     else:
         def _row(blk, t, txt, typ, goal, en="🟡 中"):
             s, e = t.split("–")
             rows.append({"block": blk, "start": s, "end": e, "energy": en,
                          "task": txt[:30], "type": typ, "goal": goal})
-        if fasted and sport and not low:
-            _row("块 A", "07:40–08:25", f"{sport}（空腹有氧）", "身体", "有氧完成即赢", "▰ 恢复")
-        _row("块 A", "09:00–11:00", f"⚡ {frogs[0][:20]}", "今日重点 / 主线", "上午做完重点", "🔴 高")
-        _row("块 B", "12:40–13:10", "语言（日语）+ 一条非事务性消息", "心智 / 精神", "两件小事闭环")
-        _row("块 C", "14:00–15:40", "内容推进 + 素材圈点", "事业", "一个可保留的中间产物")
-        if sport and not fasted and not low:
-            _row("块 D", "17:00–18:15", f"{sport}（餐后 · {intensity}）", "身体",
-                 f"本周第 {nth}/{total_sport} 次有氧")
-        _row("块 E", "21:00–22:00", "语言（英语）+ 明日青蛙 + 日记", "心智 / 精神 / 收尾", "23:00 入睡", "🔵 回落")
+        if sport and not low:
+            _row("块 A", sport_time, f"{sport_task}", "身体", f"本周第 {nth}/{total_sport} 次", "▰ 恢复")
+        _row("块 B", "12:30–14:30", f"⚡ {frogs[0][:20]}", "今日重点", "商务/大号推进一步", "🔴 高")
+        _row("块 C", "13:30–14:15", "犯困带 · 换脑子读一会儿", "心智", "轻输入不算 KPI")
+        _row("块 D", "15:00–15:50", "第二梯队：海外运营 / 大号工作台", "事业", "挑一样推进")
+        _row("块 E", "20:00–21:40", "语言 40 分钟 + 作业 60 分钟", "心智 / 事业", "两件闭环", "🟡 中")
+        _row("块 F", "23:40–23:45", "睡前三问 + 数据", "精神 / 收尾", "00:00 睡", "🔵 回落")
 
     # 本周有氧排布展示
     wp, wf, wd = _week_sport_plan()
@@ -2389,30 +2379,37 @@ def generate_today_plan(energy: float = 3, sleep: float = 7.0) -> dict:
     if fresh_start:
         md += [fresh_start, ""]
     md += course_lines
-    md += [f"**今日重点（上午先做）**："]
+    md += [f"**今日重点**："]
     md += [f"- {f}" for f in frogs]
     md += ["", "**每天只做三件事**："]
     md += [f"{i + 1}. {t}" for i, t in enumerate(three)]
     md += ["", f"**今天明确不做**：{not_do}。", "",
-           "**今日预算**：¥100 —— 支出记在「今日数据 · 总支出」。", "",
-           f"**有氧（每周随机 4 次 · 攀岩/游泳/羽毛球/爬坡 各一次）**：{week_line}",
-           (f"今天安排：{sport_task}（第 {nth}/{total_sport} 次）" if sport and not low
-            else "今天休（周计划随机轮空，恢复也是训练）。" if not sport
+           "**今日预算**：¥100 —— 睡前三问里顺手记支出。", "",
+           f"**运动（每天晨泳 · 周一/四力量 · 目标体脂 22%）**：{week_line}",
+           (f"今天安排：{sport_task}（本周第 {nth}/{total_sport} 次）" if sport and not low
+            else "今天游泳休息日（周日）。" if not sport
             else "今天有氧已删（低精力档）。"), "",
            "## 🗓️ 总览主表（任务 × 时间 × 精力）", "",
            "| 块 | 时间 | 精力水平 | 任务 | 类型 | 完成线 |",
            "|----|------|----------|------|------|--------|"]
     md += ["| " + " | ".join([r["block"], f"{r['start']}–{r['end']}", r["energy"],
                               r["task"], r["type"], r["goal"]]) + " |" for r in rows]
-    # 只保留可执行的核心任务；休息和注意力重置不再占用待办清单。
-    md += ["", "> A/B 选项只需完成一个；优先青蛙，其他都是加分项。"]
+    md += ["", "> 优先第一梯队；做不完的顺延，不算失败。"]
 
     for title, items in sections:
         md += ["", f"## {title}", ""]
         for t, txt in sorted(items):
             md += [f"- [ ] {t} {txt}"]
 
-    # 日记/闭环：没写过就不预写空模板（写日记时 DiaryEditor 会自动创建对应段落）
+    # 睡前三问（轻松语气 · 体重/支出 · 入睡时间推算睡眠）
+    md += ["", "## ✨ 睡前三问（23:40 · 顺手 5 分钟）", "",
+           "1. 今天最爽的一下是啥？",
+           "2. 哪儿卡住了？（尽管吐槽）",
+           "3. 明天最想干掉的一件事？", "",
+           "- 体重：",
+           "- 支出：",
+           "- 入睡时间：（如 00:30）", ""]
+    # 日记：没写过就不预写空模板（写日记时 DiaryEditor 会自动创建对应段落）
     if old_diary:
         md += ["## 📖 今日日记", "", old_diary, ""]
     p.parent.mkdir(parents=True, exist_ok=True)
