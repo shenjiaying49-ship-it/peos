@@ -2234,7 +2234,33 @@ def generate_today_plan(energy: float = 3, sleep: float = 7.0) -> dict:
         ex_list = " · ".join(today_strength.get("exercises", [])[:3])
         strength_text += f"（{ex_list}）"
 
-    # ── 课程日程 vs 非课程日程（夜型作息 10:30 起 / 00:00 睡 / 泳池 15:00 开门）──
+    # ── 系统直接拍板的确定性内容（不再让用户挑）──
+    # 语言：按星期定死 —— 单日=日语，双日=英语；周末两天 40 分钟双语
+    _wd0 = _today().weekday()
+    lang_20 = ("日语 20 分钟：认读假名 + 跟读课文" if _wd0 % 2 == 0
+               else "英语 20 分钟：口述一个真实话题 + IELTS Part 2 录音")
+    # 二梯队：单日=海外运营拆解，双日=大号工作台
+    tier2_text = ("海外运营学习：拆 1 条海外爆款（YouTube Shorts / X / TikTok 按周轮换）——记下钩子、前 3 秒、CTA 三件套"
+                  if _wd0 % 2 == 0 else
+                  "大号工作台：把本周这篇推进到可发状态（配图 + 排版 + 定发布时间）")
+
+    # 作业块：自动点名最近的未过截止 + 它的具体动作（courses.json action 字段）
+    hw_text = None
+    _dls = [x for x in upcoming_deadlines(30) if x["days_away"] > 0]
+    _dls.sort(key=lambda x: x["days_away"])
+    if _dls:
+        _d0 = _dls[0]
+        _act = ""
+        for _c in load_courses().get("courses", []):
+            if _c["code"] == _d0["course"]:
+                _act = next((a.get("action", "") for a in _c.get("assessments", [])
+                             if a.get("item") == _d0["item"]), "")
+                break
+        hw_text = f"🥉 {_d0['course']} {_d0['item']}（{_d0['days_away']} 天后交）——{_act[:44]}"
+    else:
+        hw_text = "🥉 复习最近一节课的 slide，标出 3 个考点"
+
+    # ── 课程日程 vs 非课程日程（夜型作息 10:30 起 / 00:00 睡 / 泳池 15:00 开门；吃饭不占任务位）──
     if has_courses:
         # 每门课一条可勾选的出勤任务（勾选 = 确认上课 → 出勤积分）
         for cb in course_blocks:
@@ -2244,31 +2270,25 @@ def generate_today_plan(energy: float = 3, sleep: float = 7.0) -> dict:
 
         if _has_am:
             # 周四/周五型：上午课 9:00-11:50 + 下午课 14:00-16:50 → 泳池 17:10 场
-            _push("12:10–12:40", "午餐（食堂 / 微波炉 3 分钟食谱）", body)
-            _push("12:45–13:50", "🥇 原子公社商务块（65 分钟 · 压缩版）", voc)
-            _push("22:30–23:00", f"📖 睡前读书 30 分钟：{book_show_text[:36] if book_show_text else '任意在读书'}", mind)
-            _push("19:30–20:00" if strength_time else "18:10–18:40", "晚餐", body)
-            _push("20:10–20:30", "语言 20 分钟：日语 / 英语（隔天轮）", mind)
+            _push("12:10–13:40", "🥇 原子公社商务块（90 分钟 · 番茄钟 25×3）", voc)
+            _push("20:10–20:30", lang_20, mind)
             _push("20:40–21:25", "🥈 大号内容 · 发布工作台推进本周这篇", voc)
-            _push("21:35–22:20", "🥉 课程作业（最近的截止优先）", voc)
+            _push("21:35–22:20", hw_text, voc)
+            _push("22:30–23:00", f"📖 睡前读书 30 分钟：{book_show_text[:36] if book_show_text else '任意在读书'}", mind)
         elif _has_pm:
             # 周三型：下午课 13:30-16:20 + 晚课 18:00-20:50 → 商务块提到中午，泳 16:40 场
-            _push("11:00–11:30", "早午餐", body)
             _push("11:30–13:00", "🥇 原子公社商务块（90 分钟）", voc)
-            _push("17:30–17:55", "晚餐（下课快速吃）", body)
-            _push("21:05–21:25", "语言 20 分钟", mind)
-            _push("21:30–22:15", "🥈 大号内容 · 发布工作台推进", voc)
-            _push("22:20–23:05", "🥉 课程作业", voc)
+            _push("21:05–21:25", lang_20, mind)
+            _push("21:30–22:15", "🥈 大号内容 · 发布工作台推进本周这篇", voc)
+            _push("22:20–23:05", hw_text, voc)
         else:
             # 周一/周二型：仅晚课 18:00 → 白天完整，泳 15:00 开门场
-            _push("11:30–12:00", "早午餐", body)
             _push("12:00–14:00", "🥇 原子公社商务块（120 分钟 · 番茄钟 25×4）", voc)
             _push("14:15–15:00", f"📖 犯困带换脑子 · {book_show_text[:42] if book_show_text else '任意在读书 40 分钟'}", mind)
             if not strength_time:
-                _push("16:00–17:00", "🥈 第二梯队：海外运营学习 / 大号工作台", voc)
-            _push("17:20–17:50", "晚餐（课前吃点）", body)
-            _push("21:05–21:25", "语言 20 分钟", mind)
-            _push("21:35–22:50", "🥈 大号工作台 / 🥉 作业（挑更急的，75 分钟）", voc)
+                _push("16:00–17:00", f"🥈 {tier2_text}", voc)
+            _push("21:05–21:25", lang_20, mind)
+            _push("21:35–22:50", hw_text, voc)
 
         if strength_time and strength_text:
             _push(strength_time, strength_text, body)
@@ -2277,18 +2297,16 @@ def generate_today_plan(energy: float = 3, sleep: float = 7.0) -> dict:
     else:
         # 非课日（周六/周日/假期）：泳 15:00 开门场，重点块 12:00 开工
         frog_desc = f"⚡ 今日重点：{frogs[0][:30]}" + ("（番茄钟 25×4）" if not low else "（做 25 分钟就算赢）")
-        _push("11:30–12:00", "早午餐", body)
         _push("12:00–14:00", frog_desc, voc)
-        _push("14:05–14:50", "午餐（食堂 / 微波炉 3 分钟食谱）", body)
+        if not strength_time:
+            _push("15:00-15:50" if not (sport_time and "15:00" in sport_time) else "16:00–17:00",
+                  f"🥈 {tier2_text}", voc)
         if book_show_text and not low:
             _push("17:15–18:00", f"📖 {book_show_text[:60]}", mind)
-        if not strength_time:
-            _push("16:00–17:00", "🥈 第二梯队：海外运营学习 / 大号工作台（挑一样）", voc)
         if strength_time and strength_text:
             _push(strength_time, strength_text, body)
-        _push("19:00–19:30", "晚餐", body)
-        _push("20:00–20:40", "语言 40 分钟：日语 20 + 英语 20", mind)
-        _push("20:40–21:40", "🥉 课程作业 / 商务收尾（60 分钟）", voc)
+        _push("20:00–20:40", "语言 40 分钟：日语 20（假名+跟读）+ 英语 20（口述+Part 2）", mind)
+        _push("20:40–21:40", hw_text, voc)
         _push("23:40–23:45", "睡前三问 + 体重 / 支出 · 00:00 睡", spirit)
 
     # 运动任务插入（只插一次；低精力档删运动）
