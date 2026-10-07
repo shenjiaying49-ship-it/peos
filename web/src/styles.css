@@ -72,6 +72,12 @@ body[data-scene="review"]::after { background: radial-gradient(900px 500px at 50
 @keyframes blink { 50% { opacity: 0; } }
 .nav-items { display: flex; gap: 4px; margin-left: auto; overflow-x: auto; scrollbar-width: none; }
 .nav-items::-webkit-scrollbar { display: none; }
+.nav-lan {
+  flex: none; margin-left: 14px; font-size: 10.5px; color: var(--faint);
+  text-decoration: none; border: 1px solid var(--line); padding: 3px 9px;
+  align-self: center; white-space: nowrap;
+}
+.nav-lan:hover { color: var(--gold-strong); border-color: var(--gold); }
 .nav-link {
   position: relative; color: var(--dim); text-decoration: none; font-size: 13px;
   padding: 7px 13px; letter-spacing: 2px; white-space: nowrap;

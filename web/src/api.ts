@@ -21,6 +21,7 @@ export interface Overview {
   content: { stats: Record<string, number>; todo: { topic: string; status: string; plan: string }[]; recent_published: { topic: string; date: string }[] };
   timeline: { date: string; days_away: number; item: string }[];
   today_courses: CourseBlock[];
+  lan_url?: string;
   upcoming_deadlines: Deadline[];
   today_deadlines: Deadline[];
   calendar?: CalendarInfo;

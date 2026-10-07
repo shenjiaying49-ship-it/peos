@@ -2826,6 +2826,7 @@ def build_overview():
         "content": parse_content_calendar(),
         "timeline": parse_timeline(),
         "today_courses": today_course_blocks(),
+        "lan_url": f"http://{_lan_ip()}:{CONFIG.get('port', 8790)}",
         "upcoming_deadlines": upcoming_deadlines(30),
         "today_deadlines": today_deadlines(),
         "calendar": {

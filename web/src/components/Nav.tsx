@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { api } from "../api";
 
 const ITEMS = [
   { id: "today", label: "今日" },
@@ -12,6 +13,11 @@ const ITEMS = [
 
 export default function Nav() {
   const [active, setActive] = useState("");
+  const [lanUrl, setLanUrl] = useState("");
+
+  useEffect(() => {
+    api.overview().then(d => setLanUrl(d?.lan_url || "")).catch(() => {});
+  }, []);
 
   useEffect(() => {
     const obs = new IntersectionObserver(
@@ -34,6 +40,11 @@ export default function Nav() {
           </a>
         ))}
       </div>
+      {lanUrl && (
+        <a className="nav-lan mono" href={lanUrl} title="手机连同一 WiFi 打开这个地址">
+          📱 {lanUrl.replace("http://", "")}
+        </a>
+      )}
     </nav>
   );
 }
