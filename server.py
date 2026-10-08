@@ -881,22 +881,35 @@ def _save_progress(pr: dict):
 
 def progress_suggestions(d=None):
     """Suggest a small next step from persisted reading/viewing progress.
-    有 finish_by 时按剩余天数自适应配速（ceil 平分），否则用 daily_target。"""
+    有 finish_by 时按剩余天数自适应配速，但设硬上限（页 45 / 集 5）——
+    拖了几天不该被 90 页/天惩罚，超出上限自动放缓并顺延 finish_by。"""
     d = d or _today()
     out = []
-    for item in _load_progress().get("items", []):
+    pr = _load_progress()
+    changed = False
+    for item in pr.get("items", []):
         current, total = item.get("current", 0), item.get("total", 0)
         if current >= total or total <= 0:
             continue
         remaining = total - current
+        cap = 45 if item.get("kind") == "book" else 5      # 每日硬上限
         target = min(remaining, max(1, int(item.get("daily_target", 1))))
         pace_note = ""
         finish_by = item.get("finish_by")
         if finish_by:
             try:
                 days_left = max(1, (dt.date.fromisoformat(str(finish_by)) - d).days)
-                target = min(remaining, max(1, -(-remaining // days_left)))
-                pace_note = f"（{days_left} 天内读完，每天约 {target}{ '页' if item.get('kind') == 'book' else '集' }）"
+                ideal = -(-remaining // days_left)
+                if ideal > cap:
+                    # 配速爆表 → 放缓到上限，并顺延 finish_by 到刚好可行
+                    new_days = -(-remaining // cap)
+                    item["finish_by"] = (d + dt.timedelta(days=new_days)).isoformat()
+                    changed = True
+                    pace_note = f"（原计划太赶已自动放缓到每天 {cap}{ '页' if item.get('kind') == 'book' else '集' }——想加速就多读）"
+                    ideal = cap
+                target = min(remaining, max(1, ideal))
+                if not pace_note:
+                    pace_note = f"（{days_left} 天内读完，每天约 {target}{ '页' if item.get('kind') == 'book' else '集' }）"
             except ValueError:
                 pass
         unit = "页" if item.get("kind") == "book" else "集"
@@ -904,6 +917,8 @@ def progress_suggestions(d=None):
                     "title": item.get("title"), "current": current, "total": total,
                     "suggested": target, "unit": unit,
                     "text": f"{item.get('title')}：今天读 {target}{unit}（已读 {current}/{total}）{pace_note}"})
+    if changed:
+        _save_progress(pr)
     return out[:5]
 
 
@@ -1118,7 +1133,13 @@ def _load_work_context(date_str: str = None) -> dict:
         try:
             data = json.loads(p.read_text(encoding="utf-8"))
             if date_str:
-                return data.get(date_str, {})
+                if date_str in data:
+                    return data[date_str]
+                # 没有当天记录 → 沿用最近一次（≤ 当天）的上下文，直到被显式更新
+                past = [k for k in data if k <= date_str and isinstance(data[k], dict)]
+                if past:
+                    return data[max(past)]
+                return {}
             return data
         except Exception:
             pass
