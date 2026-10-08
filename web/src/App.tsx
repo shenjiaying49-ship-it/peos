@@ -15,6 +15,7 @@ import Radar from "./components/Radar";
 import Spark from "./components/Spark";
 import MediaBoard from "./components/MediaBoard";
 import InsightsPanel from "./components/InsightsPanel";
+import CourseGates from "./components/CourseGates";
 import CalibrationFlow from "./components/CalibrationFlow";
 import JarvisBoard, { DayTypePicker, NowCard, QuickCapture } from "./components/JarvisBoard";
 import { AgentChat, DiaryEditor, DiaryStream } from "./components/Review";
@@ -149,6 +150,8 @@ export default function App() {
             {d.today_deadlines?.length ? (
               <p className="dl-note" style={{ marginTop: 10 }}>⚠️ 今天截止：{d.today_deadlines.map(t => `${t.course} ${t.item}`).join("；")}</p>
             ) : null}
+            <div className="col-head mono" style={{ marginTop: 30 }}>🎓 结课要求 · 出勤硬门槛</div>
+            <CourseGates />
           </div>
           <div data-reveal>
             <div className="col-head mono">近期时间线 · 60 天</div>

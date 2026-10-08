@@ -1,0 +1,79 @@
+{
+  "updated": "2026-10-08",
+  "source": "vault/03 Areas/学业/2026秋·结课要求总览.md",
+  "gates": [
+    {
+      "course": "MKT6012",
+      "type": "attendance",
+      "required": 10,
+      "note": "出勤 ≥10 次否则 15% 拿不满"
+    },
+    {
+      "course": "MKT6012",
+      "type": "participation",
+      "required": 5,
+      "note": "主动发言 ≥5 次"
+    },
+    {
+      "course": "MKT6019",
+      "type": "attendance",
+      "required": 15,
+      "note": "全勤得 5%；期中/期末展示全员必须到场"
+    },
+    {
+      "course": "MKT5011",
+      "type": "attendance",
+      "required": 15,
+      "note": "出勤参与 10%；缺课须提前邮件告知"
+    },
+    {
+      "course": "MKT6013",
+      "type": "attendance",
+      "required": 15,
+      "note": "出勤参与 10%"
+    },
+    {
+      "course": "MKT5018",
+      "type": "attendance",
+      "required": 14,
+      "note": "出勤参与 10 分（共 14 次教学）"
+    },
+    {
+      "course": "MKT5012",
+      "type": "attendance",
+      "required": 10,
+      "note": "课堂参与（权重未公布，宽松口径 ≥10 次）"
+    },
+    {
+      "course": "MKT6033",
+      "type": "attendance",
+      "required": 15,
+      "note": "出勤参与 20%（含 2 次 quiz）"
+    },
+    {
+      "course": "CEC5000",
+      "type": "attendance",
+      "required": 15,
+      "note": "参与 40%（P/F 等级制，缺课可能直接 F）"
+    },
+    {
+      "course": "CEC5010",
+      "type": "attendance",
+      "required": 15,
+      "note": "参与 40%（P/F 等级制，缺课可能直接 F）"
+    },
+    {
+      "course": "MKT6012",
+      "type": "milestone",
+      "required": 1,
+      "note": "小组最终展示全员参加（12/11 或 12/18）"
+    },
+    {
+      "course": "MKT6019",
+      "type": "milestone",
+      "required": 1,
+      "note": "期中+期末展示全员到场"
+    }
+  ],
+  "tracking_since": "2026-10-08"
+}

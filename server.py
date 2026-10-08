@@ -941,6 +941,72 @@ def _norm_title(s: str) -> str:
     return s.lower()
 
 
+# ---------------------------------------------------------------- 结课要求达成度（出勤追踪）
+
+def _course_attendance():
+    """扫描 Daily：勾选任务里含课程代码 → 该课出勤 1 次。
+    tracking_since 之前的课无法追溯（勾选系统上线前），只从该日起计数。
+    返回 {code: {attended, sessions_elapsed, required, note}}。"""
+    courses = load_courses().get("courses", [])
+    by_code = {c["code"]: c for c in courses}
+    try:
+        req_doc = json.loads((DATA_DIR / "course_requirements.json").read_text(encoding="utf-8"))
+    except Exception:
+        req_doc = {}
+    since = dt.date.fromisoformat(str(req_doc.get("tracking_since", "2026-10-08")))
+    attended = {c["code"]: 0 for c in courses}
+    for d, path in list_recent_dailies(90):
+        if d < since:
+            continue
+        data = parse_daily(path, d)
+        done_texts = "∥".join(t["text"] for sec in data["tasks_by_section"]
+                              for t in sec["tasks"] if t["done"])
+        for code in attended:
+            if code in done_texts:
+                attended[code] += 1
+    today = _today()
+    out = {}
+    for g in req_doc.get("gates", []):
+        code = g["course"]
+        c = by_code.get(code)
+        if not c or g["type"] != "attendance":
+            continue
+        first = dt.date.fromisoformat(c["first_date"])
+        # 追踪期内的应上课时数（按周计，扣放假日；补课日另加）
+        elapsed = 0
+        wd = (c["weekday"] - 1)
+        d = first
+        holidays = set(load_courses().get("holidays", []))
+        makeup = load_courses().get("makeup_days", {})
+        while d <= today:
+            is_class_day = (d.weekday() == wd) != (makeup.get(d.isoformat()) == c["weekday"])
+            if is_class_day and d >= since and d.isoformat() not in holidays:
+                elapsed += 1
+            d += dt.timedelta(days=1)
+        out[code] = {"attended": attended.get(code, 0), "sessions_elapsed": elapsed,
+                     "sessions_total": c.get("sessions", 15), "required": g["required"],
+                     "note": g["note"]}
+    return out
+
+
+def course_progress():
+    """结课要求达成度总览：出勤硬门槛 + 逾期/即将截止。"""
+    att = _course_attendance()
+    items = []
+    for code, a in sorted(att.items()):
+        pace_ok = a["attended"] >= a["sessions_elapsed"]           # 一节没落
+        proj = a["attended"] + max(0, a["sessions_total"] - a["sessions_elapsed"])  # 全勤假设下最终出勤
+        will_meet = proj >= a["required"]
+        items.append({
+            "course": code, **a, "missed": max(0, a["sessions_elapsed"] - a["attended"]),
+            "projected": proj, "will_meet": will_meet,
+            "status": ("ok" if pace_ok and will_meet else
+                       "risk" if will_meet else "danger"),
+        })
+    return {"ok": True, "attendance": items,
+            "doc": "03 Areas/学业/2026秋·结课要求总览.md"}
+
+
 def weread_status():
     c = _weread_cookie()
     return {"ok": True, "cookie_set": bool(c),
@@ -2289,7 +2355,14 @@ def generate_today_plan(energy: float = 3, sleep: float = 7.0) -> dict:
             _push(f"{cb['start']}–{cb['end']}",
                   f"📍 {cb['code']} {cb['name']}（{cb['session']}）{makeup_tag} 上课出勤", voc)
 
-        if _has_am:
+        if _has_am and not _has_pm:
+            # 周三型（2026-10-08 改课表后）：早课 09:15-12:05 + 晚课 18:00 → 下午完整，泳 15:00 场
+            _push("12:30–14:30", "🥇 原子公社商务块（120 分钟 · 番茄钟 25×4）", voc)
+            _push("16:00–17:00", f"📖 换脑子读书 60 分钟：{book_show_text[:36] if book_show_text else '任意在读书'}", mind)
+            _push("21:10–21:30", lang_20, mind)
+            _push("21:35–22:20", "🥈 大号内容 · 发布工作台推进本周这篇", voc)
+            _push("22:30–23:10", hw_text, voc)
+        elif _has_am:
             # 周四/周五型：上午课 9:00-11:50 + 下午课 14:00-16:50 → 泳池 17:10 场
             _push("12:10–13:40", "🥇 原子公社商务块（90 分钟 · 番茄钟 25×3）", voc)
             _push("20:10–20:30", lang_20, mind)
@@ -2464,13 +2537,17 @@ def generate_today_plan(energy: float = 3, sleep: float = 7.0) -> dict:
             md += [f"- [ ] {t} {txt}"]
 
     # 睡前三问（轻松语气 · 体重/支出 · 入睡时间推算睡眠）
-    md += ["", "## ✨ 睡前三问（23:40 · 顺手 5 分钟）", "",
-           "1. 今天最爽的一下是啥？",
-           "2. 哪儿卡住了？（尽管吐槽）",
-           "3. 明天最想干掉的一件事？", "",
-           "- 体重：",
-           "- 支出：",
-           "- 入睡时间：（如 00:30）", ""]
+    md += ["", "## ✨ 睡前三问（23:40 · 顺手 5 分钟）", ""]
+    if has_courses:
+        _codes_q = " + ".join(cb["code"] for cb in course_blocks)
+        md += [f"0. 今天 {(_codes_q)} 的课去上了吗？（去了→勾掉上面的 📍 出勤任务；没去→写一句原因，别骗自己）", ""]
+    md += [
+        "1. 今天最爽的一下是啥？",
+        "2. 哪儿卡住了？（尽管吐槽）",
+        "3. 明天最想干掉的一件事？", "",
+        "- 体重：",
+        "- 支出：",
+        "- 入睡时间：（如 00:30）", ""]
     # 日记：没写过就不预写空模板（写日记时 DiaryEditor 会自动创建对应段落）
     if old_diary:
         md += ["## 📖 今日日记", "", old_diary, ""]
@@ -2930,6 +3007,12 @@ class Handler(SimpleHTTPRequestHandler):
             return
         if self.path.startswith("/api/weread/status"):
             self._json(200, weread_status())
+            return
+        if self.path.startswith("/api/courses/progress"):
+            try:
+                self._json(200, course_progress())
+            except Exception as e:
+                self._json(500, {"ok": False, "error": str(e)})
             return
         if self.path.startswith("/api/insights"):
             qs = parse_qs(urlparse(self.path).query)
