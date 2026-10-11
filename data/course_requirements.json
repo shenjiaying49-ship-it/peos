@@ -51,18 +51,6 @@
       "note": "出勤参与 20%（含 2 次 quiz）"
     },
     {
-      "course": "CEC5000",
-      "type": "attendance",
-      "required": 15,
-      "note": "参与 40%（P/F 等级制，缺课可能直接 F）"
-    },
-    {
-      "course": "CEC5010",
-      "type": "attendance",
-      "required": 15,
-      "note": "参与 40%（P/F 等级制，缺课可能直接 F）"
-    },
-    {
       "course": "MKT6012",
       "type": "milestone",
       "required": 1,

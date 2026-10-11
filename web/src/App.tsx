@@ -106,27 +106,12 @@ export default function App() {
               <summary>📋 今日 TODO · 四象限（点开编辑）</summary>
               <TodayTodos daily={today} onChanged={reload} />
             </details>
-            <div className="sec-block">
-              <div className="col-head mono">今日数据 · 网页直填</div>
-              <DailyDataForm today={d.today} daily={today} onSaved={reload} />
-            </div>
           </div>
           <div className="today-right" data-reveal>
-            <div className="col-head mono">时间表 · 拖拽调整 · 悬停微调</div>
+            <div className="col-head mono">时间表</div>
             {schedSrc
-              ? <ScheduleRail rows={schedSrc.rows} frogs={schedSrc.frogs} isToday={schedSrc.isToday} dateLabel={schedSrc.dateLabel} todayCourses={d.today_courses || []} todayDeadlines={d.today_deadlines || []} calendar={d.calendar} upcomingDeadlines={d.upcoming_deadlines || []} date={schedSrc.date} onChanged={reload} />
+              ? <ScheduleRail rows={schedSrc.rows} isToday={schedSrc.isToday} dateLabel={schedSrc.dateLabel} todayCourses={d.today_courses || []} todayDeadlines={d.today_deadlines || []} calendar={d.calendar} date={schedSrc.date} onChanged={reload} />
               : <p className="muted">最近一篇 Daily 没有可解析的总览主表——用左侧「丢给我」排第一版。</p>}
-            <div className="sec-block">
-              <div className="col-head mono">今日类型 · 决定今天的盘子多大</div>
-              <DayTypePicker today={d.today} />
-            </div>
-            <div className="sec-block">
-              <div className="col-head mono">近 7 天信号 · 说你该听的</div>
-              <InsightsPanel />
-            </div>
-            <div className="sec-block">
-              <ProgressPanel fitness={d.fitness} onChanged={reload} />
-            </div>
           </div>
         </div>
       </Section>
@@ -164,17 +149,26 @@ export default function App() {
         </div>
       </Section>
 
-      {/* ───── CH3 书影 ───── */}
+      {/* ───── CH3 书影 + 目标进度 ───── */}
       <Section id="media" index="03">
         <MediaBoard />
+        <div className="sec-block" style={{ maxWidth: 640 }}>
+          <ProgressPanel fitness={d.fitness} onChanged={reload} />
+        </div>
       </Section>
 
       {/* ───── CH4 复盘 ───── */}
       <Section id="review" index="04">
         <div className="review-grid">
           <div data-reveal>
-            <div className="col-head mono">今日日记</div>
+            <div className="col-head mono">近 7 天信号 · 说你该听的</div>
+            <InsightsPanel />
+            <div className="col-head mono" style={{ marginTop: 28 }}>今日日记</div>
             <DiaryEditor today={d.today} initial={today?.diary || ""} onSaved={reload} />
+            <details className="quad-collapse" style={{ marginTop: 20 }}>
+              <summary>📝 记数据（体重 / 支出 / 睡眠）</summary>
+              <DailyDataForm today={d.today} daily={today} onSaved={reload} />
+            </details>
             <div className="col-head mono" style={{ marginTop: 28 }}>判断顺序</div>
             <p className="mono order-line">{d.config.decision_order.map(o => o.name).join(" → ")}</p>
             <div className="col-head mono" style={{ marginTop: 28 }}>决策 Agent</div>
@@ -189,6 +183,10 @@ export default function App() {
 
       {/* ───── CH5 JARVIS · 长期引擎（语义排程 / 长期目标 / 身心灵） ───── */}
       <Section id="jarvis" index="05">
+        <div className="sec-block" style={{ maxWidth: 420 }}>
+          <div className="col-head mono">今日类型 · 决定今天的盘子多大</div>
+          <DayTypePicker today={d.today} />
+        </div>
         <JarvisBoard today={d.today} todayDaily={today} onChanged={reload} />
       </Section>
 

@@ -401,56 +401,6 @@
           "note": "至少出席 10 次+参与 5 次"
         }
       ]
-    },
-    {
-      "code": "CEC5000",
-      "name": "Theory and Practice of State-building in Contemporary China",
-      "weekday": 5,
-      "weekday_cn": "周五",
-      "start_time": "14:00",
-      "end_time": "15:50",
-      "location": "Administration Bldg E206",
-      "first_date": "2026-09-11",
-      "sessions": 15,
-      "assessments": [
-        {
-          "item": "Participation",
-          "weight": 40,
-          "due": null,
-          "note": "课堂参与/考勤"
-        },
-        {
-          "item": "Final Task (Exam/Essay/Report)",
-          "weight": 60,
-          "due": null,
-          "note": "期末考核；P/F 等级制"
-        }
-      ]
-    },
-    {
-      "code": "CEC5010",
-      "name": "Dialectics of Nature",
-      "weekday": 5,
-      "weekday_cn": "周五",
-      "start_time": "16:00",
-      "end_time": "16:50",
-      "location": "Administration Bldg E206",
-      "first_date": "2026-09-11",
-      "sessions": 15,
-      "assessments": [
-        {
-          "item": "Participation",
-          "weight": 40,
-          "due": null,
-          "note": "课堂参与/考勤"
-        },
-        {
-          "item": "Final Task (Exam/Essay/Report)",
-          "weight": 60,
-          "due": null,
-          "note": "期末考核；P/F 等级制"
-        }
-      ]
     }
   ]
 }

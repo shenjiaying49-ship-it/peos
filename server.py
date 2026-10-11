@@ -1395,8 +1395,7 @@ def game_state():
 
     # ── 扫描 90 天 Daily ──
     COURSE_CODES = ("MKT5010", "MKT5011", "MKT5012", "MKT5018",
-                    "MKT6012", "MKT6013", "MKT6019", "MKT6033",
-                    "CEC5000", "CEC5010")
+                    "MKT6012", "MKT6013", "MKT6019", "MKT6033")
     stats = {k: 0 for k in ("tasks_done", "frogs_done", "diary_days", "data_days",
                             "lang_jp", "lang_en", "spirit_msg", "deep_talks",
                             "stretch_done", "sport_any", "budget_ok_days",
