@@ -337,10 +337,10 @@
     }
   ],
   "agent": {
-    "_comment": "决策 agent。默认离线规则引擎；填 api_base + api_key（任何 OpenAI 兼容端点）+ model 即切换为 LLM 自由问答。也可用环境变量 PEOS_LLM_API_KEY / OPENAI_API_KEY / OPENROUTER_API_KEY。",
-    "api_base": "",
+    "_comment": "任务解析/决策 agent。原子引擎（AtomClub）。key 存 data/llm_key.txt（gitignore），也可用环境变量 PEOS_LLM_API_KEY。",
+    "api_base": "https://api.atomclub.cn/v1",
     "api_key": "",
-    "model": "glm-4.6"
+    "model": "glm-5-turbo"
   },
   "finance": {
     "_comment": "opening_balance 为期初余额（元）；notes 为预算备注，均可在本文件修改。",

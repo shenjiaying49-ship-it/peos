@@ -2780,9 +2780,7 @@ def call_llm(cfg: dict, api_key: str, question: str, ctx: str) -> str:
 
 
 def agent_answer(question: str, st: dict):
-    cfg = CONFIG.get("agent", {})
-    api_key = (cfg.get("api_key") or os.environ.get("PEOS_LLM_API_KEY")
-               or os.environ.get("OPENAI_API_KEY") or os.environ.get("OPENROUTER_API_KEY"))
+    api_key, cfg = _llm_key()
     ctx = agent_context(st)
     if api_key and cfg.get("api_base"):
         try:
@@ -2812,7 +2810,11 @@ TASK_PARSE_PROMPT = """你是 ADHD 用户的任务解析器。把一段口语化
 
 def _llm_key():
     cfg = CONFIG.get("agent", {})
-    return (cfg.get("api_key") or os.environ.get("PEOS_LLM_API_KEY")
+    file_key = ""
+    kp = DATA_DIR / "llm_key.txt"
+    if kp.exists():
+        file_key = kp.read_text(encoding="utf-8").strip()
+    return (cfg.get("api_key") or file_key or os.environ.get("PEOS_LLM_API_KEY")
             or os.environ.get("OPENAI_API_KEY") or os.environ.get("OPENROUTER_API_KEY")), cfg
 
 
@@ -2839,7 +2841,7 @@ def parse_tasks_llm(raw: str):
                 headers={"Authorization": f"Bearer {api_key}",
                          "Content-Type": "application/json"},
                 method="POST")
-            with urllib.request.urlopen(req, timeout=30) as r:
+            with urllib.request.urlopen(req, timeout=60) as r:
                 data = json.loads(r.read().decode("utf-8"))
             content = data["choices"][0]["message"]["content"].strip()
             content = re.sub(r"^```(?:json)?\s*|\s*```$", "", content)
@@ -2865,7 +2867,8 @@ def parse_tasks_llm(raw: str):
     parts = re.split(r"[。；;\n]|然后|顺便|之后|接着", raw)
     tasks = [{"text": p.strip()[:60], "duration_min": 30, "priority": "q2", "time_hint": "any"}
              for p in parts if p.strip()]
-    return {"ok": bool(tasks), "mode": "fallback", "tasks": tasks, "error": err if not tasks else None}
+    return {"ok": bool(tasks), "mode": "fallback", "tasks": tasks,
+            "error": err if not tasks else (err or None)}
 
 
 # ---------------------------------------------------------------- 财务

@@ -27,3 +27,6 @@ Thumbs.db
 data/weread_cookie.txt
 *.cookie
 data/*.cookie
+
+# LLM key
+data/llm_key.txt
