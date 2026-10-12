@@ -51,7 +51,7 @@ const BODY_KW = ["健身", "游泳", "跑步", "飞盘", "攀岩", "羽毛球", 
 const LIGHT_KW = ["回消息", "邮件", "杂事", "整理", "收拾", "买", "订", "预约", "回复", "缴费", "洗"];
 const DEEP_KW = ["写", "论文", "作业", "复习", "准备", "改", "剪", "录", "复盘", "规划", "学", "课程", "方案", "稿"];
 const cnNum = (w: string) => (CNUM[w] !== undefined ? CNUM[w] : /^\d+$/.test(w) ? parseInt(w) : null);
-interface PTask { text: string; time: string; dur: number; prio: 0 | 1 | 2; quad: string; flags: string[]; isBody: boolean }
+interface PTask { text: string; time: string; dur: number; prio: 0 | 1 | 2; quad: string; flags: string[]; isBody: boolean; hint?: string }
 function parseOne(raw: string): PTask | null {
   let text = raw.trim(); if (!text) return null;
   const flags: string[] = [];
@@ -211,18 +211,18 @@ export function NowCard({ rows, compact }: { rows: SchedRow[]; compact?: boolean
 
 /* ═════════════ QuickCapture：丢给我（取代自定义任务） ═════════════ */
 
-/** 把无时间的任务智能排进空闲槽：q1 最先 → q2 → q3/q4 靠后；避课程/已有日程；按今日类型卡截止线 */
+/** 把无时间的任务智能排进空闲槽：q1 最先 → q2 → q3/q4 靠后；避课程/已有日程；按今日类型卡截止线。
+ *  time_hint 感知：focus（要动脑）优先排精力峰 12:30–17:00；light（不动脑）优先犯困带/晚上。 */
 function autoSchedule(ts: PTask[], busy: [number, number][], dtype: string): PTask[] {
   const HARD_END = 23 * 60;
   const dayEnd = (dtype === "play" ? 18 : dtype === "low" ? 20.5 : 22) * 60;
   const now = Math.ceil(nowMin() / 30) * 30;
   const taken: [number, number][] = [...busy];
-  const overlaps = (s: number, e: number) => taken.some(([bs, be]) => s < be && e > bs);
   const freeSlot = (s: number) => !taken.some(([bs, be]) => s < be && bs < s + 30);
 
-  const findRun = (n: number, limit: number, from: number): number => {
-    let s = Math.max(from, Math.ceil(nowMin() / 30) * 30);
-    while (s + n * 30 <= Math.min(limit, HARD_END)) {
+  const findRun = (n: number, limit: number, from: number, winLo = 0, winHi = HARD_END): number => {
+    let s = Math.max(from, Math.ceil(nowMin() / 30) * 30, winLo);
+    while (s + n * 30 <= Math.min(limit, winHi)) {
       let ok = true;
       for (let i = 0; i < n; i++) {
         if (!freeSlot(s + i * 30)) {
@@ -247,8 +247,16 @@ function autoSchedule(ts: PTask[], busy: [number, number][], dtype: string): PTa
       for (let i = 0; i < slots; i++) taken.push([s + i * 30, s + (i + 1) * 30]);
       continue;
     }
-    // 三道防线：①今日容量线内找空位 ②放宽到 23:00 ③并行兜底（绝不允许任务没落位）
-    let start = findRun(slots, dayEnd, now);
+    // 时段偏好窗口：focus → 精力峰（下午 12:30–17:00）；light → 犯困带 + 晚上（13:30–15:30 / 20:00 后）
+    let start = -1;
+    if (t.hint === "focus") {
+      start = findRun(slots, dayEnd, now, 12 * 60 + 30, 17 * 60);
+    } else if (t.hint === "light") {
+      start = findRun(slots, dayEnd, now, 13 * 60 + 30, 15 * 60 + 30);
+      if (start === -1) start = findRun(slots, dayEnd, Math.max(now, 20 * 60), 20 * 60, dayEnd);
+    }
+    // 三道防线：①偏好窗口 ②今日容量线内找空位 ③放宽到 23:00 ④并行兜底（绝不允许任务没落位）
+    if (start === -1) start = findRun(slots, dayEnd, now);
     if (start === -1) {
       start = findRun(slots, HARD_END, now);
       if (start >= 21 * 60) t.flags = [...t.flags, "排到很晚了——今天太满，考虑顺延明天"];
@@ -293,10 +301,41 @@ export function QuickCapture({ today, todayDaily, courses, onChanged }: {
       // 时间/时长改动后，只保留显式锚点，重跑排期（确定性）
       return autoSchedule(next, busyOf(), localStorage.getItem(`peos.daytype.${today}`) || "work");
     });
-  const doParse = () => {
-    const ts = parseAll(raw);
-    if (!ts.length) { flash("先写点事进来"); return; }
-    setParsed(autoSchedule(ts, busyOf(), localStorage.getItem(`peos.daytype.${today}`) || "work"));
+  const [parsing, setParsing] = useState(false);
+  const doParse = async () => {
+    if (!raw.trim() || parsing) return;
+    setParsing(true);
+    try {
+      // 优先走 LLM：整段话智能拆任务（不依赖换行）+ 按难度估时长 + 时段偏好
+      const r = await api.parseTasks(raw);
+      let ts: PTask[] = [];
+      let mode = r.mode || "fallback";
+      if (r.ok && r.tasks?.length) {
+        ts = r.tasks.map(t => {
+          const m = (t.time_hint || "").match(/^(\d{1,2}):(\d{2})$/);
+          const hint = m ? "any" : (t.time_hint === "focus" || t.time_hint === "light" ? t.time_hint : "any");
+          return {
+            text: t.text,
+            time: m ? `${String(parseInt(m[1])).padStart(2, "0")}:${m[2]}` : "",
+            dur: Math.max(30, Math.round(t.duration_min / 30) * 30),
+            prio: (t.priority === "q1" ? 0 : t.priority === "q2" ? 1 : 2) as 0 | 1 | 2,
+            quad: ["q1", "q2", "q3", "q4"].includes(t.priority) ? t.priority : "q2",
+            flags: [], isBody: false, hint,
+          };
+        });
+      } else if (mode === "fallback") {
+        ts = parseAll(raw);
+      }
+      if (!ts.length) { flash(r.error ? `LLM 不可用（${r.error.slice(0, 40)}），本地解析也没拆出任务` : "先写点事进来"); setParsing(false); return; }
+      setParsed(autoSchedule(ts, busyOf(), localStorage.getItem(`peos.daytype.${today}`) || "work"));
+      flash(mode === "llm" ? "AI 拆解完成——时长和位置按难度排好了，可微调" : "本地粗拆（未配 LLM，按 30 分钟计）——时长自己改");
+    } catch (e) {
+      const ts = parseAll(raw);
+      if (!ts.length) { flash("解析失败，先写点事进来"); setParsing(false); return; }
+      setParsed(autoSchedule(ts, busyOf(), localStorage.getItem(`peos.daytype.${today}`) || "work"));
+      flash("LLM 请求失败，本地兜底解析");
+    }
+    setParsing(false);
   };
   const [committing, setCommitting] = useState(false);
   const commit = async () => {
@@ -329,12 +368,12 @@ export function QuickCapture({ today, todayDaily, courses, onChanged }: {
       {msg && <div className="jv-toast mono">{msg}</div>}
       <textarea
         value={raw} onChange={e => setRaw(e.target.value)}
-        placeholder={"一行一件，什么时候做不用管，我来排：\n写论文两小时（截止今天）\n健身\n下午3点开会一小时\n回邮件"}
+        placeholder={"想到什么直接丢一段进来，AI 帮你拆（不换行也行）：\n下午帮我安排下：先把选题邮件发了很快，然后论文初稿得认真写，晚上还要回个消息"}
         rows={3}
       />
       <div className="jv-nl-actions">
-        <button className="btn-solid" onClick={doParse}>解析并智能排期</button>
-        <span className="jv-hint mono">没写时间的自动找空位（避课程、q1 先排、按今日类型卡线）· 「下午3点」写的直接落位</span>
+        <button className="btn-solid" onClick={doParse} disabled={parsing}>{parsing ? "AI 拆解中…" : "AI 解析并排期"}</button>
+        <span className="jv-hint mono">AI 按难度估时长、难任务排精力峰、轻活排犯困带 · 写了具体时间的直接落位</span>
       </div>
       {parsed && (
         <div className="jv-preview">
@@ -351,7 +390,7 @@ export function QuickCapture({ today, todayDaily, courses, onChanged }: {
                   {HALF_SLOTS.map(s => <option key={s} value={s}>{s}</option>)}
                 </select>
                 <select value={t.dur} onChange={e => patch(i, { dur: parseInt(e.target.value) })}>
-                  {[30, 60, 90, 120, 180].map(d => <option key={d} value={d}>{d} 分钟</option>)}
+                  {[30, 60, 90, 120, 150, 180, 240].map(d => <option key={d} value={d}>{d} 分钟</option>)}
                 </select>
                 <span className="mono jv-dur">{sectionOf(t) === "voc" ? "事业" : sectionOf(t) === "body" ? "身体" : "心智"}</span>
               </div>

@@ -143,6 +143,8 @@ export const api = {
     fetch(`/api/insights?days=${days}`).then(r => r.json()),
   courseProgress: (): Promise<{ ok: boolean; doc: string; attendance: { course: string; attended: number; sessions_elapsed: number; sessions_total: number; required: number; missed: number; projected: number; will_meet: boolean; status: string; note: string }[] }> =>
     fetch("/api/courses/progress").then(r => r.json()),
+  parseTasks: (text: string): Promise<{ ok: boolean; mode?: "llm" | "fallback"; error?: string | null; tasks?: { text: string; duration_min: number; priority: string; time_hint: string }[] }> =>
+    fetch("/api/parse-tasks", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ text }) }).then(r => r.json()),
   game: (): Promise<GameState> => fetch("/api/game").then(r => r.json()),
   gameAct: (body: Record<string, unknown>) =>
     fetch("/api/game", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) }).then(r => r.json()),

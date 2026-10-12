@@ -2793,6 +2793,81 @@ def agent_answer(question: str, st: dict):
     return {"mode": "offline", "answer": offline_oracle(question, st)}
 
 
+# ---------------------------------------------------------------- LLM 任务解析（丢给我 → 智能拆解）
+
+TASK_PARSE_PROMPT = """你是 ADHD 用户的任务解析器。把一段口语化输入拆成结构化任务，严格只输出 JSON 数组，不要任何解释。
+
+规则：
+1. 不依赖换行：按语义判断到底有几件事（"下午买咖啡顺便把论文初稿写了"= 2 件）
+2. duration_min 按真实工作量估：回复消息/取快递 15-30；常规作业/开会 30-60；写文章/做 PPT/写代码 60-120；大项目整块 120-240
+3. priority：q1=今天必须或有明确截止；q2=重要不紧急；q3=琐事速办；q4=可选享受
+4. time_hint：需要动脑的难任务给 "focus"（排精力好的时段）；不用动脑的轻活给 "light"（犯困带也能做）；用户说了具体时间给 "HH:MM"；没说给 "any"
+5. text 洗掉所有时间表述和「顺便/然后」这类连接词，保留动作+对象，30 字以内
+6. 用户提到「截止今天/明天」→ priority=q1 且 text 里保留截止信息
+
+输出示例：
+[{"text":"买咖啡","duration_min":20,"priority":"q3","time_hint":"any"},
+ {"text":"论文初稿","duration_min":120,"priority":"q1","time_hint":"focus"}]"""
+
+
+def _llm_key():
+    cfg = CONFIG.get("agent", {})
+    return (cfg.get("api_key") or os.environ.get("PEOS_LLM_API_KEY")
+            or os.environ.get("OPENAI_API_KEY") or os.environ.get("OPENROUTER_API_KEY")), cfg
+
+
+def parse_tasks_llm(raw: str):
+    """整段话 → LLM 拆任务（含时长/优先级/时段偏好）。未配 LLM → 本地兜底按标点粗拆。"""
+    api_key, cfg = _llm_key()
+    raw = (raw or "").strip()
+    if not raw:
+        return {"ok": False, "error": "空的"}
+    if api_key and cfg.get("api_base"):
+        try:
+            payload = json.dumps({
+                "model": cfg.get("model", "glm-4.6"),
+                "messages": [
+                    {"role": "system", "content": TASK_PARSE_PROMPT},
+                    {"role": "user", "content": raw},
+                ],
+                "max_tokens": 600,
+                "temperature": 0.1,
+            }).encode("utf-8")
+            req = urllib.request.Request(
+                cfg["api_base"].rstrip("/") + "/chat/completions",
+                data=payload,
+                headers={"Authorization": f"Bearer {api_key}",
+                         "Content-Type": "application/json"},
+                method="POST")
+            with urllib.request.urlopen(req, timeout=30) as r:
+                data = json.loads(r.read().decode("utf-8"))
+            content = data["choices"][0]["message"]["content"].strip()
+            content = re.sub(r"^```(?:json)?\s*|\s*```$", "", content)
+            items = json.loads(content)
+            tasks = []
+            for it in items if isinstance(items, list) else []:
+                dur = int(it.get("duration_min") or 30)
+                dur = max(30, min(240, round(dur / 30) * 30))   # 吸附到 30 分钟粒度（排期底座）
+                tasks.append({
+                    "text": str(it.get("text") or "")[:60].strip(),
+                    "duration_min": dur,
+                    "priority": it.get("priority") if it.get("priority") in ("q1", "q2", "q3", "q4") else "q2",
+                    "time_hint": str(it.get("time_hint") or "any")[:8],
+                })
+            tasks = [t for t in tasks if t["text"]]
+            if tasks:
+                return {"ok": True, "mode": "llm", "tasks": tasks}
+        except Exception as e:
+            err = str(e)
+    else:
+        err = "未配置 LLM（config.json → agent.api_base/api_key）"
+    # 本地兜底：按标点/连接词粗拆，时长一律 30
+    parts = re.split(r"[。；;\n]|然后|顺便|之后|接着", raw)
+    tasks = [{"text": p.strip()[:60], "duration_min": 30, "priority": "q2", "time_hint": "any"}
+             for p in parts if p.strip()]
+    return {"ok": bool(tasks), "mode": "fallback", "tasks": tasks, "error": err if not tasks else None}
+
+
 # ---------------------------------------------------------------- 财务
 
 def _load_finance() -> dict:
@@ -3103,6 +3178,11 @@ class Handler(SimpleHTTPRequestHandler):
             self._json(200, delete_progress(str(body.get("id", ""))))
         elif self.path == "/api/weread/sync":
             self._json(200, weread_sync())
+        elif self.path == "/api/parse-tasks":
+            try:
+                self._json(200, parse_tasks_llm(str(body.get("text", ""))))
+            except Exception as e:
+                self._json(400, {"ok": False, "error": str(e)})
         elif self.path == "/api/game":
             action = body.get("action")
             try:
