@@ -177,61 +177,6 @@
       ]
     },
     {
-      "code": "MKT6033",
-      "name": "Artificial Intelligence Applications in Marketing",
-      "weekday": 3,
-      "weekday_cn": "周三",
-      "start_time": "18:00",
-      "end_time": "20:50",
-      "location": "Teaching B Bldg 102",
-      "first_date": "2026-09-09",
-      "sessions": 15,
-      "assessments": [
-        {
-          "item": "Assignment 1",
-          "weight": 10,
-          "due": "2026-10-18",
-          "note": "10/18 23:59 Blackboard 提交",
-          "action": "独立完成 A1（个人），23:59 前传 Blackboard"
-        },
-        {
-          "item": "Group project first draft",
-          "weight": null,
-          "due": "2026-10-23",
-          "note": "10/23 23:59 Blackboard 提交",
-          "action": "小组项目初稿汇总，23:59 前传 Blackboard"
-        },
-        {
-          "item": "Assignment 2",
-          "weight": 10,
-          "due": "2026-11-01",
-          "note": "11/01 23:59 Blackboard 提交",
-          "action": "独立完成 A2，23:59 前传 Blackboard"
-        },
-        {
-          "item": "Assignment 3",
-          "weight": 10,
-          "due": "2026-11-15",
-          "note": "11/15 23:59 Blackboard 提交",
-          "action": "独立完成 A3，23:59 前传 Blackboard"
-        },
-        {
-          "item": "Assignment 4",
-          "weight": 10,
-          "due": "2026-11-29",
-          "note": "11/29 23:59 Blackboard 提交",
-          "action": "独立完成 A4，23:59 前传 Blackboard"
-        },
-        {
-          "item": "Group project final + Peer evaluation",
-          "weight": 40,
-          "due": "2026-12-11",
-          "note": "12/11 23:59 Blackboard 提交项目报告+互评表；互评=他人评分均值向上取整",
-          "action": "项目报告+互评表（覆盖全部作业+项目）传 BB"
-        }
-      ]
-    },
-    {
       "code": "MKT5012",
       "name": "Marketing Research in the Digital Age",
       "weekday": 4,

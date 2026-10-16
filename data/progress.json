@@ -8,7 +8,7 @@
    "total": 268,
    "date": "2026-09-24",
    "daily_target": 30,
-   "finish_by": "2026-10-18"
+   "finish_by": "2026-10-22"
   },
   {
    "id": "20260924100950",
@@ -20,5 +20,6 @@
    "daily_target": 20,
    "finish_by": "2026-10-25"
   }
- ]
+ ],
+ "reading_synced": "2026-10-16"
 }

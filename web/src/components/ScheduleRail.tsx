@@ -124,7 +124,7 @@ export default function ScheduleRail({ rows, isToday, dateLabel, todayCourses, t
   // 先排序课程和常规行
   const courseAsRow: (SchedRow | CourseBlock)[] = (todayCourses || []).map(c => ({
     __isCourse: true, code: c.code, name: c.name, start: c.start, end: c.end,
-    location: c.location, session: c.session,
+    location: c.location, session: c.session, attended: (c as CourseBlock).attended,
   } as unknown as SchedRow));
 
   const merged: { start: string; item: SchedRow | CourseBlock }[] = [];
@@ -192,11 +192,25 @@ export default function ScheduleRail({ rows, isToday, dateLabel, todayCourses, t
             <span className="s-body"><span className="s-meta">⏸ 缓冲 {row.buffer}min —— 切换 / 迟到保护 / 走神额度</span></span>
           </div>
         ) : isCourseBlock(row) ? (
-          <div key={`c${i}`} className="sched-row course-block">
+          <div key={`c${i}`} className={`sched-row course-block ${row.attended ? "attended" : ""}`}>
             <span className="s-time">{row.start}<br /><span className="s-end">{row.end}</span></span>
             <span className="s-rail"><i className="course-dot" /></span>
             <span className="s-body">
-              <span className="s-head">📚 {row.code} {row.name}</span>
+              <span className="s-head">📚 {row.code} {row.name}
+                {isToday && (
+                  <button
+                    className={`att-btn ${row.attended ? "on" : ""}`}
+                    title={row.attended ? "已确认出勤（点一下取消）" : "我来了——点我确认出勤"}
+                    onClick={async () => {
+                      setErr("");
+                      const r = await api.attendance(date || new Date().toISOString().slice(0, 10), row.code, !row.attended);
+                      if (!r.ok) setErr(r.error || "出勤记录失败");
+                      onChanged?.();
+                    }}>
+                    ✓ {row.attended ? "已到" : "打卡"}
+                  </button>
+                )}
+              </span>
               <span className="s-meta">📍 {row.location}{row.session ? ` · ${row.session}` : ""}</span>
             </span>
           </div>

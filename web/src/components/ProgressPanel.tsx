@@ -34,6 +34,17 @@ export default function ProgressPanel({ fitness, onChanged }: {
   const inc = async (id: string, d: number) => { await api.progressInc(id, d); load(); };
   const del = async (id: string) => { await api.progressDel(id); load(); };
 
+  // 拉杆：拖动即时显示，松手才写库（避免拖一路写一路）
+  const [sliderVal, setSliderVal] = useState<Record<string, number>>({});
+  const setSlider = (id: string, v: number) => setSliderVal(s => ({ ...s, [id]: v }));
+  const commitSlider = async (id: string) => {
+    const v = sliderVal[id];
+    if (v === undefined) return;
+    await api.progressSet(id, v);
+    load();
+  };
+  const curOf = (x: ProgressItem) => sliderVal[x.id] ?? x.current;
+
   // 微信读书同步（非官方 API · cookie 见 peos/data/weread_cookie.txt）
   const [wrBusy, setWrBusy] = useState(false);
   const [wrMsg, setWrMsg] = useState("");
@@ -81,13 +92,15 @@ export default function ProgressPanel({ fitness, onChanged }: {
     return (
       <div className="pp-row item">
         <span className="pp-name">{p === 100 ? "✓ " : ""}{x.title}</span>
-        <span className="pp-bar"><i style={{ width: `${p}%` }} /></span>
-        <span className="pp-num mono">{x.current}/{x.total}</span>
-        <span className="pp-btns">
-          <button onClick={() => inc(x.id, 1)} aria-label={`进度加一`}>+1</button>
-          <button onClick={() => inc(x.id, -1)} aria-label={`进度减一`}>−</button>
-          <button onClick={() => del(x.id)} aria-label="删除追踪">✕</button>
-        </span>
+        <input
+          type="range" min={0} max={x.total} value={curOf(x)}
+          className="pp-slider"
+          aria-label={`${x.title} 进度`}
+          onChange={e => setSlider(x.id, parseInt(e.target.value))}
+          onPointerUp={() => commitSlider(x.id)}
+          onKeyUp={() => commitSlider(x.id)} />
+        <span className="pp-num mono">{curOf(x)}/{x.total}</span>
+        <button className="pp-del" onClick={() => del(x.id)} aria-label="删除追踪">✕</button>
       </div>
     );
   };

@@ -12,7 +12,7 @@ export interface Daily {
 }
 export interface Quad { id: string; name: string; icon: string; current: number; after90: number; ideal: number; stage: string; diagnosis: string; action: string; kpi_weekly: string }
 export interface DiaryCard { date: string; weekday: string; emoji: string; summary: string; rating: number; comment: string; done: number; total: number }
-export interface CourseBlock { code: string; name: string; start: string; end: string; location: string; session: string; weekday_cn: string; is_makeup?: boolean }
+export interface CourseBlock { code: string; name: string; start: string; end: string; location: string; session: string; weekday_cn: string; is_makeup?: boolean; attended?: boolean }
 export interface Deadline { date: string; days_away: number; course: string; course_name: string; item: string; weight?: number | null; note: string; weekday_cn: string }
 export interface CalendarInfo { is_holiday: boolean; is_makeup: boolean; makeup_weekday: number | null; holidays: string[] }
 export interface Overview {
@@ -145,6 +145,10 @@ export const api = {
     fetch("/api/courses/progress").then(r => r.json()),
   parseTasks: (text: string): Promise<{ ok: boolean; mode?: "llm" | "fallback"; error?: string | null; tasks?: { text: string; duration_min: number; priority: string; time_hint: string }[] }> =>
     fetch("/api/parse-tasks", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ text }) }).then(r => r.json()),
+  attendance: (date: string, code: string, done: boolean): Promise<{ ok: boolean; error?: string }> =>
+    fetch("/api/attendance", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ date, code, done }) }).then(r => r.json()),
+  progressSet: (id: string, current: number) =>
+    fetch("/api/progress/set", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ id, current }) }).then(r => r.json()),
   game: (): Promise<GameState> => fetch("/api/game").then(r => r.json()),
   gameAct: (body: Record<string, unknown>) =>
     fetch("/api/game", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) }).then(r => r.json()),

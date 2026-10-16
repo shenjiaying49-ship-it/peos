@@ -442,13 +442,22 @@ def today_course_blocks(d=None):
     makeup_wd = _makeup_weekday(d)
     wd = (makeup_wd - 1) if makeup_wd else d.weekday()  # 0=周一
     courses = load_courses().get("courses", [])
+    holidays = set(load_courses().get("holidays", []))
+    makeup = load_courses().get("makeup_days", {})
     blocks = []
     for c in courses:
         if c["weekday"] != wd + 1:
             continue
-        # 计算是第几次课
+        # 第几次课 = 从 first_date 到今天实际应上课次数（扣放假日、含本课调休补课日）
+        # 国庆/中秋放假的那几周不算课时，编号不再虚高
         first = dt.date.fromisoformat(c["first_date"])
-        session_no = (d - first).days // 7 + 1
+        session_no = 0
+        dd = first
+        while dd <= d:
+            is_class_day = (dd.weekday() == wd) != (makeup.get(dd.isoformat()) == c["weekday"])
+            if is_class_day and dd.isoformat() not in holidays:
+                session_no += 1
+            dd += dt.timedelta(days=1)
         if 1 <= session_no <= c["sessions"]:
             blocks.append({
                 "code": c["code"], "name": c["name"],
@@ -575,6 +584,55 @@ def toggle_task(date_iso: str, section: str, raw_line: str, done: bool):
             flip(i)
             return {"ok": True, "path": str(p), "fallback": True}
     return {"ok": False, "error": "没找到该行（文件可能刚被改动，请刷新页面）"}
+
+
+def attendance_toggle(date_iso: str, code: str, done: bool):
+    """日程表上课打勾：找到当天 📍 CODE 出勤任务并翻转。
+    没有该任务（计划没生成/手动删了）→ 现场补一行再勾。"""
+    try:
+        d = dt.date.fromisoformat(date_iso)
+    except ValueError:
+        return {"ok": False, "error": "bad date"}
+    p = daily_path(d)
+    if not p.exists():
+        return {"ok": False, "error": "今天的 Daily 还没生成"}
+    text = p.read_text(encoding="utf-8")
+    lines = text.split("\n")
+    marker = "x" if done else " "
+    hit = None
+    for i, line in enumerate(lines):
+        if TASK_RE.match(line) and code in line and "📍" in line:
+            hit = i
+            break
+    if hit is not None:
+        lines[hit] = TASK_RE.sub(lambda mm: f"- [{marker}] {mm.group(2)}", lines[hit], count=1)
+    else:
+        # 补一行出勤任务（课程信息从课表取）
+        cb = next((b for b in today_course_blocks(d) if b["code"] == code), None)
+        if not cb:
+            return {"ok": False, "error": f"课表里没有 {code}"}
+        # 插到事业分区第一个任务前；没有分区就追加到文末
+        for i, line in enumerate(lines):
+            if "事业" in line and line.startswith("##"):
+                lines.insert(i + 2, f"- [{'x' if done else ' '}] {cb['start']}–{cb['end']} 📍 {code} {cb['name']}（{cb['session']}） 上课出勤")
+                break
+        else:
+            lines.append(f"- [{'x' if done else ' '}] {cb['start']}–{cb['end']} 📍 {code} {cb['name']}（{cb['session']}） 上课出勤")
+    p.write_text("\n".join(lines), encoding="utf-8")
+    return {"ok": True, "code": code, "done": done}
+
+
+def attendance_state(d=None):
+    """今天每门课的出勤勾选状态 {code: bool}。"""
+    d = d or _today()
+    data = parse_daily(daily_path(d), d)
+    out = {}
+    for sec in data["tasks_by_section"]:
+        for t in sec["tasks"]:
+            if "📍" in t["text"]:
+                for code in re.findall(r"MKT\d{4}|CEC\d{4}", t["text"]):
+                    out[code] = t["done"]
+    return out
 
 
 # ---------------------------------------------------------------- 日记（复盘台读写）
@@ -1175,6 +1233,39 @@ def inc_progress(pid: str, delta: int):
     return {"ok": False, "error": "not found"}
 
 
+def set_progress(pid: str, current: int):
+    """进度条直接拖到某一页/集。"""
+    pr = _load_progress()
+    for x in pr["items"]:
+        if x["id"] == pid:
+            x["current"] = max(0, min(x["total"], int(current)))
+            _save_progress(pr)
+            return {"ok": True, "item": x}
+    return {"ok": False, "error": "not found"}
+
+
+def sync_reading_from_dailies():
+    """从每日记录自动更新读书进度：扫描上次同步以来的 Daily 原文，
+    「读书：N页」（三问/日记里写的）累加到第一本在读书。"""
+    pr = _load_progress()
+    book = next((x for x in pr["items"] if x.get("kind") == "book" and x["current"] < x["total"]), None)
+    if not book:
+        return
+    last = dt.date.fromisoformat(str(pr.get("reading_synced", book.get("date", "2026-01-01"))))
+    pages = 0
+    d = last
+    while d <= _today():
+        p = daily_path(d)
+        if p.exists():
+            for m in re.finditer(r"读书[：:]?\s*(\d+)\s*页", p.read_text(encoding="utf-8")):
+                pages += int(m.group(1))
+        d += dt.timedelta(days=1)
+    if pages > 0:
+        book["current"] = min(book["total"], book["current"] + pages)
+        pr["reading_synced"] = _today().isoformat()
+        _save_progress(pr)
+
+
 def delete_progress(pid: str):
     pr = _load_progress()
     before = len(pr["items"])
@@ -1395,7 +1486,7 @@ def game_state():
 
     # ── 扫描 90 天 Daily ──
     COURSE_CODES = ("MKT5010", "MKT5011", "MKT5012", "MKT5018",
-                    "MKT6012", "MKT6013", "MKT6019", "MKT6033")
+                    "MKT6012", "MKT6013", "MKT6019")
     stats = {k: 0 for k in ("tasks_done", "frogs_done", "diary_days", "data_days",
                             "lang_jp", "lang_en", "spirit_msg", "deep_talks",
                             "stretch_done", "sport_any", "budget_ok_days",
@@ -2544,6 +2635,7 @@ def generate_today_plan(energy: float = 3, sleep: float = 7.0) -> dict:
         "1. 今天最爽的一下是啥？",
         "2. 哪儿卡住了？（尽管吐槽）",
         "3. 明天最想干掉的一件事？", "",
+        "- 读书：页（今天读了几页，进度条自动走）",
         "- 体重：",
         "- 支出：",
         "- 入睡时间：（如 00:30）", ""]
@@ -3000,7 +3092,10 @@ def build_overview():
         "diary_cards": diary_cards[::-1],
         "content": parse_content_calendar(),
         "timeline": parse_timeline(),
-        "today_courses": today_course_blocks(),
+        "today_courses": [
+            {**cb, "attended": attendance_state().get(cb["code"], False)}
+            for cb in today_course_blocks()
+        ],
         "lan_url": f"http://{_lan_ip()}:{CONFIG.get('port', 8790)}",
         "upcoming_deadlines": upcoming_deadlines(30),
         "today_deadlines": today_deadlines(),
@@ -3055,6 +3150,7 @@ class Handler(SimpleHTTPRequestHandler):
                 self._json(500, {"ok": False, "error": str(e)})
             return
         if self.path.startswith("/api/progress"):
+            sync_reading_from_dailies()   # 每次读进度先从每日记录同步
             self._json(200, {"ok": True, **_load_progress()})
             return
         if self.path.startswith("/api/calibration"):
@@ -3177,6 +3273,11 @@ class Handler(SimpleHTTPRequestHandler):
                 self._json(200, inc_progress(str(body.get("id", "")), int(body.get("delta", 1))))
             except Exception as e:
                 self._json(400, {"ok": False, "error": str(e)})
+        elif self.path == "/api/progress/set":
+            try:
+                self._json(200, set_progress(str(body.get("id", "")), int(body.get("current", 0))))
+            except Exception as e:
+                self._json(400, {"ok": False, "error": str(e)})
         elif self.path == "/api/progress/delete":
             self._json(200, delete_progress(str(body.get("id", ""))))
         elif self.path == "/api/weread/sync":
@@ -3184,6 +3285,13 @@ class Handler(SimpleHTTPRequestHandler):
         elif self.path == "/api/parse-tasks":
             try:
                 self._json(200, parse_tasks_llm(str(body.get("text", ""))))
+            except Exception as e:
+                self._json(400, {"ok": False, "error": str(e)})
+        elif self.path == "/api/attendance":
+            try:
+                self._json(200, attendance_toggle(str(body.get("date", "")),
+                                                  str(body.get("code", "")),
+                                                  bool(body.get("done"))))
             except Exception as e:
                 self._json(400, {"ok": False, "error": str(e)})
         elif self.path == "/api/game":
