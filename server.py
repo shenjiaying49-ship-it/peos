@@ -2953,6 +2953,8 @@ def parse_tasks_llm(raw: str):
                 return {"ok": True, "mode": "llm", "tasks": tasks}
         except Exception as e:
             err = str(e)
+            if "402" in err or "Payment" in err:
+                err = "LLM 渠道欠费（402）——充值后自动恢复，先用本地粗拆顶着"
     else:
         err = "未配置 LLM（config.json → agent.api_base/api_key）"
     # 本地兜底：按标点/连接词粗拆，时长一律 30

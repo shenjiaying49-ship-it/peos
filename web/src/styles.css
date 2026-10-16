@@ -293,6 +293,16 @@ input[type="range"] { width: 100%; accent-color: var(--gold); height: 24px; }
 .sched-row.course-block.attended { background: rgba(169, 134, 44, .07); }
 .sched-row.course-block.attended .s-head { text-decoration: none; }
 
+/* AI 自动分类标签（丢给我预览，可点循环切换） */
+.jv-tag {
+  cursor: pointer; font-size: 11px; font-weight: 700; border-radius: 10px;
+  padding: 2px 10px; border: 1.5px solid; background: transparent; white-space: nowrap;
+}
+.jv-tag.tq1 { color: #B4552D; border-color: #B4552D; background: rgba(180, 85, 45, .07); }
+.jv-tag.tq2 { color: var(--gold-strong); border-color: var(--gold-strong); background: var(--gold-soft); }
+.jv-tag.tq3 { color: var(--water); border-color: var(--water); }
+.jv-tag.tq4 { color: var(--faint); border-color: var(--line); }
+
 /* 微信读书同步 */
 .pp-weread { display: flex; gap: 8px; align-items: baseline; margin-top: 6px; flex-wrap: wrap; }
 .pp-weread-msg { font-size: 11.5px; color: var(--dim); }

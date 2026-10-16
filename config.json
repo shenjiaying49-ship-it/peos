@@ -337,10 +337,10 @@
     }
   ],
   "agent": {
-    "_comment": "任务解析/决策 agent。原子引擎（AtomClub）。key 存 data/llm_key.txt（gitignore），也可用环境变量 PEOS_LLM_API_KEY。",
-    "api_base": "https://api.atomclub.cn/v1",
+    "_comment": "LLM 渠道。当前：dxl 中转站 gpt-5.6-luna（原子引擎欠费备用中）。key 存 data/llm_key.txt",
+    "api_base": "https://ai.finlaw.cloud/v1",
     "api_key": "",
-    "model": "glm-5-turbo"
+    "model": "gpt-5.6-luna"
   },
   "finance": {
     "_comment": "opening_balance 为期初余额（元）；notes 为预算备注，均可在本文件修改。",

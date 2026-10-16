@@ -377,12 +377,27 @@ export function QuickCapture({ today, todayDaily, courses, onChanged }: {
       </div>
       {parsed && (
         <div className="jv-preview">
-          <div className="jv-ph mono">排期结果（{parsed.length} 件）——时间可改，改完重新错开</div>
-          {parsed.map((t, i) => (
+          <div className="jv-ph mono">排期结果（{parsed.length} 件）——标签/时间都可点改</div>
+          {parsed.map((t, i) => {
+            const QMETA: Record<string, { label: string; cls: string }> = {
+              q1: { label: "🔴 重要紧急", cls: "tq1" },
+              q2: { label: "🟡 重要", cls: "tq2" },
+              q3: { label: "⚡ 速办", cls: "tq3" },
+              q4: { label: "💤 可选", cls: "tq4" },
+            };
+            const cycle = () => {
+              const order = ["q1", "q2", "q3", "q4"];
+              const next = order[(order.indexOf(t.quad) + 1) % 4];
+              patch(i, { quad: next, prio: (next === "q1" ? 0 : next === "q2" ? 1 : 2) as 0 | 1 | 2 });
+            };
+            return (
             <div key={i} className="jv-ptask">
               <div className="jv-pt-top">
                 <span className="jv-pt-txt">{t.text}</span>
-                <span className={`jv-prio p${t.prio}`}>{t.prio === 0 ? "高" : t.prio === 1 ? "中" : "低"}</span>
+                <button className={`jv-tag ${QMETA[t.quad]?.cls}`} onClick={cycle}
+                        title="AI 自动定的级，不对就点一下切换">
+                  {QMETA[t.quad]?.label || "🟡 重要"} ▾
+                </button>
               </div>
               {t.flags.length > 0 && <div className="jv-flags">⚠️ {t.flags.join("；")}</div>}
               <div className="jv-pt-row">
@@ -392,10 +407,11 @@ export function QuickCapture({ today, todayDaily, courses, onChanged }: {
                 <select value={t.dur} onChange={e => patch(i, { dur: parseInt(e.target.value) })}>
                   {[30, 60, 90, 120, 150, 180, 240].map(d => <option key={d} value={d}>{d} 分钟</option>)}
                 </select>
-                <span className="mono jv-dur">{sectionOf(t) === "voc" ? "事业" : sectionOf(t) === "body" ? "身体" : "心智"}</span>
+                <span className="mono jv-dur">{sectionOf(t) === "voc" ? "事业" : sectionOf(t) === "body" ? "身体" : "心智"}{t.hint === "focus" ? " · 精力峰" : t.hint === "light" ? " · 轻时段" : ""}</span>
               </div>
             </div>
-          ))}
+            );
+          })}
           <div className="jv-pt-actions">
             <button className="btn-solid" onClick={commit} disabled={committing}>{committing ? "写入中…" : "确认写入（防重复）"}</button>
             <button className="btn-outline sm" onClick={() => setParsed(null)} disabled={committing}>取消</button>
