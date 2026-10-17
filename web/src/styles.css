@@ -425,6 +425,8 @@ input[type="range"] { width: 100%; accent-color: var(--gold); height: 24px; }
 .fin-form { display: flex; gap: 12px; flex-wrap: wrap; align-items: center; padding: 18px 0; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
 .form-label { font-size: 11px; color: var(--faint); letter-spacing: 2px; }
 .seg { display: flex; }
+.jv-mode { margin-bottom: 10px; }
+.jv-mode button { font-size: 12px; padding: 5px 14px; }
 .seg button {
   font-family: var(--sans); font-size: 12.5px; padding: 8px 16px; cursor: pointer;
   background: none; border: 1px solid var(--line); color: var(--dim);

@@ -302,6 +302,28 @@ export function QuickCapture({ today, todayDaily, courses, onChanged }: {
       return autoSchedule(next, busyOf(), localStorage.getItem(`peos.daytype.${today}`) || "work");
     });
   const [parsing, setParsing] = useState(false);
+  const [rebuildMode, setRebuildMode] = useState(false);
+
+  /* 重排今天：整段日程总述 → 服务端清模板 + AI 重排（课程保留） */
+  const doRebuild = async () => {
+    if (!raw.trim() || parsing) return;
+    setParsing(true);
+    try {
+      const r = await api.rebuildDay(today, raw);
+      if (!r.ok) {
+        flash(r.error || "重排失败");
+      } else {
+        const lines = (r.placed || []).map(x => `${x.time} ${x.text}`).join("；");
+        flash(`已重排：${lines}${r.overflow?.length ? `（${r.overflow.length} 件塞不下：${r.overflow.join("、")}）` : ""}`);
+        setRaw("");
+        onChanged();
+      }
+    } catch {
+      flash("重排请求失败，再试一次");
+    }
+    setParsing(false);
+  };
+
   const doParse = async () => {
     if (!raw.trim() || parsing) return;
     setParsing(true);
@@ -366,14 +388,28 @@ export function QuickCapture({ today, todayDaily, courses, onChanged }: {
   return (
     <div className="jv-nl">
       {msg && <div className="jv-toast mono">{msg}</div>}
+      <div className="jv-mode seg" role="radiogroup" aria-label="录入模式">
+        <button className={rebuildMode ? "" : "on"} onClick={() => setRebuildMode(false)}
+                role="radio" aria-checked={!rebuildMode}>➕ 追加任务</button>
+        <button className={rebuildMode ? "on" : ""} onClick={() => setRebuildMode(true)}
+                role="radio" aria-checked={rebuildMode}>🔄 重排今天</button>
+      </div>
       <textarea
         value={raw} onChange={e => setRaw(e.target.value)}
-        placeholder={"想到什么直接丢一段进来，AI 帮你拆（不换行也行）：\n下午帮我安排下：先把选题邮件发了很快，然后论文初稿得认真写，晚上还要回个消息"}
+        placeholder={rebuildMode
+          ? "用一段话说清今天怎么过，AI 清掉模板安排、按你说的重排（课程和出勤保留）：\n今天上午先游泳一小时，下午两点到五点写论文，晚上处理商务邮件然后早点休息"
+          : "想到什么直接丢一段进来，AI 帮你拆（不换行也行）：\n下午帮我安排下：先把选题邮件发了很快，然后论文初稿得认真写，晚上还要回个消息"}
         rows={3}
       />
       <div className="jv-nl-actions">
-        <button className="btn-solid" onClick={doParse} disabled={parsing}>{parsing ? "AI 拆解中…" : "AI 解析并排期"}</button>
-        <span className="jv-hint mono">AI 按难度估时长、难任务排精力峰、轻活排犯困带 · 写了具体时间的直接落位</span>
+        {rebuildMode ? (
+          <button className="btn-solid" onClick={doRebuild} disabled={parsing}>{parsing ? "AI 重排中…" : "🔄 按我说的重排今天"}</button>
+        ) : (
+          <button className="btn-solid" onClick={doParse} disabled={parsing}>{parsing ? "AI 拆解中…" : "AI 解析并排期"}</button>
+        )}
+        <span className="jv-hint mono">{rebuildMode
+          ? "模板任务会被清掉、课程保留 · 说了具体时间的直接落位"
+          : "AI 按难度估时长、难任务排精力峰、轻活排犯困带"}</span>
       </div>
       {parsed && (
         <div className="jv-preview">

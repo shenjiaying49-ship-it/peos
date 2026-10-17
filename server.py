@@ -2236,6 +2236,115 @@ def _today_sport(ysig):
     return plan[wd], fasted[wd], nth, len(days)
 
 
+def rebuild_day(body: dict):
+    """整段日程总述 → 重排全天：
+    ① AI 拆解任务 ② 清掉今天的模板/旧自定义任务（保留 📍 课程出勤和表头）
+    ③ 服务端按课程空隙 + 时段偏好重排 ④ 逐条写入。
+    你说今天怎么过，今天就怎么排。"""
+    date_iso = str(body.get("date") or _today().isoformat())
+    raw = str(body.get("text") or "").strip()
+    if not raw:
+        return {"ok": False, "error": "先说一段今天怎么安排"}
+    r = parse_tasks_llm(raw)
+    if not r.get("ok") or not r.get("tasks"):
+        return {"ok": False, "error": r.get("error") or "AI 没拆出任务"}
+    try:
+        d = dt.date.fromisoformat(date_iso)
+    except ValueError:
+        return {"ok": False, "error": "bad date"}
+
+    p = daily_path(d)
+    if not p.exists():
+        generate_today_plan()
+
+    # ① 清场：非 📍 任务行删除；总览主表只留课程行和表头
+    course_codes = {c["code"] for c in load_courses().get("courses", [])}
+    lines = read(p).split("\n")
+    cleaned = []
+    for line in lines:
+        s = line.strip()
+        if TASK_RE.match(s) and "📍" not in s:
+            continue
+        if s.startswith("|") and not set(s) <= {"|", "-", " "}:
+            first = s.strip("|").split("|")[0].strip()
+            if first not in course_codes and first != "块":
+                continue
+        cleaned.append(line)
+    p.write_text("\n".join(cleaned), encoding="utf-8")
+
+    # ② 服务端排期（和前端 autoSchedule 同一套规则：q1 先、focus→精力峰、light→犯困带/晚）
+    def _hm(t):
+        h, m = t.split(":")
+        return int(h) * 60 + int(m)
+    def _fmt(m_):
+        return f"{m_ // 60:02d}:{m_ % 60:02d}"
+    blocks = today_course_blocks(d)
+    taken = [(_hm(b["start"]), _hm(b["end"])) for b in blocks]
+    now = _today() == d and (dt.datetime.now().hour * 60 + dt.datetime.now().minute) or 0
+    now = -(-now // 30) * 30   # 上取整到半点
+    DAY_END, HARD_END = 22 * 60, 23 * 60
+
+    def free(s, e):
+        return not any(s < be and bs < e for bs, be in taken)
+
+    def place(n, lo, hi):
+        s = max(now, lo)
+        while s + n * 30 <= hi:
+            if all(free(s + i * 30, s + i * 30 + 30) for i in range(n)):
+                for i in range(n):
+                    taken.append((s + i * 30, s + i * 30 + 30))
+                return s
+            nxt = min((be for bs, be in taken if s < be and bs < s + 30), default=s + 30)
+            s = max(-(-nxt // 30) * 30, s + 30)
+        return -1
+
+    order = {"q1": 0, "q2": 1, "q3": 2, "q4": 3}
+    tasks = sorted(r["tasks"], key=lambda t: order.get(t["priority"], 1))
+    # 锚定任务（用户给了具体时间）最先固定，其余任务避开它们
+    tasks.sort(key=lambda t: 0 if re.fullmatch(r"\d{1,2}:\d{2}", t.get("time_hint", "")) else 1)
+    placed, overflow = [], []
+    for t in tasks:
+        n = max(1, round(t["duration_min"] / 30))
+        hint = t.get("time_hint", "any")
+        anchor = re.fullmatch(r"(\d{1,2}):(\d{2})", hint)
+        if anchor:
+            s = (int(anchor.group(1)) % 24) * 60 + int(anchor.group(2))
+            for i in range(n):
+                taken.append((s + i * 30, s + i * 30 + 30))
+            placed.append((t, s))
+            continue
+        s = -1
+        if hint == "focus":
+            s = place(n, 12 * 60 + 30, 17 * 60)
+        elif hint == "light":
+            s = place(n, 13 * 60 + 30, 15 * 60 + 30)
+            if s == -1:
+                s = place(n, 20 * 60, DAY_END)
+        if s == -1:
+            s = place(n, now, DAY_END)
+        if s == -1:
+            s = place(n, now, HARD_END)
+        if s == -1:
+            overflow.append(t)
+            continue
+        placed.append((t, s))
+
+    # ③ 写入（add_task 自带去重 + 表行追加）
+    body_kw = ("游泳", "健身", "跑步", "拉伸", "力量")
+    out = []
+    for t, s in placed:
+        marker = {"q1": "⭐", "q3": "⚡", "q4": "💤"}.get(t["priority"], "")
+        txt = f"{marker} {t['text']}".strip()
+        quad = "body" if any(k in t["text"] for k in body_kw) else ("voc" if t["priority"] in ("q1", "q2") else "mind")
+        rr = add_task({"date": date_iso, "time": f"{_fmt(s)}–{_fmt(s + t['duration_min'])}",
+                       "text": txt, "quad": quad})
+        out.append({"text": t["text"], "time": f"{_fmt(s)}–{_fmt(s + t['duration_min'])}",
+                    "ok": rr.get("ok", False)})
+    return {"ok": True, "mode": r.get("mode"), "placed": out,
+            "overflow": [t["text"] for t in overflow],
+            "note": "模板任务已清，按你说的重排完" if not overflow else f"{len(overflow)} 件今天塞不下"}
+
+
 def generate_today_plan(energy: float = 3, sleep: float = 7.0) -> dict:
     dailies = list_recent_dailies(21)
     # ─── 工作上下文与日历上下文 ───
@@ -2891,7 +3000,7 @@ TASK_PARSE_PROMPT = """你是 ADHD 用户的任务解析器。把一段口语化
 1. 不依赖换行：按语义判断到底有几件事（"下午买咖啡顺便把论文初稿写了"= 2 件）
 2. duration_min 按真实工作量估：回复消息/取快递 15-30；常规作业/开会 30-60；写文章/做 PPT/写代码 60-120；大项目整块 120-240
 3. priority：q1=今天必须或有明确截止；q2=重要不紧急；q3=琐事速办；q4=可选享受
-4. time_hint：需要动脑的难任务给 "focus"（排精力好的时段）；不用动脑的轻活给 "light"（犯困带也能做）；用户说了具体时间给 "HH:MM"；没说给 "any"
+4. time_hint：需要动脑的难任务给 "focus"（排精力好的时段）；不用动脑的轻活给 "light"（犯困带也能做）；用户给了明确时间给 "HH:MM"；用户说了大致时段也给锚点（早上→"08:00" 上午→"10:30" 中午→"12:00" 下午→"14:00" 傍晚→"17:30" 晚上→"20:00"）；没说给 "any"
 5. text 洗掉所有时间表述和「顺便/然后」这类连接词，保留动作+对象，30 字以内
 6. 用户提到「截止今天/明天」→ priority=q1 且 text 里保留截止信息
 
@@ -3294,6 +3403,11 @@ class Handler(SimpleHTTPRequestHandler):
                 self._json(200, attendance_toggle(str(body.get("date", "")),
                                                   str(body.get("code", "")),
                                                   bool(body.get("done"))))
+            except Exception as e:
+                self._json(400, {"ok": False, "error": str(e)})
+        elif self.path == "/api/plan/rebuild":
+            try:
+                self._json(200, rebuild_day(body))
             except Exception as e:
                 self._json(400, {"ok": False, "error": str(e)})
         elif self.path == "/api/game":
