@@ -303,6 +303,31 @@ input[type="range"] { width: 100%; accent-color: var(--gold); height: 24px; }
 .jv-tag.tq3 { color: var(--water); border-color: var(--water); }
 .jv-tag.tq4 { color: var(--faint); border-color: var(--line); }
 
+/* 太阳目标卡（四张便签） */
+.sun-card { border: 1px solid var(--line); background: var(--card); padding: 20px 24px; margin-bottom: 34px; max-width: 720px; }
+.sun-head { font-size: 11px; color: var(--gold-strong); letter-spacing: 3px; margin-bottom: 12px; }
+.sun-goal-row { display: flex; gap: 10px; align-items: center; margin-bottom: 14px; }
+.sun-goal-row input {
+  flex: 1; border: none; border-bottom: 1.5px solid var(--gold-line); background: transparent;
+  font-size: 16px; font-weight: 700; color: var(--ink); padding: 6px 2px;
+}
+.sun-goal-row input:focus { outline: none; border-color: var(--gold); }
+.sun-goal-row input::placeholder { font-weight: 400; font-size: 13px; color: var(--faint); }
+.sun-stars { display: flex; flex-direction: column; gap: 6px; margin-bottom: 14px; }
+.sun-star {
+  display: flex; gap: 10px; align-items: baseline; text-align: left; cursor: pointer;
+  background: transparent; border: none; border-left: 3px solid var(--line);
+  padding: 6px 10px; font-size: 13.5px; color: var(--ink);
+}
+.sun-star:hover { border-left-color: var(--gold); background: var(--gold-soft); }
+.sun-star.done .ss-text { color: var(--faint); text-decoration: line-through; }
+.sun-star.done { border-left-color: var(--gold); }
+.ss-box { flex: none; width: 14px; height: 14px; border: 1.5px solid #B9B2A0; font-size: 11px; line-height: 1; color: var(--gold-strong); }
+.sun-star.done .ss-box { background: var(--gold); border-color: var(--gold); color: #fff; }
+.ss-due { margin-left: auto; color: var(--faint); font-size: 11px; flex: none; }
+.sun-vision { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 8px; }
+.sun-vision img { width: 100%; height: 110px; object-fit: cover; border: 1px solid var(--line); }
+
 /* 微信读书同步 */
 .pp-weread { display: flex; gap: 8px; align-items: baseline; margin-top: 6px; flex-wrap: wrap; }
 .pp-weread-msg { font-size: 11.5px; color: var(--dim); }

@@ -212,11 +212,13 @@ def parse_daily(path: Path, d: dt.date):
                         data[NUM_FIELDS[m.group(1)]] = float(m.group(2))
                     except ValueError:
                         pass
-            # 入睡时间 hh:mm → 推算睡眠时长（按夜型 10:30 起床口径）
+            # 入睡/起床时间 hh:mm → 推算睡眠时长（有起床时间用真实值，否则按夜型 10:30）
             m = re.search(r"入睡时间\s*[：:]\s*(\d{1,2})[：:](\d{2})", body)
+            mw = re.search(r"起床时间\s*[：:]\s*(\d{1,2})[：:](\d{2})", body)
             if m and not data.get("sleep_hours"):
                 sh, sm = int(m.group(1)) % 24, int(m.group(2))
-                wake = 10 * 60 + 30
+                wh, wm = (int(mw.group(1)) % 24, int(mw.group(2))) if mw else (10, 30)
+                wake = wh * 60 + wm
                 slept = (wake - (sh * 60 + sm)) % (24 * 60)
                 if 180 <= slept <= 780:   # 3–13h 之间才可信
                     data["sleep_hours"] = round(slept / 60, 1)
@@ -620,6 +622,39 @@ def attendance_toggle(date_iso: str, code: str, done: bool):
             lines.append(f"- [{'x' if done else ' '}] {cb['start']}–{cb['end']} 📍 {code} {cb['name']}（{cb['session']}） 上课出勤")
     p.write_text("\n".join(lines), encoding="utf-8")
     return {"ok": True, "code": code, "done": done}
+
+
+# ---------------------------------------------------------------- 太阳目标 · 四张便签
+
+def _load_sun_goal() -> dict:
+    p = DATA_DIR / "sun_goal.json"
+    if p.exists():
+        try:
+            return json.loads(p.read_text(encoding="utf-8"))
+        except Exception:
+            pass
+    return {"sun_goal": "", "hint": "", "star_goals": []}
+
+
+def sun_goal_get():
+    sg = _load_sun_goal()
+    sg["vision"] = sorted(f.name for f in (DATA_DIR / "vision").glob("*")
+                          if f.suffix.lower() in (".jpg", ".jpeg", ".png", ".webp")) \
+        if (DATA_DIR / "vision").exists() else []
+    return {"ok": True, **sg}
+
+
+def sun_goal_save(body: dict):
+    sg = _load_sun_goal()
+    if "sun_goal" in body:
+        sg["sun_goal"] = str(body["sun_goal"])[:300].strip()
+    if body.get("toggle_star"):
+        for g in sg.get("star_goals", []):
+            if g["id"] == body["toggle_star"]:
+                g["done"] = not g["done"]
+    DATA_DIR.mkdir(exist_ok=True)
+    (DATA_DIR / "sun_goal.json").write_text(json.dumps(sg, ensure_ascii=False, indent=1), encoding="utf-8")
+    return {"ok": True, **sg}
 
 
 def attendance_state(d=None):
@@ -2576,6 +2611,7 @@ def generate_today_plan(energy: float = 3, sleep: float = 7.0) -> dict:
             _push("22:20–23:05", hw_text, voc)
         else:
             # 周一/周二型：仅晚课 18:00 → 白天完整，泳 15:00 开门场
+            _push("10:30–11:30", "📵 晨间无手机：散步 20 分 → 整理房间 10 分 → 早午餐（手机别碰）", spirit)
             _push("12:00–14:00", "🥇 原子公社商务块（120 分钟 · 番茄钟 25×4）", voc)
             _push("14:15–15:00", f"📖 犯困带换脑子 · {book_show_text[:42] if book_show_text else '任意在读书 40 分钟'}", mind)
             if not strength_time:
@@ -2589,6 +2625,7 @@ def generate_today_plan(energy: float = 3, sleep: float = 7.0) -> dict:
 
     else:
         # 非课日（周六/周日/假期）：泳 15:00 开门场，重点块 12:00 开工
+        _push("10:30–11:30", "📵 晨间无手机：散步 20 分 → 整理房间 10 分 → 早午餐（手机别碰）", spirit)
         frog_desc = f"⚡ 今日重点：{frogs[0][:30]}" + ("（番茄钟 25×4）" if not low else "（做 25 分钟就算赢）")
         _push("12:00–14:00", frog_desc, voc)
         if not strength_time:
@@ -2747,7 +2784,8 @@ def generate_today_plan(energy: float = 3, sleep: float = 7.0) -> dict:
         "- 读书：页（今天读了几页，进度条自动走）",
         "- 体重：",
         "- 支出：",
-        "- 入睡时间：（如 00:30）", ""]
+        "- 入睡时间：（如 00:30）",
+        "- 起床时间：（如 10:30，睡眠自动算）", ""]
     # 日记：没写过就不预写空模板（写日记时 DiaryEditor 会自动创建对应段落）
     if old_diary:
         md += ["## 📖 今日日记", "", old_diary, ""]
@@ -3292,6 +3330,25 @@ class Handler(SimpleHTTPRequestHandler):
         if self.path.startswith("/api/weread/status"):
             self._json(200, weread_status())
             return
+        if self.path.startswith("/api/sun-goal"):
+            self._json(200, sun_goal_get())
+            return
+        if self.path.startswith("/vision/"):
+            # 远景版图片：data/vision/ 下的文件直出
+            fname = self.path[len("/vision/"):]
+            if re.fullmatch(r"[\w.\- ]+\.(jpg|jpeg|png|webp)", fname, re.I):
+                fp = DATA_DIR / "vision" / fname
+                if fp.exists():
+                    ctype = ("image/jpeg" if fp.suffix.lower() in (".jpg", ".jpeg")
+                             else "image/png" if fp.suffix.lower() == ".png" else "image/webp")
+                    self.send_response(200)
+                    self.send_header("Content-Type", ctype)
+                    self.send_header("Content-Length", str(fp.stat().st_size))
+                    self.end_headers()
+                    self.wfile.write(fp.read_bytes())
+                    return
+            self._json(404, {"ok": False, "error": "not found"})
+            return
         if self.path.startswith("/api/courses/progress"):
             try:
                 self._json(200, course_progress())
@@ -3410,6 +3467,8 @@ class Handler(SimpleHTTPRequestHandler):
                 self._json(200, rebuild_day(body))
             except Exception as e:
                 self._json(400, {"ok": False, "error": str(e)})
+        elif self.path == "/api/sun-goal":
+            self._json(200, sun_goal_save(body) if body else sun_goal_get())
         elif self.path == "/api/game":
             action = body.get("action")
             try:

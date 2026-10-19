@@ -16,6 +16,7 @@ import Spark from "./components/Spark";
 import MediaBoard from "./components/MediaBoard";
 import InsightsPanel from "./components/InsightsPanel";
 import CourseGates from "./components/CourseGates";
+import SunGoalCard from "./components/SunGoalCard";
 import CalibrationFlow from "./components/CalibrationFlow";
 import JarvisBoard, { DayTypePicker, NowCard, QuickCapture } from "./components/JarvisBoard";
 import { AgentChat, DiaryEditor, DiaryStream } from "./components/Review";
@@ -183,6 +184,7 @@ export default function App() {
 
       {/* ───── CH5 JARVIS · 长期引擎（语义排程 / 长期目标 / 身心灵） ───── */}
       <Section id="jarvis" index="05">
+        <SunGoalCard />
         <div className="sec-block" style={{ maxWidth: 420 }}>
           <div className="col-head mono">今日类型 · 决定今天的盘子多大</div>
           <DayTypePicker today={d.today} />

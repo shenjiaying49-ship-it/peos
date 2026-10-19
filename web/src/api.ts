@@ -149,6 +149,10 @@ export const api = {
     fetch("/api/attendance", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ date, code, done }) }).then(r => r.json()),
   rebuildDay: (date: string, text: string): Promise<{ ok: boolean; mode?: string; note?: string; error?: string; placed?: { text: string; time: string; ok: boolean }[]; overflow?: string[] }> =>
     fetch("/api/plan/rebuild", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ date, text }) }).then(r => r.json()),
+  sunGoal: (): Promise<{ ok: boolean; sun_goal: string; hint?: string; star_goals: { id: string; text: string; due: string; done: boolean }[]; vision: string[] }> =>
+    fetch("/api/sun-goal").then(r => r.json()),
+  sunGoalSave: (b: { sun_goal?: string; toggle_star?: string }) =>
+    fetch("/api/sun-goal", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(b) }).then(r => r.json()),
   progressSet: (id: string, current: number) =>
     fetch("/api/progress/set", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ id, current }) }).then(r => r.json()),
   game: (): Promise<GameState> => fetch("/api/game").then(r => r.json()),
