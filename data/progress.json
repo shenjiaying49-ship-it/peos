@@ -1,6 +1,15 @@
 {
  "items": [
   {
+   "id": "20261025200150",
+   "kind": "book",
+   "title": "[AI] 为什么伟大不能被计划 · Kenneth Stanley",
+   "current": 0,
+   "total": 1,
+   "date": "2026-10-25",
+   "daily_target": 10
+  },
+  {
    "id": "20261019150842",
    "kind": "book",
    "title": "[AI] 为什么伟大不能被计划 · Kenneth Stanley",
@@ -26,7 +35,7 @@
    "total": 268,
    "date": "2026-09-24",
    "daily_target": 30,
-   "finish_by": "2026-10-25"
+   "finish_by": "2026-11-02"
   },
   {
    "id": "20260924100950",
@@ -36,7 +45,7 @@
    "total": 256,
    "date": "2026-09-24",
    "daily_target": 20,
-   "finish_by": "2026-10-25"
+   "finish_by": "2026-11-02"
   }
  ],
  "reading_synced": "2026-10-16"

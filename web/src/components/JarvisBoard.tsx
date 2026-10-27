@@ -255,16 +255,16 @@ function autoSchedule(ts: PTask[], busy: [number, number][], dtype: string): PTa
       start = findRun(slots, dayEnd, now, 13 * 60 + 30, 15 * 60 + 30);
       if (start === -1) start = findRun(slots, dayEnd, Math.max(now, 20 * 60), 20 * 60, dayEnd);
     }
-    // 三道防线：①偏好窗口 ②今日容量线内找空位 ③放宽到 23:00 ④并行兜底（绝不允许任务没落位）
+    // 四道防线：①偏好窗口 ②今日容量线内找空位 ③放宽到 23:00（含上午空隙）④并行兜底（绝不允许任务没落位）
     if (start === -1) start = findRun(slots, dayEnd, now);
     if (start === -1) {
-      start = findRun(slots, HARD_END, now);
-      if (start >= 21 * 60) t.flags = [...t.flags, "排到很晚了——今天太满，考虑顺延明天"];
+      start = findRun(slots, HARD_END, 6 * 60);   // 全天视角：白天漏掉的空隙也能用
+      if (start >= 21 * 60) t.flags = [...t.flags, "排到很晚了——想塞进白天空隙，用「🔄 重排今天」"];
     }
     if (start === -1) {
       const lastEnd = taken.length ? Math.max(...taken.map(([, be]) => be)) : now;
       start = Math.min(Math.max(Math.ceil(lastEnd / 30) * 30, now), 22 * 60);
-      t.flags = [...t.flags, "今天排满了——与现有安排并行完成"];
+      t.flags = [...t.flags, "今天真的满了——与现有安排并行，或用「🔄 重排今天」清模板再排"];
     }
     t.time = fmtMin(start);
     for (let i = 0; i < slots; i++) taken.push([start + i * 30, start + (i + 1) * 30]);

@@ -2323,7 +2323,8 @@ def rebuild_day(body: dict):
         return not any(s < be and bs < e for bs, be in taken)
 
     def place(n, lo, hi):
-        s = max(now, lo)
+        # lo 允许早于 now：重排是全天视角，现在之前的空隙照样能用
+        s = max(lo, 0)
         while s + n * 30 <= hi:
             if all(free(s + i * 30, s + i * 30 + 30) for i in range(n)):
                 for i in range(n):
@@ -2344,6 +2345,15 @@ def rebuild_day(body: dict):
         anchor = re.fullmatch(r"(\d{1,2}):(\d{2})", hint)
         if anchor:
             s = (int(anchor.group(1)) % 24) * 60 + int(anchor.group(2))
+            # 夜型作息钳制：LLM 给的 10:30 前锚点 = 用户说的"早上"，实际 10:30 才起床
+            if s < 10 * 60 + 30:
+                s = 10 * 60 + 30
+            # 锚定也可能互相撞（两个"晚上"）：找到该时段起最近的不撞位置
+            guard = 0
+            while guard < 24 and not all(free(s + i * 30, s + i * 30 + 30) for i in range(n)):
+                nxt = min((be for bs, be in taken if s < be and bs < s + 30), default=s + 30)
+                s = max(-(-nxt // 30) * 30, s + 30)
+                guard += 1
             for i in range(n):
                 taken.append((s + i * 30, s + i * 30 + 30))
             placed.append((t, s))
@@ -2358,7 +2368,7 @@ def rebuild_day(body: dict):
         if s == -1:
             s = place(n, now, DAY_END)
         if s == -1:
-            s = place(n, now, HARD_END)
+            s = place(n, 10 * 60 + 30, HARD_END)   # 全天视角再试（含上午）
         if s == -1:
             overflow.append(t)
             continue
@@ -2582,6 +2592,12 @@ def generate_today_plan(energy: float = 3, sleep: float = 7.0) -> dict:
         hw_text = "🥉 复习最近一节课的 slide，标出 3 个考点"
 
     # ── 课程日程 vs 非课程日程（夜型作息 10:30 起 / 00:00 睡 / 泳池 15:00 开门；吃饭不占任务位）──
+    # 🥇 商务块写真实事项（来自工作上下文 focus），不写笼统的「商务块」
+    def _biz(minutes: int, tomatoes: int) -> str:
+        f = (work_ctx.get("focus") or "").strip()
+        base = f[:36] if f else "原子公社商务推进"
+        return f"🥇 {base}（{minutes} 分钟 · 番茄钟 25×{tomatoes}）"
+
     if has_courses:
         # 每门课一条可勾选的出勤任务（勾选 = 确认上课 → 出勤积分）
         for cb in course_blocks:
@@ -2591,28 +2607,28 @@ def generate_today_plan(energy: float = 3, sleep: float = 7.0) -> dict:
 
         if _has_am and not _has_pm:
             # 周三型（2026-10-08 改课表后）：早课 09:15-12:05 + 晚课 18:00 → 下午完整，泳 15:00 场
-            _push("12:30–14:30", "🥇 原子公社商务块（120 分钟 · 番茄钟 25×4）", voc)
+            _push("12:30–14:30", _biz(120, 4), voc)
             _push("16:00–17:00", f"📖 换脑子读书 60 分钟：{book_show_text[:36] if book_show_text else '任意在读书'}", mind)
             _push("21:10–21:30", lang_20, mind)
             _push("21:35–22:20", "🥈 大号内容 · 发布工作台推进本周这篇", voc)
             _push("22:30–23:10", hw_text, voc)
         elif _has_am:
             # 周四/周五型：上午课 9:00-11:50 + 下午课 14:00-16:50 → 泳池 17:10 场
-            _push("12:10–13:40", "🥇 原子公社商务块（90 分钟 · 番茄钟 25×3）", voc)
+            _push("12:10–13:40", _biz(90, 3), voc)
             _push("20:10–20:30", lang_20, mind)
             _push("20:40–21:25", "🥈 大号内容 · 发布工作台推进本周这篇", voc)
             _push("21:35–22:20", hw_text, voc)
             _push("22:30–23:00", f"📖 睡前读书 30 分钟：{book_show_text[:36] if book_show_text else '任意在读书'}", mind)
         elif _has_pm:
-            # 周三型：下午课 13:30-16:20 + 晚课 18:00-20:50 → 商务块提到中午，泳 16:40 场
-            _push("11:30–13:00", "🥇 原子公社商务块（90 分钟）", voc)
+            # 周三旧型（现无下午课，保留兼容）：商务块提到中午
+            _push("11:30–13:00", _biz(90, 3), voc)
             _push("21:05–21:25", lang_20, mind)
             _push("21:30–22:15", "🥈 大号内容 · 发布工作台推进本周这篇", voc)
             _push("22:20–23:05", hw_text, voc)
         else:
             # 周一/周二型：仅晚课 18:00 → 白天完整，泳 15:00 开门场
             _push("10:30–11:30", "📵 晨间无手机：散步 20 分 → 整理房间 10 分 → 早午餐（手机别碰）", spirit)
-            _push("12:00–14:00", "🥇 原子公社商务块（120 分钟 · 番茄钟 25×4）", voc)
+            _push("12:00–14:00", _biz(120, 4), voc)
             _push("14:15–15:00", f"📖 犯困带换脑子 · {book_show_text[:42] if book_show_text else '任意在读书 40 分钟'}", mind)
             if not strength_time:
                 _push("16:00–17:00", f"🥈 {tier2_text}", voc)
@@ -3036,9 +3052,10 @@ TASK_PARSE_PROMPT = """你是 ADHD 用户的任务解析器。把一段口语化
 
 规则：
 1. 不依赖换行：按语义判断到底有几件事（"下午买咖啡顺便把论文初稿写了"= 2 件）
-2. duration_min 按真实工作量估：回复消息/取快递 15-30；常规作业/开会 30-60；写文章/做 PPT/写代码 60-120；大项目整块 120-240
+2. 同类小任务自动合并：同一对象/同场景的琐碎动作合并成一条（"回微信、回邮件、发消息"→"处理消息和邮件 30min"；"买菜做饭"→"做饭"），别拆成五个 15 分钟
+3. duration_min 按真实工作量估：回复消息/取快递 15-30；常规作业/开会 30-60；写文章/做 PPT/写代码 60-120；大项目整块 120-240
 3. priority：q1=今天必须或有明确截止；q2=重要不紧急；q3=琐事速办；q4=可选享受
-4. time_hint：需要动脑的难任务给 "focus"（排精力好的时段）；不用动脑的轻活给 "light"（犯困带也能做）；用户给了明确时间给 "HH:MM"；用户说了大致时段也给锚点（早上→"08:00" 上午→"10:30" 中午→"12:00" 下午→"14:00" 傍晚→"17:30" 晚上→"20:00"）；没说给 "any"
+4. time_hint：需要动脑的难任务给 "focus"（排精力好的时段）；不用动脑的轻活给 "light"（犯困带也能做）；用户给了明确时间给 "HH:MM"；用户说了大致时段也给锚点（早上/上午→"10:30" 中午→"12:00" 下午→"14:00" 傍晚→"17:30" 晚上→"20:00"）；没说给 "any"。注意：用户是夜型作息 10:30 起床，没有 8 点这种时刻
 5. text 洗掉所有时间表述和「顺便/然后」这类连接词，保留动作+对象，30 字以内
 6. 用户提到「截止今天/明天」→ priority=q1 且 text 里保留截止信息
 
@@ -3096,6 +3113,15 @@ def parse_tasks_llm(raw: str):
                     "time_hint": str(it.get("time_hint") or "any")[:8],
                 })
             tasks = [t for t in tasks if t["text"]]
+            # 兜底合并：≤30min 的 q3/q4 琐事 ≥3 条 → 合成一条"杂务"（避免碎成五六个 15 分钟）
+            small = [t for t in tasks if t["duration_min"] <= 30 and t["priority"] in ("q3", "q4")
+                     and t.get("time_hint") in ("any", "light")]
+            if len(small) >= 3:
+                keep = [t for t in tasks if t not in small]
+                merged = {"text": "杂务：" + "、".join(t["text"][:10] for t in small[:4]),
+                          "duration_min": min(60, sum(t["duration_min"] for t in small)),
+                          "priority": "q3", "time_hint": "light"}
+                tasks = keep + [merged]
             if tasks:
                 return {"ok": True, "mode": "llm", "tasks": tasks}
         except Exception as e:
