@@ -2552,11 +2552,8 @@ def generate_today_plan(energy: float = 3, sleep: float = 7.0) -> dict:
     if today_dl:
         dl_note = "📌 今日截止：" + "；".join(f"{d['item']}（{d['course']}）" for d in today_dl)
 
-    # ── 今日重点（用户 2026-10 问卷：第一梯队 = 原子公社商务 > 大号 > 课程作业）──
+    # ── 今日重点（2026-10-27 起：原子公社商务不再列 todo，自己做主；重点 = 大号 > 课程作业）──
     frogs = []
-    focus = work_ctx.get("focus", "")
-    if focus:
-        frogs.append(f"🥇 {focus[:40]}")
     dahao_stage = work_ctx.get("dahao_stage", "")
     if dahao_stage and dahao_stage not in ("", "选题"):
         stage_verbs = {"素材": "收集素材", "草稿": "写草稿", "修改": "修改现有草稿",
@@ -2631,12 +2628,6 @@ def generate_today_plan(energy: float = 3, sleep: float = 7.0) -> dict:
         hw_text = "🥉 复习最近一节课的 slide，标出 3 个考点"
 
     # ── 课程日程 vs 非课程日程（夜型作息 10:30 起 / 00:00 睡 / 泳池 15:00 开门；吃饭不占任务位）──
-    # 🥇 商务块写真实事项（来自工作上下文 focus），不写笼统的「商务块」
-    def _biz(minutes: int, tomatoes: int) -> str:
-        f = (work_ctx.get("focus") or "").strip()
-        base = f[:36] if f else "原子公社商务推进"
-        return f"🥇 {base}（{minutes} 分钟 · 番茄钟 25×{tomatoes}）"
-
     if has_courses:
         # 每门课一条可勾选的出勤任务（勾选 = 确认上课 → 出勤积分）
         for cb in course_blocks:
@@ -2646,28 +2637,24 @@ def generate_today_plan(energy: float = 3, sleep: float = 7.0) -> dict:
 
         if _has_am and not _has_pm:
             # 周三型（2026-10-08 改课表后）：早课 09:15-12:05 + 晚课 18:00 → 下午完整，泳 15:00 场
-            _push("12:30–14:30", _biz(120, 4), voc)
             _push("16:00–17:00", f"📖 换脑子读书 60 分钟：{book_show_text[:36] if book_show_text else '任意在读书'}", mind)
             _push("21:10–21:30", lang_20, mind)
             _push("21:35–22:20", "🥈 大号内容 · 发布工作台推进本周这篇", voc)
             _push("22:30–23:10", hw_text, voc)
         elif _has_am:
             # 周四/周五型：上午课 9:00-11:50 + 下午课 14:00-16:50 → 泳池 17:10 场
-            _push("12:10–13:40", _biz(90, 3), voc)
             _push("20:10–20:30", lang_20, mind)
             _push("20:40–21:25", "🥈 大号内容 · 发布工作台推进本周这篇", voc)
             _push("21:35–22:20", hw_text, voc)
             _push("22:30–23:00", f"📖 睡前读书 30 分钟：{book_show_text[:36] if book_show_text else '任意在读书'}", mind)
         elif _has_pm:
             # 周三旧型（现无下午课，保留兼容）：商务块提到中午
-            _push("11:30–13:00", _biz(90, 3), voc)
             _push("21:05–21:25", lang_20, mind)
             _push("21:30–22:15", "🥈 大号内容 · 发布工作台推进本周这篇", voc)
             _push("22:20–23:05", hw_text, voc)
         else:
             # 周一/周二型：仅晚课 18:00 → 白天完整，泳 15:00 开门场
             _push("10:30–11:30", "📵 晨间无手机：散步 20 分 → 整理房间 10 分 → 早午餐（手机别碰）", spirit)
-            _push("12:00–14:00", _biz(120, 4), voc)
             _push("14:15–15:00", f"📖 犯困带换脑子 · {book_show_text[:42] if book_show_text else '任意在读书 40 分钟'}", mind)
             if not strength_time:
                 _push("16:00–17:00", f"🥈 {tier2_text}", voc)
