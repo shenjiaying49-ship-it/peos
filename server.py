@@ -2371,12 +2371,16 @@ def rebuild_day(body: dict):
             # 夜型作息钳制：LLM 给的 10:30 前锚点 = 用户说的"早上"，实际 10:30 才起床
             if s < 10 * 60 + 30:
                 s = 10 * 60 + 30
-            # 锚定也可能互相撞（两个"晚上"）：找到该时段起最近的不撞位置
+            # 锚定也可能互相撞（两个"晚上"）：找到该时段起最近的不撞位置；
+            # 上限 23:00——撞出天际就放弃锚定改走自动排（防 25:00/28:00 幻影时间）
             guard = 0
             while guard < 24 and not all(free(s + i * 30, s + i * 30 + 30) for i in range(n)):
                 nxt = min((be for bs, be in taken if s < be and bs < s + 30), default=s + 30)
                 s = max(-(-nxt // 30) * 30, s + 30)
                 guard += 1
+            if s + n * 30 > HARD_END:      # 锚定失败 → 改走自动排（q1 先、focus 窗口）
+                tasks.append(t)
+                continue
             for i in range(n):
                 taken.append((s + i * 30, s + i * 30 + 30))
             placed.append((t, s))
@@ -3072,6 +3076,7 @@ def call_llm(cfg: dict, api_key: str, question: str, ctx: str) -> str:
 def agent_answer(question: str, st: dict):
     api_key, cfg = _llm_key()
     ctx = agent_context(st)
+    err = ""
     if api_key and cfg.get("api_base"):
         try:
             return {"mode": "llm", "answer": call_llm(cfg, api_key, question, ctx)}
