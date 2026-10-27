@@ -2292,17 +2292,34 @@ def rebuild_day(body: dict):
     if not p.exists():
         generate_today_plan()
 
-    # ① 清场：非 📍 任务行删除；总览主表只留课程行和表头
+    # ① 清场：只清「模板生成」的任务，用户手动/AI 录入的保留。
+    #    模板特征：含固定短语（商务块/晨间无手机/犯困带/睡前读书/语言/三问/第二梯队/无有氧/散步或泡沫轴）
+    TEMPLATE_PAT = ("商务", "晨间无手机", "犯困带", "睡前读书", "换脑子读书",
+                    "语言", "三问", "第二梯队", "海外运营学习", "大号内容 · 发布工作台",
+                    "今日无有氧", "散步或泡沫轴", "模板")
     course_codes = {c["code"] for c in load_courses().get("courses", [])}
+
+    def _is_template(s: str) -> bool:
+        if "📍" in s:                      # 课程出勤永远保留
+            return False
+        body = TASK_RE.sub(lambda m: m.group(2), s.strip(), count=1)
+        return any(k in body for k in TEMPLATE_PAT)
+
     lines = read(p).split("\n")
+    kept_tasks = []                        # 保留的用户任务（重排时避让）
     cleaned = []
     for line in lines:
         s = line.strip()
-        if TASK_RE.match(s) and "📍" not in s:
+        if TASK_RE.match(s):
+            if _is_template(s):
+                continue
+            kept_tasks.append(s)           # 用户任务：从 checkbox 区拿走，重排后统一让 AI 结果避开它
             continue
         if s.startswith("|") and not set(s) <= {"|", "-", " "}:
             first = s.strip("|").split("|")[0].strip()
-            if first not in course_codes and first != "块":
+            body_txt = s
+            if first not in course_codes and first != "块" and not any(k in body_txt for k in TEMPLATE_PAT):
+                # 自定义表行：若是保留任务的镜像行先记下，稍后重建
                 continue
         cleaned.append(line)
     p.write_text("\n".join(cleaned), encoding="utf-8")
@@ -2315,6 +2332,12 @@ def rebuild_day(body: dict):
         return f"{m_ // 60:02d}:{m_ % 60:02d}"
     blocks = today_course_blocks(d)
     taken = [(_hm(b["start"]), _hm(b["end"])) for b in blocks]
+    # 用户已有任务占位（保留不动，AI 新排的避开它们）
+    import re as _re
+    for kt in kept_tasks:
+        mm = _re.match(r"- \[.\]\s*(\d{2}:\d{2})[–—-](\d{2}:\d{2})", kt)
+        if mm:
+            taken.append((_hm(mm.group(1)), _hm(mm.group(2))))
     now = _today() == d and (dt.datetime.now().hour * 60 + dt.datetime.now().minute) or 0
     now = -(-now // 30) * 30   # 上取整到半点
     DAY_END, HARD_END = 22 * 60, 23 * 60
@@ -2368,7 +2391,7 @@ def rebuild_day(body: dict):
         if s == -1:
             s = place(n, now, DAY_END)
         if s == -1:
-            s = place(n, 10 * 60 + 30, HARD_END)   # 全天视角再试（含上午）
+            s = place(n, 10 * 60 + 30, DAY_END)   # 全天视角再试（含上午；不越过 22:00 收尾带）
         if s == -1:
             overflow.append(t)
             continue
@@ -2385,9 +2408,21 @@ def rebuild_day(body: dict):
                        "text": txt, "quad": quad})
         out.append({"text": t["text"], "time": f"{_fmt(s)}–{_fmt(s + t['duration_min'])}",
                     "ok": rr.get("ok", False)})
+    # ④ 用户保留任务写回 checkbox 区（时间不变）
+    if kept_tasks:
+        lines2 = read(p).split("\n")
+        try:
+            si = next(i for i, l in enumerate(lines2) if l.strip() == "## 🚀 事业 Vocation")
+            lines2[si + 2:si + 2] = kept_tasks
+        except StopIteration:
+            lines2 += ["", "## 🚀 事业 Vocation", "", *kept_tasks]
+        p.write_text("\n".join(lines2), encoding="utf-8")
+
     return {"ok": True, "mode": r.get("mode"), "placed": out,
+            "kept": len(kept_tasks),
             "overflow": [t["text"] for t in overflow],
-            "note": "模板任务已清，按你说的重排完" if not overflow else f"{len(overflow)} 件今天塞不下"}
+            "note": (f"模板已清、你之前录的 {len(kept_tasks)} 件保留" if kept_tasks else "模板任务已清") +
+                    (f"；{len(overflow)} 件今天塞不下" if overflow else "，按你说的重排完")}
 
 
 def generate_today_plan(energy: float = 3, sleep: float = 7.0) -> dict:

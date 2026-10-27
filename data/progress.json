@@ -1,33 +1,6 @@
 {
  "items": [
   {
-   "id": "20261025200150",
-   "kind": "book",
-   "title": "[AI] 为什么伟大不能被计划 · Kenneth Stanley",
-   "current": 0,
-   "total": 1,
-   "date": "2026-10-25",
-   "daily_target": 10
-  },
-  {
-   "id": "20261019150842",
-   "kind": "book",
-   "title": "[AI] 为什么伟大不能被计划 · Kenneth Stanley",
-   "current": 0,
-   "total": 1,
-   "date": "2026-10-19",
-   "daily_target": 10
-  },
-  {
-   "id": "20261018224450",
-   "kind": "book",
-   "title": "[社科] 中国小说史略 · 鲁迅",
-   "current": 0,
-   "total": 1,
-   "date": "2026-10-18",
-   "daily_target": 10
-  },
-  {
    "id": "20260924210915",
    "kind": "book",
    "title": "[小说] 大地上我们转瞬即逝的绚烂 · 王鸥行",
