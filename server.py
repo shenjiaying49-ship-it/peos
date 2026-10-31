@@ -2535,9 +2535,17 @@ def generate_today_plan(energy: float = 3, sleep: float = 7.0) -> dict:
             else:
                 sport_time = f"{_fmt(earliest)}–{_fmt(earliest + 45)}"
 
-    # 力量（周一/四）：排在游泳后 15 分钟；若与晚课冲突则压到游泳前
+    # 力量（周一/四）：排在游泳后 15 分钟；若与晚课冲突则压到游泳前；姨妈期豁免
     strength_time = None
-    if is_strength_day and today_strength and sport_time and "灵活" not in sport_time:
+    _per = CONFIG.get("period", {})
+    _period_ok = True
+    if _per.get("start"):
+        try:
+            _ps = dt.date.fromisoformat(_per["start"])
+            _period_ok = not (_ps <= _today() <= _ps + dt.timedelta(days=int(_per.get("days", 7)) - 1))
+        except ValueError:
+            pass
+    if is_strength_day and today_strength and sport_time and "灵活" not in sport_time and _period_ok:
         s0 = _hm(sport_time.split("–")[0])
         after_swim = s0 + 45 + 15
         if not _has_ev or after_swim + 75 <= min(s for s, _ in _bus if s >= 17 * 60) - 15:
@@ -2681,8 +2689,20 @@ def generate_today_plan(energy: float = 3, sleep: float = 7.0) -> dict:
         _push("20:40–21:40", hw_text, voc)
         _push("23:40–23:45", "睡前三问 + 体重 / 支出 · 00:00 睡", spirit)
 
+    # 姨妈期豁免：period 日期内游泳/力量自动降级为轻恢复
+    _per = CONFIG.get("period", {})
+    _in_period = False
+    if _per.get("start"):
+        try:
+            _ps = dt.date.fromisoformat(_per["start"])
+            _in_period = _ps <= _today() <= _ps + dt.timedelta(days=int(_per.get("days", 7)) - 1)
+        except ValueError:
+            pass
+
     # 运动任务插入（只插一次；低精力档删运动）
-    if sport_task and sport_time and not low:
+    if _in_period:
+        body.append(("17:00–17:30", "🩸 姨妈期恢复：散步 20 分钟或轻拉伸（游泳暂停，别硬练）"))
+    elif sport_task and sport_time and not low:
         body.append((sport_time, f"{sport_task} · 本周第 {nth}/{total_sport} 次"))
     elif not low and not sport_task and not is_strength_day:
         body.append(("17:00–17:30", "今日无有氧：散步或泡沫轴 20 分钟"))
