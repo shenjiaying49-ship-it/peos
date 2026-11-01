@@ -2711,6 +2711,10 @@ def generate_today_plan(energy: float = 3, sleep: float = 7.0) -> dict:
     if _today().weekday() == 5 and not low:
         spirit.append(("22:00–22:30", "🎙️ 深度对话 30 分钟：问一个真人「最近在思考什么」"))
 
+    # 每周日：故事语料库 15 分钟维护（饭局反思落地：storytelling 是 BD 核心武器）
+    if _today().weekday() == 6 and not low:
+        voc.append(("21:00–21:15", "🎤 故事语料库 15 分钟：本周素材起草一条 / 用过的故事标注反馈（vault·我的故事语料库）"))
+
     # ── 去重兜底：同分区同文本只保留第一条（防双重插入回归）──
     def _dedupe(bucket):
         seen, out = set(), []
